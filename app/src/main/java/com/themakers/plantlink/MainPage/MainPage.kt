@@ -5,22 +5,21 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.Card
+import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.Card
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -49,8 +48,6 @@ fun MainPage(
 ) {
     val lazyListState = rememberLazyListState()
 
-
-
     Scaffold(
         //backgroundColor = MaterialTheme.colorScheme.background,
         topBar = {
@@ -68,34 +65,29 @@ fun MainPage(
                             .fillMaxWidth()
                             .padding(0.dp, 0.dp, 50.dp, 0.dp),
                     )
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+                            Toast.makeText(
+                                context,
+                                "Bluetooth",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_bluetooth_24),
+                            contentDescription = "Bluetooth",
+                            tint = Color.Black,
+                            modifier = Modifier
+                                .size(40.dp)
+                        )
+                    }
                 }
             )
 
-            Row(// Place favorite button on top right of image for card
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                IconButton(
-                    onClick = {
-                        Toast.makeText(
-                            context,
-                            "Bluetooth",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                    ) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_bluetooth_24),
-                        contentDescription = "Bluetooth",
-                        tint = Color.Black,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .align(Alignment.CenterVertically)
-                    )
-                }
-            }
+
         },
         bottomBar = {
             NavigationBar(
@@ -175,6 +167,18 @@ fun MainPage(
             }
         }
     ) { padding ->
+        Column (
+            verticalArrangement = Arrangement.Bottom,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.baseline_grass_24), // TEMPORARY
+                contentDescription = "Big Plant",
+                tint = Color(61, 168, 44),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        //Spacer(modifier = Modifier.height(30.dp))
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
@@ -184,36 +188,6 @@ fun MainPage(
             state = lazyListState
         ) {
             item {
-                Text(
-                    text = "2",
-                    color = Color(0, 0, 0, 255)
-                )
-            }
-
-            item {
-                Button(
-                    onClick = {  },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(15.dp),
-                    shape = MaterialTheme.shapes.medium,
-                    //backgroundColor = MaterialTheme.colorScheme.background,
-                    //contentColor = MaterialTheme.colorScheme.secondary
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0, 0, 0, 255),
-                        contentColor = Color(0, 0, 0, 255),
-                    )
-                ) {
-                    Text(
-                        text = "Change Text Font",
-                        modifier = Modifier
-                            .padding(15.dp),
-                        fontSize = (20.sp)
-                    )
-                }
-            }
-
-            item {
                 Card (
                     shape = MaterialTheme.shapes.medium,
                     backgroundColor = MaterialTheme.colorScheme.background,
@@ -222,18 +196,110 @@ fun MainPage(
                         .padding(15.dp)
                         .fillMaxWidth()
                 ) {
-                    Column {
-                        Row {
-                            Icon(
-                                painter = painterResource(R.drawable.baseline_device_thermostat_24),
-                                contentDescription = "Temperature"
-                            )
+                    Row (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_device_thermostat_24),
+                            contentDescription = "Temperature",
+                            tint = Color.Black,
+                            modifier = Modifier
+                                .size(30.dp)
+                        )
+                        Text(
+                            text = "Temperature",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Left,
+                            fontSize = 20.sp
+                        )
+                        Text(
+                            text = "74° F ",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontSize = 30.sp
+                        )
+                    }
+                }
 
-                            Text(
-                                text = "2",
-                                color = Color(0, 0, 0, 255)
-                            )
-                        }
+                Spacer(modifier = Modifier.height(150.dp))
+                
+                Card (
+                    shape = MaterialTheme.shapes.medium,
+                    backgroundColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier
+                        .padding(15.dp)
+                        .fillMaxWidth()
+                ) {
+                    Row (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.sharp_humidity_percentage_24),
+                            contentDescription = "Humidity",
+                            tint = Color.Black,
+                            modifier = Modifier
+                                .size(30.dp)
+                        )
+                        Text(
+                            text = "Humidity",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Left,
+                            fontSize = 20.sp
+                        )
+                        Text(
+                            text = "34.7 RH ",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontSize = 30.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(150.dp))
+
+                Card (
+                    shape = MaterialTheme.shapes.medium,
+                    backgroundColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier
+                        .padding(15.dp)
+                        .fillMaxWidth()
+                ) {
+                    Row (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_water_drop_24),
+                            contentDescription = "Soil Moisture",
+                            tint = Color.Black,
+                            modifier = Modifier
+                                .size(30.dp)
+                        )
+                        Text(
+                            text = "Soil Moisture",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Left,
+                            fontSize = 20.sp
+                        )
+                        Text(
+                            text = "880 ",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontSize = 30.sp
+                        )
                     }
                 }
             }
