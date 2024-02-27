@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.AccountCircle
@@ -46,9 +47,6 @@ fun MainPage(
 ) {
     val scope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
-    var searchText by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue("", TextRange(0, 7)))
-    }
 
     var selectedItemIndex by rememberSaveable {
         mutableIntStateOf(0)
@@ -118,19 +116,19 @@ fun MainPage(
                     ),
                     selected = false,
                     onClick = {
-                        navController.navigate("sign_in")
+                        navController.navigate("settings")
                     },
                     label = {
                         Text(
-                            text = "Profile",
+                            text = "Settings",
                             color = MaterialTheme.colorScheme.secondary,
                             fontSize = 15.sp
                         )
                     },
                     icon = {
                         Icon(
-                            imageVector = Icons.Outlined.AccountCircle,
-                            contentDescription = "Profile"
+                            imageVector = Icons.Outlined.Settings,
+                            contentDescription = "Settings"
                         )
                     }
                 )
@@ -153,32 +151,8 @@ fun MainPage(
                     },
                     icon = {
                         Icon(
-                            imageVector = Icons.Default.FavoriteBorder,
+                            imageVector = Icons.Default.DateRange,
                             contentDescription = "Favorites"
-                        )
-                    }
-                )
-                NavigationBarItem(
-                    colors = NavigationBarItemDefaults.colors(
-                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                        selectedIconColor = MaterialTheme.colorScheme.secondary,
-                        indicatorColor = MaterialTheme.colorScheme.background
-                    ),
-                    selected = false,
-                    onClick = {
-                        navController.navigate("settingsPage")
-                    },
-                    label = {
-                        Text(
-                            text = "Settings",
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 15.sp
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Outlined.Settings,
-                            contentDescription = "Settings"
                         )
                     }
                 )
