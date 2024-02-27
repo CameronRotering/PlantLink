@@ -1,12 +1,10 @@
-package com.themakers.plantlink.MainPage
+package com.themakers.plantlink.HistoryPage
 
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -16,8 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.Card
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,7 +39,7 @@ import com.themakers.plantlink.R
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun MainPage(
+fun HistoryPage(
     context: Context,
     navController: NavHostController
 ) {
@@ -61,7 +57,7 @@ fun MainPage(
                 ),
                 title = {
                     Text(
-                        text = "Home",
+                        text = "History",
                         color = MaterialTheme.colorScheme.secondary,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
@@ -85,7 +81,7 @@ fun MainPage(
                             Toast.LENGTH_LONG
                         ).show()
                     }
-                    ) {
+                ) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_bluetooth_24),
                         contentDescription = "Bluetooth",
@@ -108,8 +104,10 @@ fun MainPage(
                         selectedIconColor = Color(0, 0, 0, 255),
                         indicatorColor = MaterialTheme.colorScheme.background
                     ),
-                    selected = true,
-                    onClick = {},
+                    selected = false,
+                    onClick = {
+                        navController.navigate("Home")
+                    },
                     label = {
                         Text(
                             text = "Home",
@@ -127,12 +125,12 @@ fun MainPage(
                 NavigationBarItem(
                     colors = NavigationBarItemDefaults.colors(
                         unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                        selectedIconColor = MaterialTheme.colorScheme.secondary,
+                        selectedIconColor = Color(0, 0, 0, 255),
                         indicatorColor = MaterialTheme.colorScheme.background
                     ),
                     selected = false,
                     onClick = {
-                        navController.navigate("settings")
+                        navController.navigate("Settings")
                     },
                     label = {
                         Text(
@@ -151,13 +149,11 @@ fun MainPage(
                 NavigationBarItem(
                     colors = NavigationBarItemDefaults.colors(
                         unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                        selectedIconColor = MaterialTheme.colorScheme.secondary,
+                        selectedIconColor = Color(0, 0, 0, 255),
                         indicatorColor = MaterialTheme.colorScheme.background
                     ),
-                    selected = false,
-                    onClick = {
-                        navController.navigate("history")
-                    },
+                    selected = true,
+                    onClick = {},
                     label = {
                         Text(
                             text = "History",
@@ -174,67 +170,18 @@ fun MainPage(
                 )
             }
         }
-    ) { padding ->
+    ) { values ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = padding,
+            contentPadding = values,
             state = lazyListState
         ) {
-            item {
-                Text(
-                    text = "2",
-                    color = Color(0, 0, 0, 255)
-                )
-            }
-
-            item {
-                Button(
-                    onClick = {  },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(15.dp),
-                    shape = MaterialTheme.shapes.medium,
-                    //backgroundColor = MaterialTheme.colorScheme.background,
-                    //contentColor = MaterialTheme.colorScheme.secondary
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0, 0, 0, 255),
-                        contentColor = Color(0, 0, 0, 255),
-                    )
-                ) {
-                    Text(
-                        text = "Change Text Font",
-                        modifier = Modifier
-                            .padding(15.dp),
-                        fontSize = (20.sp)
-                    )
-                }
-            }
-
             item {
                 Card (
                     shape = MaterialTheme.shapes.medium,
                     backgroundColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier
-                        .padding(15.dp)
-                        .fillMaxWidth()
+                    contentColor = MaterialTheme.colorScheme.secondary
                 ) {
-                    Column {
-                        Row {
-                            Icon(
-                                painter = painterResource(R.drawable.baseline_device_thermostat_24),
-                                contentDescription = "Temperature"
-                            )
 
-                            Text(
-                                text = "2",
-                                color = Color(0, 0, 0, 255)
-                            )
-                        }
-                    }
                 }
             }
         }

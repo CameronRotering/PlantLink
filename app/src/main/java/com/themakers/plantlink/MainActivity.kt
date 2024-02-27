@@ -10,7 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.themakers.plantlink.HistoryPage.HistoryPage
 import com.themakers.plantlink.MainPage.MainPage
+import com.themakers.plantlink.SettingsPage.SettingsPage
 import com.themakers.plantlink.ui.theme.PlantLInkTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,31 +24,32 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val navController = rememberNavController();
+                    val navController = rememberNavController()
 
                     NavHost(
                         navController = navController,
-                        startDestination = "mainPage"
+                        startDestination = "Home"
                     ) {
-                        composable("mainPage") {
+                        composable("Home") {
                             MainPage(
                                 context = applicationContext,
                                 navController = navController
                             )
                         }
 
-                        //composable("favoritesPage") {
-                        //    FavoritesPage(
-                        //        navController = navController,
-                        //        context = applicationContext
-                        //    )
-                        //}
-//
-                        //composable("settingsPage") {
-                        //    SettingsPage(
-                        //        context = applicationContext
-                        //    )
-                        //}
+                        composable("Settings") {
+                            SettingsPage(
+                                navController = navController,
+                                context = applicationContext
+                            )
+                        }
+
+                        composable("History") {
+                            HistoryPage(
+                                navController = navController,
+                                context = applicationContext
+                            )
+                        }
                     }
                 }
             }
