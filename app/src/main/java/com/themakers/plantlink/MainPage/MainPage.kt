@@ -172,10 +172,12 @@ fun MainPage(
             modifier = Modifier.fillMaxSize()
         ) {
             Icon(
-                painter = painterResource(R.drawable.baseline_grass_24), // TEMPORARY
+                painter = painterResource(R.drawable.sharp_psychiatry_24),
                 contentDescription = "Big Plant",
                 tint = Color(61, 168, 44),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(500.dp)
             )
         }
         //Spacer(modifier = Modifier.height(30.dp))
