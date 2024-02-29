@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.themakers.plantlink"
-        minSdk = 29
+        minSdk = 31
         //noinspection EditedTargetSdkVersion
         targetSdk = 34
         versionCode = 1

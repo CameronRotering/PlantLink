@@ -1,7 +1,8 @@
 package com.themakers.plantlink.MainPage
 
+import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.widget.Toast
+import android.os.Handler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,13 +39,37 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.themakers.plantlink.Bluetooth.ConnectThread
+import com.themakers.plantlink.Bluetooth.ConnectedThread
 import com.themakers.plantlink.R
+import java.util.UUID
+
+var connectBluetooth: ConnectThread? = null
+private val bluetoothModule: BluetoothDevice? = null
+private var connectedBluetooth: ConnectedThread? = null
+private val uuid: UUID? = null
+var handler: Handler? = null
+
+
+fun readSensors(context: Context) {
+    if (connectBluetooth == null) { // Not connected
+        connectBluetooth = ConnectThread(bluetoothModule!!, uuid!!, handler!!, context)
+        connectBluetooth!!.run()
+    }
+
+    if (connectBluetooth!!.getSocket()?.isConnected == true) {
+        if (connectedBluetooth == null) {
+            connectedBluetooth = ConnectedThread(connectBluetooth!!.getSocket()!!)
+        }
+        print(connectedBluetooth?.read())
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun MainPage(
     context: Context,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     val lazyListState = rememberLazyListState()
 
@@ -69,11 +94,7 @@ fun MainPage(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            Toast.makeText(
-                                context,
-                                "Bluetooth",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            navController.navigate("BluetoothConnect")
                         }
                     ) {
                         Icon(
@@ -180,7 +201,6 @@ fun MainPage(
                     .height(500.dp)
             )
         }
-        //Spacer(modifier = Modifier.height(30.dp))
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
@@ -227,7 +247,7 @@ fun MainPage(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(150.dp))
+                Spacer(modifier = Modifier.height(50.dp))
                 
                 Card (
                     shape = MaterialTheme.shapes.medium,
@@ -266,7 +286,7 @@ fun MainPage(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(150.dp))
+                Spacer(modifier = Modifier.height(50.dp))
 
                 Card (
                     shape = MaterialTheme.shapes.medium,

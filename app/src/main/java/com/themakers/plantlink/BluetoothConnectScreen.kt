@@ -1,16 +1,23 @@
-package com.themakers.plantlink.HistoryPage
+package com.themakers.plantlink
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.Button
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
@@ -27,19 +34,23 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.themakers.plantlink.R
+import com.themakers.plantlink.Bluetooth.BluetoothDevice
+import com.themakers.plantlink.Bluetooth.BluetoothUiState
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HistoryPage(
+fun BluetoothConnectScreen(
+    state: BluetoothUiState,
+    onStartScan: () -> Unit,
+    onStopScan: () -> Unit,
     context: Context,
     navController: NavHostController
 ) {
@@ -161,8 +172,9 @@ fun HistoryPage(
                 )
             }
         }
-    ) { padding ->
-        Column (
+    ) {padding ->
+        Spacer(modifier = Modifier.padding(padding))
+        Column(
             verticalArrangement = Arrangement.Bottom,
             modifier = Modifier.fillMaxSize()
         ) {
@@ -175,19 +187,97 @@ fun HistoryPage(
                     .height(500.dp)
             )
         }
-        LazyColumn(
-            contentPadding = padding,
-            state = lazyListState
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            item {
-                Card (
-                    shape = MaterialTheme.shapes.medium,
-                    backgroundColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.secondary
-                ) {
 
+            BluetoothDeviceList(
+                pairedDevices = state.pairedDevices,
+                scannedDevices = state.scannedDevices,
+                onClick = {},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .width(20.dp),
+                lazyListState = lazyListState
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                Button(onClick = onStartScan) {
+                    Text(text = "Start Scan")
+                }
+
+                Button(onClick = onStopScan) {
+                    Text(text = "Stop Scan")
                 }
             }
+
+
+            Card(
+                shape = MaterialTheme.shapes.medium,
+                backgroundColor = MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.secondary
+            ) {
+
+            }
+        }
+    }
+}
+
+
+@Composable
+fun BluetoothDeviceList(
+    pairedDevices: List<BluetoothDevice>,
+    scannedDevices: List<BluetoothDevice>,
+    onClick: (BluetoothDevice) -> Unit,
+    modifier: Modifier = Modifier,
+    lazyListState: LazyListState
+) {
+    LazyColumn(
+        modifier = modifier,
+        state = lazyListState
+    ) {
+        item {
+            Text(
+                text = "Paired Devices",
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+
+        items(pairedDevices) { device ->
+            Text(
+                text = device.name ?: device.address!!,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onClick(device) }
+                    .padding(16.dp)
+            )
+
+        }
+
+
+        item {
+            Text(
+                text = "Scanned Devices",
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+
+        items(scannedDevices) { device ->
+            Text(
+                text = device.name ?: device.address!!,//"(No Name)",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onClick(device) }
+                    .padding(16.dp)
+            )
+
         }
     }
 }
