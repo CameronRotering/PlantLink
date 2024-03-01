@@ -2,12 +2,10 @@ package com.themakers.plantlink
 
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,7 +24,6 @@ import com.themakers.plantlink.MainPage.MainPage
 import com.themakers.plantlink.SettingsPage.SettingsPage
 import com.themakers.plantlink.data.AndroidBluetoothController
 import com.themakers.plantlink.ui.theme.PlantLInkTheme
-import java.util.UUID
 
 class MainActivity : ComponentActivity() {
 
@@ -40,18 +37,19 @@ class MainActivity : ComponentActivity() {
     private val isBluetoothEnabled: Boolean
         get() = bluetoothAdapter?.isEnabled == true
 
+    var viewModel: BluetoothViewModel? = null
+
 
     private val TAG: String = "PlantLinkLogs"
     private val REQUEST_ENABLE_BT: Int = 1
     // We will use handler to get the BT connection status
-    val handler: Handler? = null
     private val ERROR_READ: Int = 0
-    private val arduinoBTModule: BluetoothDevice? = null
-    private val arduinoUUID: UUID = UUID.randomUUID()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        var plantViewModel = PlantDataViewModel()
 
         val enableBluetoothLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -88,8 +86,8 @@ class MainActivity : ComponentActivity() {
             var bluetoothAdapter: BluetoothAdapter = bluetoothManager.adapter
 
             PlantLInkTheme {
-                val viewModel = BluetoothViewModel(AndroidBluetoothController(applicationContext))
-                val state by viewModel.state.collectAsState()
+                viewModel = BluetoothViewModel(AndroidBluetoothController(applicationContext))
+                val state by viewModel!!.state.collectAsState()
                 
 
                 Surface(
@@ -105,7 +103,9 @@ class MainActivity : ComponentActivity() {
                         composable("Home") {
                             MainPage(
                                 context = applicationContext,
-                                navController = navController
+                                navController = navController,
+                                viewModel = viewModel!!,
+                                plantViewModel = plantViewModel
                             )
                         }
 
@@ -126,15 +126,22 @@ class MainActivity : ComponentActivity() {
                         composable("BluetoothConnect") {
                             BluetoothConnectScreen(
                                 state = state,
-                                onStartScan = viewModel::startScan,
-                                onStopScan = viewModel::stopScan,
+                                onStartScan = viewModel!!::startScan,
+                                onStopScan = viewModel!!::stopScan,
                                 context = applicationContext,
-                                navController = navController
+                                navController = navController,
+                                viewModel = viewModel!!,
+                                plantViewModel = plantViewModel
                             )
                         }
                     }
                 }
             }
         }
+    }
+
+    override fun onStop() { // When out of application, disconnect from bluetooth (Just in case they keep app on for a long time). Might not even be doing but be safe
+        viewModel?.connectedThread?.cancel()
+        super.onStop()
     }
 }

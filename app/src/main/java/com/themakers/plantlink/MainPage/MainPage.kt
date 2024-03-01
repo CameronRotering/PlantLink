@@ -1,8 +1,8 @@
 package com.themakers.plantlink.MainPage
 
-import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.os.Handler
+import android.os.Looper
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,42 +39,32 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.Bluetooth.ConnectThread
-import com.themakers.plantlink.Bluetooth.ConnectedThread
+import com.themakers.plantlink.PlantDataViewModel
 import com.themakers.plantlink.R
-import java.util.UUID
 
 var connectBluetooth: ConnectThread? = null
-private val bluetoothModule: BluetoothDevice? = null
-private var connectedBluetooth: ConnectedThread? = null
-private val uuid: UUID? = null
-var handler: Handler? = null
+var handler: Handler = Handler(Looper.getMainLooper())
+var runnable: Runnable? = null
+var loopTime: Long = 5000
 
-
-fun readSensors(context: Context) {
-    if (connectBluetooth == null) { // Not connected
-        connectBluetooth = ConnectThread(bluetoothModule!!, uuid!!, handler!!, context)
-        connectBluetooth!!.run()
-    }
-
-    if (connectBluetooth!!.getSocket()?.isConnected == true) {
-        if (connectedBluetooth == null) {
-            connectedBluetooth = ConnectedThread(connectBluetooth!!.getSocket()!!)
-        }
-        print(connectedBluetooth?.read())
-    }
+fun readSensors(viewModel: BluetoothViewModel) {
+    viewModel.connectedThread?.read()
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun MainPage(
     context: Context,
     navController: NavHostController,
+    viewModel: BluetoothViewModel,
+    plantViewModel: PlantDataViewModel
 ) {
     val lazyListState = rememberLazyListState()
 
     Scaffold(
-        //backgroundColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -122,7 +112,18 @@ fun MainPage(
                         indicatorColor = MaterialTheme.colorScheme.background
                     ),
                     selected = true,
-                    onClick = {},
+                    onClick = {
+                        handler.postDelayed(Runnable {
+                            handler.postDelayed(runnable!!, loopTime)
+                            readSensors(viewModel)
+                        }.also { runnable = it }, loopTime)
+
+                        //while (viewModel.connectedThread != null) {
+                        //    readSensors(viewModel)
+//
+                        //    Thread.sleep(1000)
+                        //}
+                    },
                     label = {
                         Text(
                             text = "Home",
@@ -238,7 +239,7 @@ fun MainPage(
                             fontSize = 20.sp
                         )
                         Text(
-                            text = "74° F ",
+                            text = plantViewModel.temperatureF.toString() + "° F ",//"74° F ",
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Right,
                             modifier = Modifier.fillMaxWidth(),
@@ -277,7 +278,7 @@ fun MainPage(
                             fontSize = 20.sp
                         )
                         Text(
-                            text = "34.7 RH ",
+                            text = plantViewModel.humidity.toString() + " RH ",//"34.7 RH ",
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Right,
                             modifier = Modifier.fillMaxWidth(),
@@ -316,7 +317,7 @@ fun MainPage(
                             fontSize = 20.sp
                         )
                         Text(
-                            text = "880 ",
+                            text = plantViewModel.moisture.toString() + " ",//"880 ",
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Right,
                             modifier = Modifier.fillMaxWidth(),

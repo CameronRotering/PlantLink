@@ -1,18 +1,18 @@
 package com.themakers.plantlink
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -21,7 +21,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,7 +43,27 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.themakers.plantlink.Bluetooth.BluetoothDevice
 import com.themakers.plantlink.Bluetooth.BluetoothUiState
+import com.themakers.plantlink.Bluetooth.BluetoothViewModel
+import com.themakers.plantlink.Bluetooth.ConnectThread
+import com.themakers.plantlink.Bluetooth.ConnectedThread
+import com.themakers.plantlink.MainPage.connectBluetooth
 
+fun connectBluetoothDevice(context: Context, viewModel: BluetoothViewModel, plantViewModel: PlantDataViewModel) {
+    if (connectBluetooth == null) { // Not connected
+
+        connectBluetooth = ConnectThread(viewModel.btModule!!, viewModel.uuid, context)
+        connectBluetooth!!.run()
+    }
+
+    if (connectBluetooth!!.getSocket()?.isConnected == true) {
+        if (viewModel.connectedThread == null) {
+            viewModel.setThread(ConnectedThread(connectBluetooth!!.getSocket()!!, plantViewModel))
+        }
+    }
+}
+
+
+@SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BluetoothConnectScreen(
@@ -52,7 +71,9 @@ fun BluetoothConnectScreen(
     onStartScan: () -> Unit,
     onStopScan: () -> Unit,
     context: Context,
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: BluetoothViewModel,
+    plantViewModel: PlantDataViewModel
 ) {
     val lazyListState = rememberLazyListState()
 
@@ -66,7 +87,7 @@ fun BluetoothConnectScreen(
                 ),
                 title = {
                     Text(
-                        text = "History",
+                        text = "Bluetooth",
                         color = MaterialTheme.colorScheme.secondary,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
@@ -172,11 +193,11 @@ fun BluetoothConnectScreen(
                 )
             }
         }
-    ) {padding ->
-        Spacer(modifier = Modifier.padding(padding))
+    ) { padding ->
         Column(
             verticalArrangement = Arrangement.Bottom,
             modifier = Modifier.fillMaxSize()
+                .padding(padding)
         ) {
             Icon(
                 painter = painterResource(R.drawable.sharp_psychiatry_24),
@@ -189,17 +210,8 @@ fun BluetoothConnectScreen(
         }
         Column(
             modifier = Modifier.fillMaxSize()
+                .padding(padding)
         ) {
-
-            BluetoothDeviceList(
-                pairedDevices = state.pairedDevices,
-                scannedDevices = state.scannedDevices,
-                onClick = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .width(20.dp),
-                lazyListState = lazyListState
-            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -214,14 +226,24 @@ fun BluetoothConnectScreen(
                 }
             }
 
+            BluetoothDeviceList(
+                pairedDevices = state.pairedDevices,
+                scannedDevices = state.scannedDevices,
+                onClick = {device -> // When a bluetooth device is selected
+                    if (device.name!!.substring(0, 9).lowercase() == "plantlink") { // Invites possibilities of "PlantLink310" Working
+                        Log.e("Log", "PlantLink Clicked!")
 
-            Card(
-                shape = MaterialTheme.shapes.medium,
-                backgroundColor = MaterialTheme.colorScheme.background,
-                contentColor = MaterialTheme.colorScheme.secondary
-            ) {
+                        viewModel.setUUID(device.device!!.uuids[0].uuid)
+                        viewModel.setModule(device.device)
 
-            }
+                        connectBluetoothDevice(context, viewModel, plantViewModel)
+
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth(),
+                lazyListState = lazyListState
+            )
         }
     }
 }
@@ -256,7 +278,6 @@ fun BluetoothDeviceList(
                     .clickable { onClick(device) }
                     .padding(16.dp)
             )
-
         }
 
 

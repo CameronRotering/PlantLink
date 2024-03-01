@@ -8,6 +8,8 @@ import com.themakers.plantlink.Bluetooth.BluetoothDeviceDomain
 fun BluetoothDevice.toBluetoothDeviceDomain(): BluetoothDeviceDomain {
     return BluetoothDeviceDomain(
         name = name,
-        address = address
+        address = address,
+        //uuid = uuids[0].uuid,
+        device = this
     )
 }

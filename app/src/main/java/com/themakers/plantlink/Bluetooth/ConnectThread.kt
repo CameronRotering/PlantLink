@@ -4,21 +4,19 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.Context
-import android.os.Handler
 import android.util.Log
 import okio.IOException
 import java.util.UUID
 
 
 @SuppressLint("MissingPermission")
-class ConnectThread(device: BluetoothDevice, MY_UUID: UUID, handler: Handler, context: Context): Thread() {
+class ConnectThread(device: BluetoothDevice, MY_UUID: UUID, context: Context): Thread() {
     var mSocket: BluetoothSocket? = null
     private val TAG: String = "Log"
-    var handler: Handler? = null
 
     init {
         var bluetoothTmp: BluetoothSocket? = null
-        this.handler = handler
+
 
         try {
             // Get a Socket to connect with the given BluetoothDevice
@@ -38,7 +36,7 @@ class ConnectThread(device: BluetoothDevice, MY_UUID: UUID, handler: Handler, co
             mSocket?.connect()
         } catch (connectException: IOException) {
             // Unable to connect; close socket and return
-            handler?.obtainMessage(0, "Unable to connect to the BT device")
+            //handler?.obtainMessage(0, "Unable to connect to the BT device")
             Log.e(TAG, "connectException: $connectException")
 
             try {
