@@ -47,7 +47,7 @@ import com.themakers.plantlink.R
 var connectBluetooth: ConnectThread? = null
 var handler: Handler = Handler(Looper.getMainLooper())
 var runnable: Runnable? = null
-var loopTime: Long = 5000
+var loopTime: Long = 500
 
 fun readSensors(viewModel: BluetoothViewModel) {
     viewModel.connectedThread?.read()

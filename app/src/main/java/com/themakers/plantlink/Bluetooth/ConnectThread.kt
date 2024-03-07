@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import okio.IOException
 import java.util.UUID
 
@@ -13,6 +14,7 @@ import java.util.UUID
 class ConnectThread(device: BluetoothDevice, MY_UUID: UUID, context: Context): Thread() {
     var mSocket: BluetoothSocket? = null
     private val TAG: String = "Log"
+    var context = context
 
     init {
         var bluetoothTmp: BluetoothSocket? = null
@@ -25,6 +27,7 @@ class ConnectThread(device: BluetoothDevice, MY_UUID: UUID, context: Context): T
         } catch (e: IOException) {
             Log.e(TAG, "Socket's create() method failed", e)
         }
+
         mSocket = bluetoothTmp
     }
 
@@ -38,6 +41,12 @@ class ConnectThread(device: BluetoothDevice, MY_UUID: UUID, context: Context): T
             // Unable to connect; close socket and return
             //handler?.obtainMessage(0, "Unable to connect to the BT device")
             Log.e(TAG, "connectException: $connectException")
+
+            Toast.makeText(
+                context,
+                "Could not connect.",
+                Toast.LENGTH_LONG
+            ).show()
 
             try {
                 mSocket?.close()

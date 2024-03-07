@@ -40,11 +40,6 @@ class MainActivity : ComponentActivity() {
     var viewModel: BluetoothViewModel? = null
 
 
-    private val TAG: String = "PlantLinkLogs"
-    private val REQUEST_ENABLE_BT: Int = 1
-    // We will use handler to get the BT connection status
-    private val ERROR_READ: Int = 0
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
