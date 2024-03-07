@@ -11,14 +11,14 @@ import java.util.UUID
 
 
 @SuppressLint("MissingPermission")
-class ConnectThread(device: BluetoothDevice, MY_UUID: UUID, context: Context): Thread() {
+class ConnectThread: Thread() {
     var mSocket: BluetoothSocket? = null
     private val TAG: String = "Log"
-    var context = context
+    var context: Context? = null
 
-    init {
+    fun setThread(device: BluetoothDevice, MY_UUID: UUID, _context: Context) {
+        context = _context
         var bluetoothTmp: BluetoothSocket? = null
-
 
         try {
             // Get a Socket to connect with the given BluetoothDevice
@@ -50,6 +50,8 @@ class ConnectThread(device: BluetoothDevice, MY_UUID: UUID, context: Context): T
 
             try {
                 mSocket?.close()
+
+                return
             } catch (closeException: IOException) {
                 Log.e(TAG, "Could not close the client socket", closeException)
             }

@@ -40,11 +40,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
-import com.themakers.plantlink.Bluetooth.ConnectThread
 import com.themakers.plantlink.PlantDataViewModel
 import com.themakers.plantlink.R
 
-var connectBluetooth: ConnectThread? = null
 var handler: Handler = Handler(Looper.getMainLooper())
 var runnable: Runnable? = null
 var loopTime: Long = 500

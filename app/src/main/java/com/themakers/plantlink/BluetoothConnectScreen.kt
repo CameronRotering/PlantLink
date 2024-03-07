@@ -46,18 +46,19 @@ import com.themakers.plantlink.Bluetooth.BluetoothUiState
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.Bluetooth.ConnectThread
 import com.themakers.plantlink.Bluetooth.ConnectedThread
-import com.themakers.plantlink.MainPage.connectBluetooth
 
-fun connectBluetoothDevice(context: Context, viewModel: BluetoothViewModel, plantViewModel: PlantDataViewModel) {
-    if (connectBluetooth == null) { // Not connected
 
-        connectBluetooth = ConnectThread(viewModel.btModule!!, viewModel.uuid, context)
-        connectBluetooth!!.run()
+
+fun connectBluetoothDevice(context: Context, viewModel: BluetoothViewModel, plantViewModel: PlantDataViewModel, connectBluetooth: ConnectThread) {
+    if (connectBluetooth.mSocket == null) { // Not connected
+        connectBluetooth.setThread(viewModel.btModule!!, viewModel.uuid, context)
+        //connectBluetooth = ConnectThread(viewModel.btModule!!, viewModel.uuid, context)
+        connectBluetooth.run()
     }
 
-    if (connectBluetooth!!.getSocket()?.isConnected == true) {
+    if (connectBluetooth.getSocket()?.isConnected == true) {
         if (viewModel.connectedThread == null) {
-            viewModel.setThread(ConnectedThread(connectBluetooth!!.getSocket()!!, plantViewModel))
+            viewModel.setThread(ConnectedThread(connectBluetooth.getSocket()!!, plantViewModel))
         }
     }
 }
@@ -76,6 +77,8 @@ fun BluetoothConnectScreen(
     plantViewModel: PlantDataViewModel
 ) {
     val lazyListState = rememberLazyListState()
+
+    val connectBluetooth = ConnectThread()
 
     Scaffold(
         //backgroundColor = MaterialTheme.colorScheme.background,
@@ -230,13 +233,16 @@ fun BluetoothConnectScreen(
                 pairedDevices = state.pairedDevices,
                 scannedDevices = state.scannedDevices,
                 onClick = {device -> // When a bluetooth device is selected
+
+                    viewModel.stopScan() // Recommended to not be scanning while connecting
+
                     if (device.name!!.substring(0, 9).lowercase() == "plantlink") { // Invites possibilities of "PlantLink310" Working
                         Log.e("Log", "PlantLink Clicked!")
 
                         viewModel.setUUID(device.device!!.uuids[0].uuid)
                         viewModel.setModule(device.device)
 
-                        connectBluetoothDevice(context, viewModel, plantViewModel)
+                        connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
 
                     }
                 },

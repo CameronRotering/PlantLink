@@ -22,7 +22,7 @@ class AndroidBluetoothController(
     private val bluetoothManager by lazy {
         context.getSystemService(BluetoothManager::class.java)
     }
-    private val bluetoothAdapter by lazy {
+    val bluetoothAdapter by lazy { // Being non-private might fix problem connecting to socket: https://stackoverflow.com/questions/24573755/android-bluetooth-socket-connect-fails
         bluetoothManager?.adapter
     }
 
