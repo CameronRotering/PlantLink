@@ -178,7 +178,7 @@ fun BluetoothConnectScreen(
                         selectedIconColor = Color(0, 0, 0, 255),
                         indicatorColor = MaterialTheme.colorScheme.background
                     ),
-                    selected = true,
+                    selected = false,
                     onClick = {},
                     label = {
                         Text(

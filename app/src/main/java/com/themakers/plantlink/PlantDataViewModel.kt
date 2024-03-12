@@ -17,7 +17,7 @@ class PlantDataViewModel {
     var humidity: BigDecimal by mutableStateOf(BigDecimal(0))
         private set
 
-    var moisture: Int by mutableStateOf(0)
+    var moisture: BigDecimal by mutableStateOf(BigDecimal(0))
         private set
 
 
@@ -30,7 +30,8 @@ class PlantDataViewModel {
         humidity = BigDecimal(pHumid).setScale(2, RoundingMode.HALF_EVEN)
     }
 
-    fun setMoist(pMoist: Int) {
-        moisture = pMoist
+    fun setMoist(pMoist: Double) {
+        moisture = BigDecimal(100 *
+                (pMoist.coerceIn(0.0, 880.0) / 880)).setScale(2, RoundingMode.HALF_EVEN)
     }
 }

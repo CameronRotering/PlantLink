@@ -315,7 +315,7 @@ fun MainPage(
                             fontSize = 20.sp
                         )
                         Text(
-                            text = plantViewModel.moisture.toString() + " ",//"880 ",
+                            text = plantViewModel.moisture.toString() + " %",//"880 ",
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Right,
                             modifier = Modifier.fillMaxWidth(),

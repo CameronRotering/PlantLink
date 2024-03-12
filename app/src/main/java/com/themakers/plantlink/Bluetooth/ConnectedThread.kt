@@ -63,7 +63,7 @@ class ConnectedThread(_socket: BluetoothSocket, private var plantViewModel: Plan
                     } else if (readingNumber == 2) {
                         plantViewModel.setHumid(readMessage.toDouble())
                     } else if (readingNumber == 3) {
-                        plantViewModel.setMoist(readMessage.toInt())
+                        plantViewModel.setMoist(readMessage.toDouble())
                     }
 
                     bytes = 0
