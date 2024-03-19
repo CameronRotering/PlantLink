@@ -276,6 +276,7 @@ fun SettingsPage(
                                 fontSize = 20.sp,
                                 modifier = Modifier.fillMaxHeight()
                             )
+
                         }
                     }
                 }
