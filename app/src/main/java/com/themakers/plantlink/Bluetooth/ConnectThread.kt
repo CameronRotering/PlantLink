@@ -6,7 +6,7 @@ import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import okio.IOException
+import java.io.IOException
 import java.util.UUID
 
 

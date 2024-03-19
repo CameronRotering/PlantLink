@@ -52,13 +52,9 @@ android {
 }
 
 dependencies {
-    //implementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    //androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
-
-
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.4")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.4")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.3")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.6.3")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.3")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     testImplementation("junit:junit:4.13.2")
@@ -67,28 +63,21 @@ dependencies {
 
     implementation("androidx.appcompat:appcompat:1.6.1")
 
-    implementation("androidx.compose.compiler:compiler:1.5.7")
-    implementation("androidx.compose.material:material:1.5.4")
-    implementation("androidx.compose.material3:material3:1.1.2")
-    implementation("androidx.compose.ui:ui-android:1.5.4")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.5.4")
+    implementation("androidx.compose.compiler:compiler:1.5.10")
+    implementation("androidx.compose.material:material:1.6.3")
+    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.compose.ui:ui-android:1.6.3")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.6.3")
 
-
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
     implementation("androidx.core:core-ktx:1.12.0")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
-    implementation("androidx.navigation:navigation-compose:2.7.6")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
 
     implementation("com.google.android.material:material:1.11.0")
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
-    implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
-    implementation("com.google.firebase:firebase-firestore-ktx:24.10.0")
-
-    implementation("io.coil-kt:coil-compose:2.4.0")
 }

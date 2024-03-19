@@ -36,9 +36,9 @@ import com.themakers.plantlink.MainPage.MainPage
 import com.themakers.plantlink.SettingsPage.SettingsPage
 import com.themakers.plantlink.data.AndroidBluetoothController
 import com.themakers.plantlink.ui.theme.PlantLInkTheme
-import okhttp3.internal.and
 import java.io.IOException
 import java.io.UnsupportedEncodingException
+import kotlin.experimental.and
 
 fun activateNfc(myTag: Tag, context: Context) {
     try {
@@ -247,12 +247,13 @@ class MainActivity : ComponentActivity() {
 
         var text = ""
         val payload = msgs[0]!!.records[0].payload
-        val textEncoding = if ((payload[0] and 0b10000000).toInt() == 0) {
+        val textEncoding = if ((payload[0] and 0b10000000.toByte()).toInt() == 0) {
             "UTF-8"
         } else {
             "UTF-16"
         }
-        val languageCodeLength: Int = payload[0] and 0b00111111 // Get language code Ex: "en
+        val languageCodeLength: Int =
+            (payload[0] and 0b00111111).toInt()// Get language code Ex: "en
 
         try {
             text = java.lang.String(
@@ -314,13 +315,18 @@ class MainActivity : ComponentActivity() {
     @Override
     override fun onPause() {
         super.onPause()
-        WriteModeOff()
+        if (nfcAdapter != null) {
+            WriteModeOff()
+        }
+        //
     }
 
     @Override
     override fun onResume() {
         super.onResume()
-        WriteModeOn()
+        if (nfcAdapter != null) {
+            WriteModeOn()
+        }
     }
 
     private fun WriteModeOn() {
