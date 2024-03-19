@@ -40,7 +40,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -227,7 +226,10 @@ fun SettingsPage(
                             fontSize = 20.sp,
                             modifier = Modifier.fillMaxSize()
                         )
-                        Row {
+                        Row (
+                            verticalAlignment = Alignment.CenterVertically
+                        )
+                        {
                             OutlinedTextField(
                                 value = searchText,
                                 onValueChange = {
@@ -235,7 +237,7 @@ fun SettingsPage(
                                 },
                                 placeholder = {
                                     Text(
-                                        text = "Search",
+                                        text = "Min",
                                         //backgroundColor = MaterialTheme.colorScheme.background,
                                         color = MaterialTheme.colorScheme.secondary,
                                         textAlign = TextAlign.Center
@@ -273,8 +275,50 @@ fun SettingsPage(
                                 text = "-",
                                 color = Color(0, 0, 0, 255),
                                 textAlign = TextAlign.Center,
-                                fontSize = 20.sp,
+                                fontSize = 60.sp,
                                 modifier = Modifier.fillMaxHeight()
+                            )
+
+                            OutlinedTextField(
+                                value = searchText,
+                                onValueChange = {
+                                    searchText = it
+                                },
+                                placeholder = {
+                                    Text(
+                                        text = "Max",
+                                        //backgroundColor = MaterialTheme.colorScheme.background,
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        textAlign = TextAlign.Center
+                                    )
+                                },
+                                modifier = Modifier
+                                    .padding(15.dp)
+                                    .width(100.dp)
+                                    .height(100.dp)
+                                    .focusRequester(focusRequester)
+                                    .align(Alignment.CenterVertically),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        focusManager.clearFocus()
+                                    }
+                                ),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Decimal,
+                                    imeAction = ImeAction.Done
+                                ),
+                                singleLine = true,
+                                shape = MaterialTheme.shapes.medium,
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = MaterialTheme.colorScheme.background,
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                                    disabledContainerColor = MaterialTheme.colorScheme.background,
+                                    focusedTextColor = Color(0, 0, 0, 255)
+                                ),
+                                textStyle = TextStyle(
+                                    fontSize = 40.sp,
+                                    textAlign = TextAlign.Center
+                                )
                             )
                         }
                     }
