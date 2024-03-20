@@ -1,7 +1,6 @@
 package com.themakers.plantlink.SettingsPage
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,10 +15,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Card
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -64,7 +63,10 @@ fun SettingsPage(
     navController: NavHostController
 ) {
     val lazyListState = rememberLazyListState()
-    var searchText by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+    var minSoilMoisture by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue("", TextRange(0, 3)))
+    }
+    var maxSoilMoisture by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue("", TextRange(0, 3)))
     }
     val focusRequester = remember { FocusRequester() }
@@ -93,11 +95,7 @@ fun SettingsPage(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            Toast.makeText(
-                                context,
-                                "Bluetooth",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            navController.navigate("BluetoothConnect")
                         }
                     ) {
                         Icon(
@@ -231,9 +229,9 @@ fun SettingsPage(
                         )
                         {
                             OutlinedTextField(
-                                value = searchText,
+                                value = minSoilMoisture,
                                 onValueChange = {
-                                    searchText = it
+                                    minSoilMoisture = it
                                 },
                                 placeholder = {
                                     Text(
@@ -246,7 +244,7 @@ fun SettingsPage(
                                 modifier = Modifier
                                     .padding(15.dp)
                                     .width(100.dp)
-                                    .height(100.dp)
+                                    .height(65.dp)
                                     .focusRequester(focusRequester),
                                 keyboardActions = KeyboardActions(
                                     onDone = {
@@ -263,10 +261,10 @@ fun SettingsPage(
                                     focusedContainerColor = MaterialTheme.colorScheme.background,
                                     unfocusedContainerColor = MaterialTheme.colorScheme.primary,
                                     disabledContainerColor = MaterialTheme.colorScheme.background,
-                                    focusedTextColor = Color(0, 0, 0, 255)
+                                    unfocusedTextColor = Color(255, 255, 255, 255)
                                 ),
                                 textStyle = TextStyle(
-                                    fontSize = 40.sp,
+                                    fontSize = 25.sp,
                                     textAlign = TextAlign.Center
                                 )
                             )
@@ -280,9 +278,9 @@ fun SettingsPage(
                             )
 
                             OutlinedTextField(
-                                value = searchText,
+                                value = maxSoilMoisture,
                                 onValueChange = {
-                                    searchText = it
+                                    maxSoilMoisture = it
                                 },
                                 placeholder = {
                                     Text(
@@ -295,7 +293,7 @@ fun SettingsPage(
                                 modifier = Modifier
                                     .padding(15.dp)
                                     .width(100.dp)
-                                    .height(100.dp)
+                                    .height(65.dp)
                                     .focusRequester(focusRequester)
                                     .align(Alignment.CenterVertically),
                                 keyboardActions = KeyboardActions(
@@ -313,10 +311,10 @@ fun SettingsPage(
                                     focusedContainerColor = MaterialTheme.colorScheme.background,
                                     unfocusedContainerColor = MaterialTheme.colorScheme.primary,
                                     disabledContainerColor = MaterialTheme.colorScheme.background,
-                                    focusedTextColor = Color(0, 0, 0, 255)
+                                    unfocusedTextColor = Color(255, 255, 255, 255)
                                 ),
                                 textStyle = TextStyle(
-                                    fontSize = 40.sp,
+                                    fontSize = 25.sp,
                                     textAlign = TextAlign.Center
                                 )
                             )

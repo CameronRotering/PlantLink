@@ -3,7 +3,6 @@ package com.themakers.plantlink
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -23,7 +21,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -46,7 +43,6 @@ import com.themakers.plantlink.Bluetooth.BluetoothUiState
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.Bluetooth.ConnectThread
 import com.themakers.plantlink.Bluetooth.ConnectedThread
-
 
 
 fun connectBluetoothDevice(context: Context, viewModel: BluetoothViewModel, plantViewModel: PlantDataViewModel, connectBluetooth: ConnectThread) {
@@ -97,25 +93,6 @@ fun BluetoothConnectScreen(
                             .fillMaxWidth()
                             .padding(0.dp, 0.dp, 50.dp, 0.dp),
                     )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            Toast.makeText(
-                                context,
-                                "Bluetooth",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_bluetooth_24),
-                            contentDescription = "Bluetooth",
-                            tint = Color.Black,
-                            modifier = Modifier
-                                .size(40.dp)
-                        )
-                    }
                 }
             )
         },
@@ -239,11 +216,16 @@ fun BluetoothConnectScreen(
                     if (device.name!!.substring(0, 9).lowercase() == "plantlink") { // Invites possibilities of "PlantLink310" Working
                         Log.e("Log", "PlantLink Clicked!")
 
-                        viewModel.setUUID(device.device!!.uuids[0].uuid)
-                        viewModel.setModule(device.device)
+                        if (device.device != viewModel.btModule && device.device!!.uuids[0].uuid != viewModel.uuid) { // If connecting to different device or first device to connect to
+                            connectBluetooth.mSocket = null
 
-                        connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
+                            viewModel.setUUID(device.device!!.uuids[0].uuid)
+                            viewModel.setModule(device.device)
 
+                            connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
+                        } else if (connectBluetooth.mSocket == null) { // If the socket is null (possibly due to error in connection) allow retry of connection
+                            connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
+                        }   // If same device and socket isn't null, do nothing
                     }
                 },
                 modifier = Modifier

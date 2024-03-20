@@ -318,7 +318,6 @@ class MainActivity : ComponentActivity() {
         if (nfcAdapter != null) {
             WriteModeOff()
         }
-        //
     }
 
     @Override
