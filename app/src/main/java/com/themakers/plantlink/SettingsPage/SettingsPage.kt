@@ -45,16 +45,31 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.themakers.plantlink.R
+
+class CharacterLimitVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        if (text.length <= 4) {
+            return TransformedText(text, OffsetMapping.Identity)
+        }
+        val filteredText = AnnotatedString(text.text, spanStyles = listOf(AnnotatedString.Range(SpanStyle(), 0, 3)))
+        return TransformedText(filteredText, OffsetMapping.Identity)
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -231,8 +246,11 @@ fun SettingsPage(
                             OutlinedTextField(
                                 value = minSoilMoisture,
                                 onValueChange = {
-                                    minSoilMoisture = it
+                                    if (it.text.length <= 4) {
+                                        minSoilMoisture = it
+                                    }
                                 },
+                                visualTransformation = CharacterLimitVisualTransformation(),
                                 placeholder = {
                                     Text(
                                         text = "Min",
@@ -280,8 +298,11 @@ fun SettingsPage(
                             OutlinedTextField(
                                 value = maxSoilMoisture,
                                 onValueChange = {
-                                    maxSoilMoisture = it
+                                    if (it.text.length <= 4) {
+                                        maxSoilMoisture = it
+                                    }
                                 },
+                                visualTransformation = CharacterLimitVisualTransformation(),
                                 placeholder = {
                                     Text(
                                         text = "Max",
