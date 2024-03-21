@@ -3,6 +3,7 @@ package com.themakers.plantlink
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -213,7 +214,7 @@ fun BluetoothConnectScreen(
 
                     viewModel.stopScan() // Recommended to not be scanning while connecting
 
-                    if (device.name!!.length >= 9 && device.name!!.substring(0, 9).lowercase() == "plantlink") { // Invites possibilities of "PlantLink310" Working
+                    if (device.name != null && device.name!!.length >= 9 && device.name!!.substring(0, 9).lowercase() == "plantlink") { // Invites possibilities of "PlantLink310" Working
                         Log.e("Log", "PlantLink Clicked!")
 
                         if (device.device != viewModel.btModule && device.device!!.uuids[0].uuid != viewModel.uuid) { // If connecting to different device or first device to connect to
@@ -226,6 +227,12 @@ fun BluetoothConnectScreen(
                         } else if (connectBluetooth.mSocket == null) { // If the socket is null (possibly due to error in connection) allow retry of connection
                             connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
                         }   // If same device and socket isn't null, do nothing
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Not a PlantLink device.",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 },
                 modifier = Modifier
@@ -260,7 +267,7 @@ fun BluetoothDeviceList(
 
         items(pairedDevices) { device ->
             Text(
-                text = device.name ?: device.address!!,
+                text = device.name ?:  "(No Name)",//device.address!!,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onClick(device) }
@@ -280,7 +287,7 @@ fun BluetoothDeviceList(
 
         items(scannedDevices) { device ->
             Text(
-                text = device.name ?: device.address!!,//"(No Name)",
+                text = device.name ?: "(No Name)",//device.address!!,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onClick(device) }
