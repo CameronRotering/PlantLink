@@ -3,6 +3,7 @@ package com.themakers.plantlink.MainPage
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,12 +46,36 @@ import com.themakers.plantlink.R
 
 var handler: Handler = Handler(Looper.getMainLooper())
 var runnable: Runnable? = null
-var loopTime: Long = 500
+var loopTime: Long = 1000
 
 fun readSensors(viewModel: BluetoothViewModel) {
-    viewModel.connectedThread?.read()
+    if (viewModel.isConnected()) {
+        viewModel.connectedThread?.read()
+    }
 }
 
+fun startSensorLoop(viewModel: BluetoothViewModel, navController: NavHostController) {
+    // (If on home page) and if not already running and connected to a socket
+    // Home page check because when leaving home page though it stops, it likes to start right after.
+    if ((navController.currentDestination!!.route == "Home") && runnable == null && viewModel.isConnected()) {
+        Log.e("Sensor Info", "Starting sensor loop")
+
+        handler.postDelayed(Runnable {
+            handler.postDelayed(runnable!!, loopTime)
+            readSensors(viewModel)
+        }.also { runnable = it }, loopTime)
+    }
+}
+
+fun stopReadingSensorLoop() {
+    if (runnable != null) {
+        Log.e("Sensor Info", "Stopped sensor loop")
+
+        handler.removeCallbacks(runnable!!)
+
+        runnable = null // Only run if it isn't null, slight performance gain
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -82,6 +107,8 @@ fun MainPage(
                 navigationIcon = {
                     IconButton(
                         onClick = {
+                            stopReadingSensorLoop()
+
                             navController.navigate("BluetoothConnect")
                         }
                     ) {
@@ -108,18 +135,7 @@ fun MainPage(
                         indicatorColor = MaterialTheme.colorScheme.background
                     ),
                     selected = true,
-                    onClick = {
-                        handler.postDelayed(Runnable {
-                            handler.postDelayed(runnable!!, loopTime)
-                            readSensors(viewModel)
-                        }.also { runnable = it }, loopTime)
-
-                        //while (viewModel.connectedThread != null) {
-                        //    readSensors(viewModel)
-//
-                        //    Thread.sleep(1000)
-                        //}
-                    },
+                    onClick = {},
                     label = {
                         Text(
                             text = "Home",
@@ -142,6 +158,7 @@ fun MainPage(
                     ),
                     selected = false,
                     onClick = {
+                        stopReadingSensorLoop()
                         navController.navigate("settings")
                     },
                     label = {
@@ -166,6 +183,7 @@ fun MainPage(
                     ),
                     selected = false,
                     onClick = {
+                        stopReadingSensorLoop()
                         navController.navigate("history")
                     },
                     label = {
@@ -185,6 +203,9 @@ fun MainPage(
             }
         }
     ) { padding ->
+
+        startSensorLoop(viewModel, navController)
+
         Column (
             verticalArrangement = Arrangement.Bottom,
             modifier = Modifier.fillMaxSize()

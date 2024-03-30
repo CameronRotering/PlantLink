@@ -49,8 +49,9 @@ class ConnectedThread(_socket: BluetoothSocket, private var plantViewModel: Plan
                 buffer[bytes] = inStream!!.read().toByte()
                 var readMessage: String
 
-                // If I detect a newline means I already read a full measurement
+                // If doing multiple devices, they could be separated by {} for each device and hold a list of devices.
 
+                // If I detect a newline means I already read a full measurement
                 if (buffer[bytes].toInt().toChar() == '~') { // POSSIBLE OPTIMIZATION: Only get data from bluetooth, then format/rip-apart data in phone
                     //Log.e(TAG, String(buffer, 0, bytes))
                     readMessage = String(buffer, 0, bytes)
@@ -68,6 +69,8 @@ class ConnectedThread(_socket: BluetoothSocket, private var plantViewModel: Plan
 
                     bytes = 0
                     readingNumber++
+                } else if (buffer[bytes].toInt().toChar() == ';') { // Can make it either another device and separate or it can be multiple sensors like (75,43,780;404;395) {1 temp and humidity sensor, 3 moisture sensors}
+
                 } else {
                     bytes++
                 }
