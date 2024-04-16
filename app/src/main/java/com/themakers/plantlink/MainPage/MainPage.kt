@@ -46,7 +46,7 @@ import com.themakers.plantlink.R
 
 var handler: Handler = Handler(Looper.getMainLooper())
 var runnable: Runnable? = null
-var loopTime: Long = 1000
+var loopTime: Long = 750 // Faster than arduino so we don't get old information
 
 fun readSensors(viewModel: BluetoothViewModel) {
     if (viewModel.isConnected()) {
