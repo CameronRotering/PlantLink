@@ -256,7 +256,7 @@ fun MainPage(
                             fontSize = 20.sp
                         )
                         Text(
-                            text = plantViewModel.temperatureF.toString() + "° F ",//"74° F ",
+                            text = plantViewModel.finalTemp.toString() + "° F ",//"74° F ",
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Right,
                             modifier = Modifier.fillMaxWidth(),

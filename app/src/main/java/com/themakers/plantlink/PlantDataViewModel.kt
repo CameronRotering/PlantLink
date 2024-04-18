@@ -14,6 +14,9 @@ class PlantDataViewModel {
     var temperatureF: BigDecimal by mutableStateOf(BigDecimal(0))
         private set
 
+    var finalTemp: BigDecimal by mutableStateOf(BigDecimal(0))
+        private set
+
     var humidity: BigDecimal by mutableStateOf(BigDecimal(0))
         private set
 
@@ -24,6 +27,8 @@ class PlantDataViewModel {
     fun setTemp(pTemp: Double) {
         temperatureC = BigDecimal(pTemp).setScale(2, RoundingMode.HALF_EVEN)
         temperatureF = BigDecimal((pTemp * 1.8) + 32).setScale(2, RoundingMode.HALF_EVEN)
+
+        finalTemp = BigDecimal(pTemp).setScale(2, RoundingMode.HALF_EVEN)
     }
 
     fun setHumid(pHumid: Double) {

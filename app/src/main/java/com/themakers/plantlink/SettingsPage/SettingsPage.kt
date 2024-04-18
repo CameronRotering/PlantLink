@@ -253,7 +253,7 @@ fun SettingsPage(
                                 visualTransformation = CharacterLimitVisualTransformation(),
                                 placeholder = {
                                     Text(
-                                        text = "Min",
+                                        text = "Min", // Eventually make this the value stored in the arduino
                                         //backgroundColor = MaterialTheme.colorScheme.background,
                                         color = MaterialTheme.colorScheme.secondary,
                                         textAlign = TextAlign.Center
