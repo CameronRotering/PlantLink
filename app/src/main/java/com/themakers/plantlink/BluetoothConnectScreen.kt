@@ -178,7 +178,6 @@ fun BluetoothConnectScreen(
         Column(
             verticalArrangement = Arrangement.Bottom,
             modifier = Modifier.fillMaxSize()
-                .padding(padding)
         ) {
             Icon(
                 painter = painterResource(R.drawable.sharp_psychiatry_24),
@@ -186,7 +185,7 @@ fun BluetoothConnectScreen(
                 tint = Color(61, 168, 44),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(500.dp)
+                    .height(450.dp)
             )
         }
         Column(

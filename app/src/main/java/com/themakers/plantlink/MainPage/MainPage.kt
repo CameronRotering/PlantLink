@@ -216,7 +216,7 @@ fun MainPage(
                 tint = Color(61, 168, 44),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(500.dp)
+                    .height(450.dp)
             )
         }
         LazyColumn(
