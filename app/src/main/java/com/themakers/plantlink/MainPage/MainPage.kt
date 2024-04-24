@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -47,6 +48,7 @@ import com.themakers.plantlink.R
 var handler: Handler = Handler(Looper.getMainLooper())
 var runnable: Runnable? = null
 var loopTime: Long = 750 // Faster than arduino so we don't get old information
+var infoSpacerLength: Dp = 30.dp
 
 fun readSensors(viewModel: BluetoothViewModel) {
     if (viewModel.isConnected()) {
@@ -265,7 +267,7 @@ fun MainPage(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(50.dp))
+                Spacer(modifier = Modifier.height(infoSpacerLength))
                 
                 Card (
                     shape = MaterialTheme.shapes.medium,
@@ -304,7 +306,7 @@ fun MainPage(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(50.dp))
+                Spacer(modifier = Modifier.height(infoSpacerLength))
 
                 Card (
                     shape = MaterialTheme.shapes.medium,
@@ -335,6 +337,45 @@ fun MainPage(
                         )
                         Text(
                             text = plantViewModel.moisture.toString() + " %",//"880 ",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontSize = 30.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(infoSpacerLength))
+
+                Card (
+                    shape = MaterialTheme.shapes.medium,
+                    backgroundColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier
+                        .padding(15.dp)
+                        .fillMaxWidth()
+                ) {
+                    Row (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_sun_24),
+                            contentDescription = "Light",
+                            tint = Color.Black,
+                            modifier = Modifier
+                                .size(30.dp)
+                        )
+                        Text(
+                            text = " Light",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Left,
+                            fontSize = 20.sp
+                        )
+                        Text(
+                            text = plantViewModel.light.toString() + " % ",//"34.7 RH ",
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Right,
                             modifier = Modifier.fillMaxWidth(),

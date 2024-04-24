@@ -39,12 +39,12 @@ class ConnectedThread(_socket: BluetoothSocket, private var plantViewModel: Plan
     fun read() {
         val buffer = ByteArray(256)
         var bytes = 0 // bytes returned from read()
-        var readingNumber = 1 // 1 = Temp, 2 = Humidity, 3 = Moisture
+        var readingNumber = 1 // 1 = Temp, 2 = Humidity, 3 = Moisture, 4 = Light
 
         // Keep listening to the inputstream until exception occurs
         // We just want to get 1 reading from arduino
 
-        while (readingNumber <= 3) {
+        while (readingNumber <= 4) {
             try {
                 buffer[bytes] = inStream!!.read().toByte()
                 var readMessage: String
@@ -59,12 +59,19 @@ class ConnectedThread(_socket: BluetoothSocket, private var plantViewModel: Plan
                     // Value to be read by the Observer streamed by the Observable
                     //Log.e(TAG, readMessage.toFloat().toString())
 
-                    if (readingNumber == 1) {
-                        plantViewModel.setTemp(readMessage.toDouble())
-                    } else if (readingNumber == 2) {
-                        plantViewModel.setHumid(readMessage.toDouble())
-                    } else if (readingNumber == 3) {
-                        plantViewModel.setMoist(readMessage.toDouble())
+                    when (readingNumber) {
+                        1 -> {
+                            plantViewModel.setTemp(readMessage.toDouble())
+                        }
+                        2 -> {
+                            plantViewModel.setHumid(readMessage.toDouble())
+                        }
+                        3 -> {
+                            plantViewModel.setMoist(readMessage.toDouble())
+                        }
+                        4 -> {
+                            plantViewModel.setLight(readMessage.toDouble())
+                        }
                     }
 
                     bytes = 0
