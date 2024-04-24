@@ -8,11 +8,11 @@ import java.math.RoundingMode
 
 class PlantDataViewModel {
 
-    var temperatureC: BigDecimal by mutableStateOf(BigDecimal(0))
-        private set
-
-    var temperatureF: BigDecimal by mutableStateOf(BigDecimal(0))
-        private set
+    //var temperatureC: BigDecimal by mutableStateOf(BigDecimal(0))
+    //    private set
+//
+    //var temperatureF: BigDecimal by mutableStateOf(BigDecimal(0))
+    //    private set
 
     var finalTemp: BigDecimal by mutableStateOf(BigDecimal(0))
         private set
@@ -28,8 +28,8 @@ class PlantDataViewModel {
 
 
     fun setTemp(pTemp: Double) {
-        temperatureC = BigDecimal(pTemp).setScale(2, RoundingMode.HALF_EVEN)
-        temperatureF = BigDecimal((pTemp * 1.8) + 32).setScale(2, RoundingMode.HALF_EVEN)
+        //temperatureC = BigDecimal(pTemp).setScale(2, RoundingMode.HALF_EVEN)
+        //temperatureF = BigDecimal((pTemp * 1.8) + 32).setScale(2, RoundingMode.HALF_EVEN)
 
         finalTemp = BigDecimal(pTemp).setScale(2, RoundingMode.HALF_EVEN)
     }
@@ -45,6 +45,6 @@ class PlantDataViewModel {
 
     fun setLight(pLight: Double) {
         light = BigDecimal(100 *
-                (pLight.coerceIn(0.0, 880.0) / 880)).setScale(2, RoundingMode.HALF_EVEN)
+                (pLight.coerceIn(0.0, 400.0) / 400)).setScale(2, RoundingMode.HALF_EVEN) // 400 might be max amount
     }
 }
