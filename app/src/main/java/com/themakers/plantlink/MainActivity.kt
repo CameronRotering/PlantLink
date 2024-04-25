@@ -191,12 +191,12 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable("History") {
-                            HistoryPage(
-                                navController = navController,
-                                context = applicationContext
-                            )
-                        }
+                        //composable("History") {
+                        //    HistoryPage(
+                        //        navController = navController,
+                        //        context = applicationContext
+                        //    )
+                        //}
 
                         composable("BluetoothConnect") {
                             BluetoothConnectScreen(

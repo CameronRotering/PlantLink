@@ -150,28 +150,28 @@ fun BluetoothConnectScreen(
                         )
                     }
                 )
-                NavigationBarItem(
-                    colors = NavigationBarItemDefaults.colors(
-                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                        selectedIconColor = Color(0, 0, 0, 255),
-                        indicatorColor = MaterialTheme.colorScheme.background
-                    ),
-                    selected = false,
-                    onClick = {},
-                    label = {
-                        Text(
-                            text = "History",
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 15.sp
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_bar_chart_24),
-                            contentDescription = "Bar Chart"
-                        )
-                    }
-                )
+                //NavigationBarItem(
+                //    colors = NavigationBarItemDefaults.colors(
+                //        unselectedIconColor = MaterialTheme.colorScheme.secondary,
+                //        selectedIconColor = Color(0, 0, 0, 255),
+                //        indicatorColor = MaterialTheme.colorScheme.background
+                //    ),
+                //    selected = false,
+                //    onClick = {},
+                //    label = {
+                //        Text(
+                //            text = "History",
+                //            color = MaterialTheme.colorScheme.secondary,
+                //            fontSize = 15.sp
+                //        )
+                //    },
+                //    icon = {
+                //        Icon(
+                //            painter = painterResource(R.drawable.baseline_bar_chart_24),
+                //            contentDescription = "Bar Chart"
+                //        )
+                //    }
+                //)
             }
         }
     ) { padding ->

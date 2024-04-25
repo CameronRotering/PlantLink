@@ -36,6 +36,19 @@ class ConnectedThread(_socket: BluetoothSocket, private var plantViewModel: Plan
         outStream = tmpOut
     }
 
+    fun sendData() {
+        val delim: Byte = 126
+
+        var dataToSend: ByteArray
+                                                                // Next command
+        dataToSend = byteArrayOf(48, delim, 50, delim, 53, 48, 48, delim, 49, delim, 51, delim, 54, 49, 49)
+
+
+
+        // 0, 2, 500
+        outStream!!.write(dataToSend)
+    }
+
     fun read() {
         val buffer = ByteArray(256)
         var bytes = 0 // bytes returned from read()

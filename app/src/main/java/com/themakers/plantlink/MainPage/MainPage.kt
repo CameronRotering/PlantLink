@@ -137,7 +137,9 @@ fun MainPage(
                         indicatorColor = MaterialTheme.colorScheme.background
                     ),
                     selected = true,
-                    onClick = {},
+                    onClick = {
+                        viewModel.connectedThread?.sendData()
+                    },
                     label = {
                         Text(
                             text = "Home",
@@ -177,31 +179,31 @@ fun MainPage(
                         )
                     }
                 )
-                NavigationBarItem(
-                    colors = NavigationBarItemDefaults.colors(
-                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                        selectedIconColor = MaterialTheme.colorScheme.secondary,
-                        indicatorColor = MaterialTheme.colorScheme.background
-                    ),
-                    selected = false,
-                    onClick = {
-                        stopReadingSensorLoop()
-                        navController.navigate("history")
-                    },
-                    label = {
-                        Text(
-                            text = "History",
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 15.sp
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_bar_chart_24),
-                            contentDescription = "Bar Chart"
-                        )
-                    }
-                )
+                //NavigationBarItem(
+                //    colors = NavigationBarItemDefaults.colors(
+                //        unselectedIconColor = MaterialTheme.colorScheme.secondary,
+                //        selectedIconColor = MaterialTheme.colorScheme.secondary,
+                //        indicatorColor = MaterialTheme.colorScheme.background
+                //    ),
+                //    selected = false,
+                //    onClick = {
+                //        stopReadingSensorLoop()
+                //        navController.navigate("history")
+                //    },
+                //    label = {
+                //        Text(
+                //            text = "History",
+                //            color = MaterialTheme.colorScheme.secondary,
+                //            fontSize = 15.sp
+                //        )
+                //    },
+                //    icon = {
+                //        Icon(
+                //            painter = painterResource(R.drawable.baseline_bar_chart_24),
+                //            contentDescription = "Bar Chart"
+                //        )
+                //    }
+                //)
             }
         }
     ) { padding ->

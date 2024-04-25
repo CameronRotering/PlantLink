@@ -44,7 +44,9 @@ class PlantDataViewModel {
     }
 
     fun setLight(pLight: Double) {
+        //light = BigDecimal(pLight).setScale(2, RoundingMode.HALF_EVEN)
+
         light = BigDecimal(100 *
-                (pLight.coerceIn(0.0, 400.0) / 400)).setScale(2, RoundingMode.HALF_EVEN) // 400 might be max amount
+                (pLight.coerceIn(0.0, 666.0) / 666)).setScale(2, RoundingMode.HALF_EVEN) // 666 seems to be around max amount (When tested with phone flashlight on max, it got mostly below 660 except for one being 661. When tested in direct sunlight it got up to 667)
     }
 }
