@@ -40,8 +40,8 @@ class ConnectedThread(_socket: BluetoothSocket, private var plantViewModel: Plan
         val delim: Byte = 126
 
         var dataToSend: ByteArray
-                                                                // Next command
-        dataToSend = byteArrayOf(48, delim, 50, delim, 53, 48, 48, delim, 49, delim, 51, delim, 54, 49, 49)
+                                                           // Next command                       Next command                             Next command
+        dataToSend = byteArrayOf(48, delim, 48, delim, 70, delim, 48, delim, 49, delim, 72, 105, delim, 48, delim, 50, delim, 53, 48, 48, delim, 49, delim, 51, delim, 54, 49, 49)
 
 
 
