@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,9 +42,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.themakers.plantlink.data.AppDatabase
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.PlantDataViewModel
 import com.themakers.plantlink.R
+import com.themakers.plantlink.SettingsViewModel
 
 var handler: Handler = Handler(Looper.getMainLooper())
 var runnable: Runnable? = null
@@ -85,7 +88,9 @@ fun MainPage(
     context: Context,
     navController: NavHostController,
     viewModel: BluetoothViewModel,
-    plantViewModel: PlantDataViewModel
+    plantViewModel: PlantDataViewModel,
+    settingsDb: AppDatabase,
+    settingsViewModel: SettingsViewModel
 ) {
     val lazyListState = rememberLazyListState()
 
@@ -138,6 +143,15 @@ fun MainPage(
                     ),
                     selected = true,
                     onClick = {
+                        Toast.makeText(
+                            context,
+                            if (settingsViewModel.getSetting(context)) "Fahrenheit" else "Celsius", // settingsDb
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                        //settingsViewModel.getSetting(settingsDb)
+
+
                         viewModel.connectedThread?.sendData()
                     },
                     label = {

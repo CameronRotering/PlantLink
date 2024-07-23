@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +21,8 @@ import androidx.compose.material.Card
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,6 +37,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,7 +64,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.themakers.plantlink.data.AppDatabase
 import com.themakers.plantlink.R
+import com.themakers.plantlink.SettingsViewModel
 
 class CharacterLimitVisualTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
@@ -72,11 +78,32 @@ class CharacterLimitVisualTransformation : VisualTransformation {
     }
 }
 
+
+
+
+
+fun getDegree(bFahrenheit: Boolean, context: Context) {
+    if (bFahrenheit) {
+        Toast.makeText(
+            context,
+            "Degree Type is Fahrenheit",
+            Toast.LENGTH_LONG
+        ).show()
+    } else {
+        Toast.makeText(
+            context,
+            "Degree Type is Celsius",
+            Toast.LENGTH_LONG
+        ).show()
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsPage(
     context: Context,
-    navController: NavHostController
+    navController: NavHostController,
+    settingsDb: AppDatabase
 ) {
     val lazyListState = rememberLazyListState()
     var minSoilMoisture by rememberSaveable(stateSaver = TextFieldValue.Saver) {
@@ -87,6 +114,15 @@ fun SettingsPage(
     }
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
+
+    val settingsViewModel = SettingsViewModel()
+
+    var isFahrenheit by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        isFahrenheit = settingsViewModel.getSetting(context)
+    }
+
 
 
 
@@ -340,6 +376,134 @@ fun SettingsPage(
                                     textAlign = TextAlign.Center
                                 )
                             )
+                        }
+                    }
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+
+
+            item {
+                Card (
+                    shape = MaterialTheme.shapes.medium,
+                    backgroundColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.secondary
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Temperature Unit",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Center,
+                            fontSize = 20.sp,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        Row (
+                            verticalAlignment = Alignment.CenterVertically
+                        )
+                        {
+                            if (isFahrenheit) {
+                                Button(
+                                    onClick = { // Click C button
+                                        isFahrenheit = false
+                                        settingsViewModel.changeSetting(context, false) // settingsDb
+                                        getDegree(isFahrenheit, context)
+                                    }, //expanded = !expanded },
+                                    modifier = Modifier
+                                        .padding(15.dp)
+                                        .width(100.dp)
+                                        .height(65.dp),
+                                    shape = MaterialTheme.shapes.medium,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(220, 220, 220),
+                                        contentColor = Color(0, 0, 0),
+                                    )
+                                ) {
+                                    Text(
+                                        text = "C",
+                                        modifier = Modifier
+                                            .padding(15.dp),
+                                        fontSize = 20.sp
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.padding(10.dp))
+
+                                Button(
+                                    onClick = { getDegree(isFahrenheit, context) },
+                                    modifier = Modifier
+                                        .padding(15.dp)
+                                        .width(100.dp)
+                                        .height(65.dp),
+                                    shape = MaterialTheme.shapes.medium,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        contentColor = MaterialTheme.colorScheme.secondary,
+
+                                    )
+                                ) {
+                                    Text(
+                                        text = "F",
+                                        modifier = Modifier
+                                            .padding(15.dp),
+                                        fontSize = 20.sp
+                                    )
+                                }
+                            } else {
+                                Button(
+                                    onClick = { getDegree(isFahrenheit, context) },
+                                    modifier = Modifier
+                                        .padding(15.dp)
+                                        .width(100.dp)
+                                        .height(65.dp),
+                                    shape = MaterialTheme.shapes.medium,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        contentColor = MaterialTheme.colorScheme.secondary
+                                    )
+                                ) {
+                                    Text(
+                                        text = "C",
+                                        modifier = Modifier
+                                            .padding(15.dp),
+                                        fontSize = 20.sp
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.padding(10.dp))
+
+                                Button(
+                                    onClick = { // Click F when C is enabled
+                                        isFahrenheit = true
+                                        settingsViewModel.changeSetting(context, true)
+                                        getDegree(isFahrenheit, context)
+                                    },
+                                    modifier = Modifier
+                                        .padding(15.dp)
+                                        .width(100.dp)
+                                        .height(65.dp),
+                                    shape = MaterialTheme.shapes.medium,
+                                    colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(220, 220, 220),
+                                            contentColor = Color(0, 0, 0)
+                                        )
+                                ) {
+                                    Text(
+                                        text = "F",
+                                        modifier = Modifier
+                                            .padding(15.dp),
+                                        fontSize = 20.sp
+                                    )
+                                }
+                            }
                         }
                     }
                 }

@@ -1,7 +1,9 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
+
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.org.jetbrains.kotlin.android)
 }
 
 android {
@@ -53,26 +55,33 @@ android {
 }
 
 dependencies {
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.6")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.6.6")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.6")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    testImplementation("junit:junit:4.13.2")
-
-    implementation("androidx.activity:activity-compose:1.9.0")
-
-    implementation("androidx.compose.compiler:compiler:1.5.12")
-    implementation("androidx.compose.material:material:1.6.6")
-    implementation("androidx.compose.material3:material3:1.2.1")
-    implementation("androidx.compose.ui:ui-android:1.6.6")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.6.6")
 
 
-    implementation("androidx.core:core-ktx:1.13.0")
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation(libs.androidx.room.ktx)
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
 
-    implementation("com.google.android.material:material:1.11.0")
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+    androidTestImplementation(libs.androidx.junit)
+    testImplementation(libs.junit)
+
+    implementation(libs.androidx.activity.compose)
+
+    implementation(libs.androidx.compiler)
+    implementation(libs.androidx.material)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.ui.android)
+    implementation(libs.androidx.ui.tooling.preview)
+
+    implementation(libs.androidx.core.ktx)
+
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.navigation.compose)
+
+    implementation(libs.material)
 }

@@ -31,10 +31,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
-import com.themakers.plantlink.HistoryPage.HistoryPage
 import com.themakers.plantlink.MainPage.MainPage
 import com.themakers.plantlink.SettingsPage.SettingsPage
 import com.themakers.plantlink.data.AndroidBluetoothController
+import com.themakers.plantlink.data.AppDatabase
 import com.themakers.plantlink.ui.theme.PlantLInkTheme
 import java.io.IOException
 import java.io.UnsupportedEncodingException
@@ -71,7 +71,49 @@ fun activateNfc(myTag: Tag, context: Context) {
     }
 }
 
+//@Entity
+//data class Settings(
+//    @PrimaryKey val id: Int = 1, // Only using one setting
+//    val isFahrenheit: Boolean
+//)
+
+//@Dao
+//interface SettingsDao {
+//    @Query("SELECT * FROM Settings WHERE id =1")
+//    fun getSetting(): Flow<Settings?>
+//
+//    @Query("UPDATE Settings SET isFahrenheit = :newValue WHERE id = 1")
+//    suspend fun updateFahrenheit(newValue: Boolean)
+//
+////    @Insert(onConflict = OnConflictStrategy.REPLACE)
+////    suspend fun insert(setting: Settings)
+//}
+
+//@Database(entities = [Settings::class], version = 1)
+//abstract class AppDatabase : RoomDatabase() {
+//    abstract fun settingsDao(): SettingsDao
+//
+//    companion object {
+//        @Volatile
+//        private var INSTANCE: AppDatabase? = null
+//
+//        fun getDatabase(context: Context): AppDatabase {
+//            return INSTANCE ?: synchronized(this) {
+//                val instance = Room.databaseBuilder(
+//                    context.applicationContext,
+//                    AppDatabase::class.java,
+//                    "SettingsDatabase"
+//                ).build()
+//                INSTANCE = instance
+//                instance
+//            }
+//        }
+//    }
+//}
+
 class MainActivity : ComponentActivity() {
+
+
 
     var pendingIntent: PendingIntent? = null
     var writeTagFilters: Array<IntentFilter?>? = null
@@ -115,7 +157,6 @@ class MainActivity : ComponentActivity() {
             //finish()
         }
 
-
         //readFromIntent(intent)
         pendingIntent = PendingIntent.getActivity(applicationContext, 0, Intent(applicationContext, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_IMMUTABLE) // was 0
@@ -125,6 +166,10 @@ class MainActivity : ComponentActivity() {
 
 
         val plantViewModel = PlantDataViewModel()
+
+        val settingsDb = AppDatabase.getDatabase(applicationContext)
+
+        val settingsViewModel = SettingsViewModel()
 
         val enableBluetoothLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -169,6 +214,18 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+                    //val settingsDb = Room.databaseBuilder(
+                    //    applicationContext,
+                    //    AppDatabase::class.java, "settings-database"
+                    //).build()
+
+                    // To get the setting:
+                    //val settingFlow = db.settingsDao().getSetting()
+
+                    // To insert a setting:
+                    //db.settingsDao().updateFahrenheit(false)
+
+
                     val navController = rememberNavController()
 
                     NavHost(
@@ -180,14 +237,17 @@ class MainActivity : ComponentActivity() {
                                 context = applicationContext,
                                 navController = navController,
                                 viewModel = viewModel!!,
-                                plantViewModel = plantViewModel
+                                plantViewModel = plantViewModel,
+                                settingsDb = settingsDb,
+                                settingsViewModel = settingsViewModel
                             )
                         }
 
                         composable("Settings") {
                             SettingsPage(
                                 navController = navController,
-                                context = applicationContext
+                                context = applicationContext,
+                                settingsDb = settingsDb
                             )
                         }
 
