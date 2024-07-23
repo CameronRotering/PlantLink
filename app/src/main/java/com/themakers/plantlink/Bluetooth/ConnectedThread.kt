@@ -43,6 +43,9 @@ class ConnectedThread(_socket: BluetoothSocket, private var plantViewModel: Plan
                                                            // Next command                       Next command                             Next command
         dataToSend = byteArrayOf(48, delim, 48, delim, 70, delim, 48, delim, 49, delim, 72, 105, delim, 48, delim, 50, delim, 53, 48, 48, delim, 49, delim, 51, delim, 54, 49, 49)
 
+        // Can add to byte array just by using +    (https://stackoverflow.com/questions/55250751/how-to-append-bytes-to-bytearray-in-kotlin)
+        // For Example:
+        // dataTosend += 50
 
 
         // 0, 2, 500
