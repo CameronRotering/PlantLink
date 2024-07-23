@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -23,7 +22,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -46,7 +44,6 @@ import com.themakers.plantlink.Bluetooth.BluetoothUiState
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.Bluetooth.ConnectThread
 import com.themakers.plantlink.Bluetooth.ConnectedThread
-
 
 
 fun connectBluetoothDevice(context: Context, viewModel: BluetoothViewModel, plantViewModel: PlantDataViewModel, connectBluetooth: ConnectThread) {
@@ -97,25 +94,6 @@ fun BluetoothConnectScreen(
                             .fillMaxWidth()
                             .padding(0.dp, 0.dp, 50.dp, 0.dp),
                     )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            Toast.makeText(
-                                context,
-                                "Bluetooth",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_bluetooth_24),
-                            contentDescription = "Bluetooth",
-                            tint = Color.Black,
-                            modifier = Modifier
-                                .size(40.dp)
-                        )
-                    }
                 }
             )
         },
@@ -172,35 +150,34 @@ fun BluetoothConnectScreen(
                         )
                     }
                 )
-                NavigationBarItem(
-                    colors = NavigationBarItemDefaults.colors(
-                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                        selectedIconColor = Color(0, 0, 0, 255),
-                        indicatorColor = MaterialTheme.colorScheme.background
-                    ),
-                    selected = false,
-                    onClick = {},
-                    label = {
-                        Text(
-                            text = "History",
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 15.sp
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_bar_chart_24),
-                            contentDescription = "Bar Chart"
-                        )
-                    }
-                )
+                //NavigationBarItem(
+                //    colors = NavigationBarItemDefaults.colors(
+                //        unselectedIconColor = MaterialTheme.colorScheme.secondary,
+                //        selectedIconColor = Color(0, 0, 0, 255),
+                //        indicatorColor = MaterialTheme.colorScheme.background
+                //    ),
+                //    selected = false,
+                //    onClick = {},
+                //    label = {
+                //        Text(
+                //            text = "History",
+                //            color = MaterialTheme.colorScheme.secondary,
+                //            fontSize = 15.sp
+                //        )
+                //    },
+                //    icon = {
+                //        Icon(
+                //            painter = painterResource(R.drawable.baseline_bar_chart_24),
+                //            contentDescription = "Bar Chart"
+                //        )
+                //    }
+                //)
             }
         }
     ) { padding ->
         Column(
             verticalArrangement = Arrangement.Bottom,
             modifier = Modifier.fillMaxSize()
-                .padding(padding)
         ) {
             Icon(
                 painter = painterResource(R.drawable.sharp_psychiatry_24),
@@ -208,7 +185,7 @@ fun BluetoothConnectScreen(
                 tint = Color(61, 168, 44),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(500.dp)
+                    .height(450.dp)
             )
         }
         Column(
@@ -236,14 +213,25 @@ fun BluetoothConnectScreen(
 
                     viewModel.stopScan() // Recommended to not be scanning while connecting
 
-                    if (device.name!!.substring(0, 9).lowercase() == "plantlink") { // Invites possibilities of "PlantLink310" Working
+                    if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") { // Invites possibilities of "PlantLink310" Working
                         Log.e("Log", "PlantLink Clicked!")
 
-                        viewModel.setUUID(device.device!!.uuids[0].uuid)
-                        viewModel.setModule(device.device)
+                        if (device.device != viewModel.btModule && device.device!!.uuids[0].uuid != viewModel.uuid) { // If connecting to different device or first device to connect to
+                            connectBluetooth.mSocket = null
 
-                        connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
+                            viewModel.setUUID(device.device!!.uuids[0].uuid)
+                            viewModel.setModule(device.device)
 
+                            connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
+                        } else if (connectBluetooth.mSocket == null) { // If the socket is null (possibly due to error in connection) allow retry of connection
+                            connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
+                        }   // If same device and socket isn't null, do nothing
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Not a PlantLink device.",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 },
                 modifier = Modifier
@@ -277,13 +265,15 @@ fun BluetoothDeviceList(
         }
 
         items(pairedDevices) { device ->
-            Text(
-                text = device.name ?: device.address!!,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onClick(device) }
-                    .padding(16.dp)
-            )
+            if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
+                Text(
+                    text = device.name,// ?:  "(No Name)",//device.address!!,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onClick(device) }
+                        .padding(16.dp)
+                )
+            }
         }
 
 
@@ -297,14 +287,15 @@ fun BluetoothDeviceList(
         }
 
         items(scannedDevices) { device ->
-            Text(
-                text = device.name ?: device.address!!,//"(No Name)",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onClick(device) }
-                    .padding(16.dp)
-            )
-
+            if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
+                Text(
+                    text = device.name,// ?: "(No Name)",//device.address!!,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onClick(device) }
+                        .padding(16.dp)
+                )
+            }
         }
     }
 }

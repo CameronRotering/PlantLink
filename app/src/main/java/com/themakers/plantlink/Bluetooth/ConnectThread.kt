@@ -18,17 +18,16 @@ class ConnectThread: Thread() {
 
     fun setThread(device: BluetoothDevice, MY_UUID: UUID, _context: Context) {
         context = _context
-        var bluetoothTmp: BluetoothSocket? = null
+        val bluetoothTmp: BluetoothSocket?
 
         try {
             // Get a Socket to connect with the given BluetoothDevice
             // MY_UUID is the app's UUID string, also used in the server code
             bluetoothTmp = device.createRfcommSocketToServiceRecord(MY_UUID)
+            mSocket = bluetoothTmp // Moved since I don't want to connect to socket if it didn't succeed
         } catch (e: IOException) {
             Log.e(TAG, "Socket's create() method failed", e)
         }
-
-        mSocket = bluetoothTmp
     }
 
     @SuppressLint("MissingPermission")
@@ -50,6 +49,7 @@ class ConnectThread: Thread() {
 
             try {
                 mSocket?.close()
+                mSocket = null // Allow actual reconnection
 
                 return
             } catch (closeException: IOException) {

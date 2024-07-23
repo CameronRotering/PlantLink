@@ -150,7 +150,7 @@ class MainActivity : ComponentActivity() {
             arrayOf(
                 Manifest.permission.BLUETOOTH_SCAN,
                 Manifest.permission.BLUETOOTH_CONNECT,
-
+                Manifest.permission.NFC
                 )
         )
 
@@ -191,12 +191,12 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable("History") {
-                            HistoryPage(
-                                navController = navController,
-                                context = applicationContext
-                            )
-                        }
+                        //composable("History") {
+                        //    HistoryPage(
+                        //        navController = navController,
+                        //        context = applicationContext
+                        //    )
+                        //}
 
                         composable("BluetoothConnect") {
                             BluetoothConnectScreen(
@@ -318,7 +318,6 @@ class MainActivity : ComponentActivity() {
         if (nfcAdapter != null) {
             WriteModeOff()
         }
-        //
     }
 
     @Override

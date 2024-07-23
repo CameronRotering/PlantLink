@@ -40,6 +40,10 @@ class BluetoothViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _state.value)
 
+    fun isConnected(): Boolean {
+        return connectedThread != null
+    }
+
     fun startScan() {
         bluetoothController.startDiscovery()
     }
