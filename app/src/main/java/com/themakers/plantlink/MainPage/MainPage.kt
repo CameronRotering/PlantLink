@@ -4,8 +4,10 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Card
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
@@ -37,18 +38,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.PlantDataViewModel
 import com.themakers.plantlink.R
+import com.themakers.plantlink.data.PlantDevice
+
 
 var handler: Handler = Handler(Looper.getMainLooper())
 var runnable: Runnable? = null
 var loopTime: Long = 750 // Faster than arduino so we don't get old information
-var infoSpacerLength: Dp = 30.dp
+var deviceBoxPadding = PaddingValues(10.dp) // Was 30 dp for non-block version
+
+//val plantDeviceList: MutableList<PlantDevice> = mutableListOf()
+val plantDeviceList = mutableListOf<PlantDevice>(
+    PlantDevice(0, "00:00:00:00:00:00", "Galaxy Petunia"),
+    PlantDevice(1, "00:00:00:00:00:00", "Easter Cactus"),
+    PlantDevice(2, "00:00:00:00:00:00", "Acoma Crape Myrtle"),
+    PlantDevice(3, "00:00:00:00:00:00", "Katsura Tree"),
+    PlantDevice(4, "00:00:00:00:00:00", "Panda Plant"),
+)
+
 
 fun readSensors(viewModel: BluetoothViewModel) {
     if (viewModel.isConnected()) {
@@ -85,7 +97,7 @@ fun MainPage(
     context: Context,
     navController: NavHostController,
     viewModel: BluetoothViewModel,
-    plantViewModel: PlantDataViewModel
+    plantViewModel: PlantDataViewModel,
 ) {
     val lazyListState = rememberLazyListState()
 
@@ -210,7 +222,7 @@ fun MainPage(
 
         startSensorLoop(viewModel, navController)
 
-        Column (
+        Column(
             verticalArrangement = Arrangement.Bottom,
             modifier = Modifier.fillMaxSize()
         ) {
@@ -231,158 +243,35 @@ fun MainPage(
             contentPadding = padding,
             state = lazyListState
         ) {
-            item {
-                Card (
-                    shape = MaterialTheme.shapes.medium,
-                    backgroundColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier
-                        .padding(15.dp)
-                        .fillMaxWidth()
+            val chunkedDevices = plantDeviceList.chunked(2)
+
+            items(plantDeviceList.chunked(2).size) { rowIndex -> // Figure out how many rows we need (must convert to double and int)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_device_thermostat_24),
-                            contentDescription = "Temperature",
-                            tint = Color.Black,
+                    val rowItems = chunkedDevices[rowIndex]
+
+                    for (device in rowItems) {
+                        DeviceCard(
                             modifier = Modifier
-                                .size(30.dp)
+                                .weight(1f)
+                                .padding(deviceBoxPadding),
+                            onCardClick = {
+                                Toast.makeText(
+                                    context,
+                                    "Navigate to history page for this plant",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            },
+                            context = context,
+                            navController = navController,
+                            plantDevice = device,
                         )
-                        Text(
-                            text = "Temperature",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Left,
-                            fontSize = 20.sp
-                        )
-                        Text(
-                            text = plantViewModel.finalTemp.toString() + "° F ",//"74° F ",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Right,
-                            modifier = Modifier.fillMaxWidth(),
-                            fontSize = 30.sp
-                        )
-                    }
-                }
 
-                Spacer(modifier = Modifier.height(infoSpacerLength))
-                
-                Card (
-                    shape = MaterialTheme.shapes.medium,
-                    backgroundColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier
-                        .padding(15.dp)
-                        .fillMaxWidth()
-                ) {
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.sharp_humidity_percentage_24),
-                            contentDescription = "Humidity",
-                            tint = Color.Black,
-                            modifier = Modifier
-                                .size(30.dp)
-                        )
-                        Text(
-                            text = "Humidity",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Left,
-                            fontSize = 20.sp
-                        )
-                        Text(
-                            text = plantViewModel.humidity.toString() + " RH ",//"34.7 RH ",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Right,
-                            modifier = Modifier.fillMaxWidth(),
-                            fontSize = 30.sp
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(infoSpacerLength))
-
-                Card (
-                    shape = MaterialTheme.shapes.medium,
-                    backgroundColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier
-                        .padding(15.dp)
-                        .fillMaxWidth()
-                ) {
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_water_drop_24),
-                            contentDescription = "Soil Moisture",
-                            tint = Color.Black,
-                            modifier = Modifier
-                                .size(30.dp)
-                        )
-                        Text(
-                            text = "Soil Moisture",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Left,
-                            fontSize = 20.sp
-                        )
-                        Text(
-                            text = plantViewModel.moisture.toString() + " %",//"880 ",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Right,
-                            modifier = Modifier.fillMaxWidth(),
-                            fontSize = 30.sp
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(infoSpacerLength))
-
-                Card (
-                    shape = MaterialTheme.shapes.medium,
-                    backgroundColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier
-                        .padding(15.dp)
-                        .fillMaxWidth()
-                ) {
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_sun_24),
-                            contentDescription = "Light",
-                            tint = Color.Black,
-                            modifier = Modifier
-                                .size(30.dp)
-                        )
-                        Text(
-                            text = " Light",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Left,
-                            fontSize = 20.sp
-                        )
-                        Text(
-                            text = plantViewModel.light.toString() + " % ",//"34.7 RH ",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Right,
-                            modifier = Modifier.fillMaxWidth(),
-                            fontSize = 30.sp
-                        )
+                        if (rowItems.size == 1) {
+                            Spacer(Modifier.weight(1f))
+                        }
                     }
                 }
             }

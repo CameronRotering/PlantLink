@@ -1,7 +1,6 @@
 package com.themakers.plantlink.SettingsPage
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -222,7 +221,7 @@ fun SettingsPage(
         ) {
             item {
                 Card (
-                    shape = MaterialTheme.shapes.medium,
+                    shape = MaterialTheme.shapes.small,
                     backgroundColor = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.colorScheme.secondary
                 ) {
@@ -275,7 +274,7 @@ fun SettingsPage(
                                     imeAction = ImeAction.Done
                                 ),
                                 singleLine = true,
-                                shape = MaterialTheme.shapes.medium,
+                                shape = MaterialTheme.shapes.small,
                                 colors = TextFieldDefaults.colors(
                                     focusedContainerColor = MaterialTheme.colorScheme.background,
                                     unfocusedContainerColor = MaterialTheme.colorScheme.primary,
@@ -328,7 +327,7 @@ fun SettingsPage(
                                     imeAction = ImeAction.Done
                                 ),
                                 singleLine = true,
-                                shape = MaterialTheme.shapes.medium,
+                                shape = MaterialTheme.shapes.small,
                                 colors = TextFieldDefaults.colors(
                                     focusedContainerColor = MaterialTheme.colorScheme.background,
                                     unfocusedContainerColor = MaterialTheme.colorScheme.primary,
