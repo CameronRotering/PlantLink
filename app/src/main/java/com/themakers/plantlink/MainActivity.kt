@@ -21,20 +21,24 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.room.Room
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
-import com.themakers.plantlink.HistoryPage.HistoryPage
 import com.themakers.plantlink.MainPage.MainPage
 import com.themakers.plantlink.SettingsPage.SettingsPage
 import com.themakers.plantlink.data.AndroidBluetoothController
+import com.themakers.plantlink.data.SettingsDatabase
 import com.themakers.plantlink.ui.theme.PlantLInkTheme
 import java.io.IOException
 import java.io.UnsupportedEncodingException
@@ -73,6 +77,8 @@ fun activateNfc(myTag: Tag, context: Context) {
 
 class MainActivity : ComponentActivity() {
 
+
+
     var pendingIntent: PendingIntent? = null
     var writeTagFilters: Array<IntentFilter?>? = null
     var writeMode = false
@@ -100,7 +106,23 @@ class MainActivity : ComponentActivity() {
 
     var viewModel: BluetoothViewModel? = null
 
+    private val settingsDb by lazy {
+        Room.databaseBuilder(
+            applicationContext,
+            SettingsDatabase::class.java,
+            "settings.db"
+        ).build()
+    }
 
+    private val settingsViewModel by viewModels<SettingsViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return SettingsViewModel(settingsDb.settingsDao()) as T
+                }
+            }
+        }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,7 +137,6 @@ class MainActivity : ComponentActivity() {
             //finish()
         }
 
-
         //readFromIntent(intent)
         pendingIntent = PendingIntent.getActivity(applicationContext, 0, Intent(applicationContext, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_IMMUTABLE) // was 0
@@ -125,6 +146,7 @@ class MainActivity : ComponentActivity() {
 
 
         val plantViewModel = PlantDataViewModel()
+
 
         val enableBluetoothLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -163,7 +185,10 @@ class MainActivity : ComponentActivity() {
             PlantLInkTheme {
                 viewModel = BluetoothViewModel(AndroidBluetoothController(applicationContext))
                 val state by viewModel!!.state.collectAsState()
-                
+
+                val settingsState by settingsViewModel.state.collectAsState()
+
+
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -180,14 +205,21 @@ class MainActivity : ComponentActivity() {
                                 context = applicationContext,
                                 navController = navController,
                                 viewModel = viewModel!!,
-                                plantViewModel = plantViewModel
+                                plantViewModel = plantViewModel,
+                                settingsDb = settingsDb,
+                                settingsViewModel = settingsViewModel,
+                                state = settingsState,
+                                onEvent = settingsViewModel::onEvent
                             )
                         }
 
                         composable("Settings") {
                             SettingsPage(
                                 navController = navController,
-                                context = applicationContext
+                                context = applicationContext,
+                                settingsDb = settingsDb,
+                                state = settingsState,
+                                onEvent = settingsViewModel::onEvent
                             )
                         }
 
