@@ -147,23 +147,11 @@ fun MainPage(
                     ),
                     selected = true,
                     onClick = {
-                        //viewModelScope.launch {
-                        //    Toast.makeText(
-                        //        context,
-                        //        if (settingsViewModel.getSetting(context)) "Fahrenheit" else "Celsius", // settingsDb
-                        //        Toast.LENGTH_LONG
-                        //    ).show()
-                        //}
-
                         Toast.makeText(
                             context,
                             state.isFahrenheit.toString(), //if (state.isFahrenheit == false) "Celsius" else "Fahrenheit", // Null and true are Fahrenheit (default is fahrenheit)
                             Toast.LENGTH_LONG
                         ).show()
-
-
-                        //settingsViewModel.getSetting(settingsDb)
-
 
                         viewModel.connectedThread?.sendData()
                     },
@@ -287,7 +275,7 @@ fun MainPage(
                             fontSize = 20.sp
                         )
                         Text(
-                            text = plantViewModel.finalTemp.toString() + "° F ",//"74° F ",
+                            text = plantViewModel.finalTemp.toString() + "° " + if (state.isFahrenheit) "F " else "C ",//"74° F ",
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Right,
                             modifier = Modifier.fillMaxWidth(),

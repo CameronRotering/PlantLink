@@ -78,10 +78,6 @@ class CharacterLimitVisualTransformation : VisualTransformation {
     }
 }
 
-
-
-
-
 fun getDegree(bFahrenheit: Boolean, context: Context) {
     if (bFahrenheit) {
         Toast.makeText(
@@ -117,16 +113,7 @@ fun SettingsPage(
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
-    //val settingsViewModel = SettingsViewModel()
-
-    var isFahrenheit = state.isFahrenheit //remember { mutableStateOf(true) } //if (state.isFahrenheit == false) false else true
-
-    //LaunchedEffect(Unit) {
-    //    isFahrenheit.value = if (state.isFahrenheit == false) false else true  // Null and true are Fahrenheit (default is fahrenheit)
-    //}
-
-
-
+    var isFahrenheit = state.isFahrenheit
 
     Scaffold(
         //backgroundColor = MaterialTheme.colorScheme.background,

@@ -25,7 +25,6 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -41,7 +40,6 @@ import com.themakers.plantlink.SettingsPage.SettingsPage
 import com.themakers.plantlink.data.AndroidBluetoothController
 import com.themakers.plantlink.data.SettingsDatabase
 import com.themakers.plantlink.ui.theme.PlantLInkTheme
-import kotlinx.coroutines.flow.first
 import java.io.IOException
 import java.io.UnsupportedEncodingException
 import kotlin.experimental.and
@@ -76,46 +74,6 @@ fun activateNfc(myTag: Tag, context: Context) {
         ).show()
     }
 }
-
-//@Entity
-//data class Settings(
-//    @PrimaryKey val id: Int = 1, // Only using one setting
-//    val isFahrenheit: Boolean
-//)
-
-//@Dao
-//interface SettingsDao {
-//    @Query("SELECT * FROM Settings WHERE id =1")
-//    fun getSetting(): Flow<Settings?>
-//
-//    @Query("UPDATE Settings SET isFahrenheit = :newValue WHERE id = 1")
-//    suspend fun updateFahrenheit(newValue: Boolean)
-//
-////    @Insert(onConflict = OnConflictStrategy.REPLACE)
-////    suspend fun insert(setting: Settings)
-//}
-
-//@Database(entities = [Settings::class], version = 1)
-//abstract class AppDatabase : RoomDatabase() {
-//    abstract fun settingsDao(): SettingsDao
-//
-//    companion object {
-//        @Volatile
-//        private var INSTANCE: AppDatabase? = null
-//
-//        fun getDatabase(context: Context): AppDatabase {
-//            return INSTANCE ?: synchronized(this) {
-//                val instance = Room.databaseBuilder(
-//                    context.applicationContext,
-//                    AppDatabase::class.java,
-//                    "SettingsDatabase"
-//                ).build()
-//                INSTANCE = instance
-//                instance
-//            }
-//        }
-//    }
-//}
 
 class MainActivity : ComponentActivity() {
 
@@ -166,8 +124,6 @@ class MainActivity : ComponentActivity() {
         }
     )
 
-    //val settingsViewModel = SettingsViewModel()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -190,10 +146,6 @@ class MainActivity : ComponentActivity() {
 
 
         val plantViewModel = PlantDataViewModel()
-
-
-
-        //val settingsDb = AppDatabase.getDatabase(applicationContext)
 
 
         val enableBluetoothLauncher = registerForActivityResult(
@@ -242,22 +194,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    //val settingsDb = Room.databaseBuilder(
-                    //    applicationContext,
-                    //    AppDatabase::class.java, "settings-database"
-                    //).build()
-
-                    // To get the setting:
-                    //val settingFlow = db.settingsDao().getSetting()
-
-                    // To insert a setting:
-                    //db.settingsDao().updateFahrenheit(false)
-
-
-                    LaunchedEffect(Unit) {
-                        Log.e("TEMPCHANGE", "Value: ${settingsDb.settingsDao().getSetting().first()?.isFahrenheit}")
-                    }
-
                     val navController = rememberNavController()
 
                     NavHost(
