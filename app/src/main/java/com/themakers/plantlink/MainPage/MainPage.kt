@@ -42,11 +42,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.themakers.plantlink.data.AppDatabase
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.PlantDataViewModel
 import com.themakers.plantlink.R
 import com.themakers.plantlink.SettingsViewModel
+import com.themakers.plantlink.data.SettingEvent
+import com.themakers.plantlink.data.SettingState
+import com.themakers.plantlink.data.SettingsDatabase
 
 var handler: Handler = Handler(Looper.getMainLooper())
 var runnable: Runnable? = null
@@ -89,8 +91,10 @@ fun MainPage(
     navController: NavHostController,
     viewModel: BluetoothViewModel,
     plantViewModel: PlantDataViewModel,
-    settingsDb: AppDatabase,
-    settingsViewModel: SettingsViewModel
+    settingsDb: SettingsDatabase,
+    settingsViewModel: SettingsViewModel,
+    state: SettingState,
+    onEvent: (SettingEvent) -> Unit
 ) {
     val lazyListState = rememberLazyListState()
 
@@ -143,11 +147,20 @@ fun MainPage(
                     ),
                     selected = true,
                     onClick = {
+                        //viewModelScope.launch {
+                        //    Toast.makeText(
+                        //        context,
+                        //        if (settingsViewModel.getSetting(context)) "Fahrenheit" else "Celsius", // settingsDb
+                        //        Toast.LENGTH_LONG
+                        //    ).show()
+                        //}
+
                         Toast.makeText(
                             context,
-                            if (settingsViewModel.getSetting(context)) "Fahrenheit" else "Celsius", // settingsDb
+                            state.isFahrenheit.toString(), //if (state.isFahrenheit == false) "Celsius" else "Fahrenheit", // Null and true are Fahrenheit (default is fahrenheit)
                             Toast.LENGTH_LONG
                         ).show()
+
 
                         //settingsViewModel.getSetting(settingsDb)
 

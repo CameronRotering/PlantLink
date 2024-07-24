@@ -37,7 +37,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,9 +63,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.themakers.plantlink.data.AppDatabase
 import com.themakers.plantlink.R
-import com.themakers.plantlink.SettingsViewModel
+import com.themakers.plantlink.data.SettingEvent
+import com.themakers.plantlink.data.SettingState
+import com.themakers.plantlink.data.SettingsDatabase
 
 class CharacterLimitVisualTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
@@ -103,7 +103,9 @@ fun getDegree(bFahrenheit: Boolean, context: Context) {
 fun SettingsPage(
     context: Context,
     navController: NavHostController,
-    settingsDb: AppDatabase
+    settingsDb: SettingsDatabase,
+    state: SettingState,
+    onEvent: (SettingEvent) -> Unit
 ) {
     val lazyListState = rememberLazyListState()
     var minSoilMoisture by rememberSaveable(stateSaver = TextFieldValue.Saver) {
@@ -115,13 +117,13 @@ fun SettingsPage(
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
-    val settingsViewModel = SettingsViewModel()
+    //val settingsViewModel = SettingsViewModel()
 
-    var isFahrenheit by remember { mutableStateOf(true) }
+    var isFahrenheit = state.isFahrenheit //remember { mutableStateOf(true) } //if (state.isFahrenheit == false) false else true
 
-    LaunchedEffect(Unit) {
-        isFahrenheit = settingsViewModel.getSetting(context)
-    }
+    //LaunchedEffect(Unit) {
+    //    isFahrenheit.value = if (state.isFahrenheit == false) false else true  // Null and true are Fahrenheit (default is fahrenheit)
+    //}
 
 
 
@@ -414,7 +416,8 @@ fun SettingsPage(
                                 Button(
                                     onClick = { // Click C button
                                         isFahrenheit = false
-                                        settingsViewModel.changeSetting(context, false) // settingsDb
+                                        //settingsViewModel.changeSetting(context, false) // settingsDb
+                                        onEvent(SettingEvent.SetTempUnit(false))
                                         getDegree(isFahrenheit, context)
                                     }, //expanded = !expanded },
                                     modifier = Modifier
@@ -483,7 +486,7 @@ fun SettingsPage(
                                 Button(
                                     onClick = { // Click F when C is enabled
                                         isFahrenheit = true
-                                        settingsViewModel.changeSetting(context, true)
+                                        onEvent(SettingEvent.SetTempUnit(true))
                                         getDegree(isFahrenheit, context)
                                     },
                                     modifier = Modifier

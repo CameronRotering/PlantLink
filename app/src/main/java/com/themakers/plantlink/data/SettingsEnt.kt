@@ -5,6 +5,6 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Settings(
-    @PrimaryKey val id: Int = 1, // Only using one setting
-    val isFahrenheit: Boolean
+    val isFahrenheit: Boolean,
+    @PrimaryKey val id: Int = 0
 )
