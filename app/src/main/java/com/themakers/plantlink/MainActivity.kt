@@ -206,8 +206,6 @@ class MainActivity : ComponentActivity() {
                                 navController = navController,
                                 viewModel = viewModel!!,
                                 plantViewModel = plantViewModel,
-                                settingsDb = settingsDb,
-                                settingsViewModel = settingsViewModel,
                                 state = settingsState,
                                 onEvent = settingsViewModel::onEvent
                             )
@@ -217,7 +215,6 @@ class MainActivity : ComponentActivity() {
                             SettingsPage(
                                 navController = navController,
                                 context = applicationContext,
-                                settingsDb = settingsDb,
                                 state = settingsState,
                                 onEvent = settingsViewModel::onEvent
                             )
