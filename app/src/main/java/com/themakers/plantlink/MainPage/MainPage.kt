@@ -44,6 +44,7 @@ import androidx.navigation.NavHostController
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.PlantDataViewModel
 import com.themakers.plantlink.R
+import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
 import com.themakers.plantlink.data.PlantDevice
 import com.themakers.plantlink.data.SettingEvent
 import com.themakers.plantlink.data.SettingState
@@ -55,11 +56,11 @@ var deviceBoxPadding = PaddingValues(10.dp) // Was 30 dp for non-block version
 
 //val plantDeviceList: MutableList<PlantDevice> = mutableListOf()
 val plantDeviceList = mutableListOf<PlantDevice>(
-    PlantDevice(0, "00:00:00:00:00:00", "Galaxy Petunia"),
-    PlantDevice(1, "00:00:00:00:00:00", "Easter Cactus"),
-    PlantDevice(2, "00:00:00:00:00:00", "Acoma Crape Myrtle"),
-    PlantDevice(3, "00:00:00:00:00:00", "Katsura Tree"),
-    PlantDevice(4, "00:00:00:00:00:00", "Panda Plant"),
+    PlantDevice(0, "00:00:00:00:00:00", "Galaxy Petunia", "1", "10"),
+    PlantDevice(1, "00:00:00:00:00:00", "Easter Cactus", "2", "20"),
+    PlantDevice(2, "00:00:00:00:00:00", "Acoma Crape Myrtle", "3", "30"),
+    PlantDevice(3, "00:00:00:00:00:00", "Katsura Tree", "4", "40"),
+    PlantDevice(4, "00:00:00:00:00:00", "Panda Plant", "5", "50"),
 )
 
 
@@ -100,7 +101,8 @@ fun MainPage(
     viewModel: BluetoothViewModel,
     plantViewModel: PlantDataViewModel,
     state: SettingState,
-    onEvent: (SettingEvent) -> Unit
+    onEvent: (SettingEvent) -> Unit,
+    clickedPlantViewModel: CurrClickedPlantViewModel
 ) {
     val lazyListState = rememberLazyListState()
 
@@ -278,7 +280,8 @@ fun MainPage(
                             plantViewModel = plantViewModel,
                             plantDevice = device,
                             state = state,
-                            onEvent = onEvent
+                            onEvent = onEvent,
+                            clickedPlantViewModel = clickedPlantViewModel
                         )
 
                         if (rowItems.size == 1) {

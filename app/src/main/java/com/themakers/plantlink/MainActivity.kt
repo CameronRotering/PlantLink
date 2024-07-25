@@ -36,6 +36,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.MainPage.MainPage
+import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
+import com.themakers.plantlink.SettingsPage.PlantSettingsPage
 import com.themakers.plantlink.SettingsPage.SettingsPage
 import com.themakers.plantlink.data.AndroidBluetoothController
 import com.themakers.plantlink.data.SettingsDatabase
@@ -188,6 +190,8 @@ class MainActivity : ComponentActivity() {
 
                 val settingsState by settingsViewModel.state.collectAsState()
 
+                val selectedPlantViewModel = CurrClickedPlantViewModel()
+
 
 
                 Surface(
@@ -207,7 +211,8 @@ class MainActivity : ComponentActivity() {
                                 viewModel = viewModel!!,
                                 plantViewModel = plantViewModel,
                                 state = settingsState,
-                                onEvent = settingsViewModel::onEvent
+                                onEvent = settingsViewModel::onEvent,
+                                clickedPlantViewModel = selectedPlantViewModel
                             )
                         }
 
@@ -217,6 +222,14 @@ class MainActivity : ComponentActivity() {
                                 context = applicationContext,
                                 state = settingsState,
                                 onEvent = settingsViewModel::onEvent
+                            )
+                        }
+
+                        composable("PlantLinkSettings") {
+                            PlantSettingsPage(
+                                navController = navController,
+                                context = applicationContext,
+                                plantViewModel = selectedPlantViewModel
                             )
                         }
 

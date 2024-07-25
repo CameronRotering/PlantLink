@@ -1,6 +1,7 @@
 package com.themakers.plantlink.MainPage
 
 import android.content.Context
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.themakers.plantlink.PlantDataViewModel
 import com.themakers.plantlink.R
+import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
 import com.themakers.plantlink.data.PlantDevice
 import com.themakers.plantlink.data.SettingEvent
 import com.themakers.plantlink.data.SettingState
@@ -44,6 +49,7 @@ fun DeviceCard(
     plantDevice: PlantDevice, // Hold which plant this card pertains to
     state: SettingState,
     onEvent: (SettingEvent) -> Unit,
+    clickedPlantViewModel: CurrClickedPlantViewModel
 ) {
     Card(
         onClick = onCardClick,
@@ -84,6 +90,7 @@ fun DeviceCard(
                         tint = Color.Black,
                         modifier = Modifier
                             .size(iconSize)
+                            .padding(start = 5.dp)
                     )
 //                        Text(
 //                            text = "Temperature",
@@ -114,6 +121,7 @@ fun DeviceCard(
                         tint = Color.Black,
                         modifier = Modifier
                             .size(iconSize)
+                            .padding(start = 5.dp)
                     )
 //                        Text(
 //                            text = "Humidity",
@@ -144,6 +152,7 @@ fun DeviceCard(
                         tint = Color.Black,
                         modifier = Modifier
                             .size(iconSize)
+                            .padding(start = 5.dp)
                     )
 //                    Text(
 //                        text = "Soil Moisture",
@@ -174,6 +183,7 @@ fun DeviceCard(
                         tint = Color.Black,
                         modifier = Modifier
                             .size(iconSize)
+                            .padding(start = 5.dp)
                     )
 //                    Text(
 //                        text = " Light",
@@ -193,35 +203,39 @@ fun DeviceCard(
         }
 
 
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .fillMaxHeight(),
-//            horizontalArrangement = Arrangement.End
-//        )
-//        {
-//            IconButton(
-//                onClick = {
-//                    /* TODO: Take to history page which loads average data of that plant */
-//                    /* TODO: Images above name of plant, maybe just template picture as soon as possible */
-//
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            horizontalArrangement = Arrangement.End
+        )
+        {
+            IconButton(
+                onClick = {
+                    /* TODO: Take to history page which loads average data of that plant */
+                    /* TODO: Images above name of plant, maybe just template picture as soon as possible */
+
 //                    Toast.makeText(
 //                        context,
 //                        "Navigate to plant settings",
 //                        Toast.LENGTH_LONG
 //                    ).show()
-//
-//                },
-//
-//                ) {
-//                Icon(
-//                    imageVector = Icons.Default.MoreVert,
-//                    contentDescription = "Plant Settings",
-//                    tint = Color.Black,
-//                    modifier = Modifier
-//                        .size(20.dp)
-//                )
-//            }
-//        }
+
+                    clickedPlantViewModel.currClickedPlant = plantDevice
+
+                    navController.navigate("PlantLinkSettings")
+
+                },
+
+                ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "Plant Settings",
+                    tint = Color.Black,
+                    modifier = Modifier
+                        .size(20.dp)
+                )
+            }
+        }
     }
 }
