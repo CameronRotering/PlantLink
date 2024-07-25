@@ -52,6 +52,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.OffsetMapping
@@ -65,7 +66,6 @@ import androidx.navigation.NavHostController
 import com.themakers.plantlink.R
 import com.themakers.plantlink.data.SettingEvent
 import com.themakers.plantlink.data.SettingState
-import com.themakers.plantlink.data.SettingsDatabase
 
 class CharacterLimitVisualTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
@@ -77,28 +77,11 @@ class CharacterLimitVisualTransformation : VisualTransformation {
     }
 }
 
-fun getDegree(bFahrenheit: Boolean, context: Context) {
-    if (bFahrenheit) {
-        Toast.makeText(
-            context,
-            "Degree Type is Fahrenheit",
-            Toast.LENGTH_LONG
-        ).show()
-    } else {
-        Toast.makeText(
-            context,
-            "Degree Type is Celsius",
-            Toast.LENGTH_LONG
-        ).show()
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsPage(
     context: Context,
     navController: NavHostController,
-    settingsDb: SettingsDatabase,
     state: SettingState,
     onEvent: (SettingEvent) -> Unit
 ) {
@@ -391,24 +374,23 @@ fun SettingsPage(
                             text = "Temperature Unit",
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Center,
-                            fontSize = 20.sp,
-                            modifier = Modifier.fillMaxSize()
+                            fontSize = 30.sp,
+                            modifier = Modifier.fillMaxSize(),
+                            fontWeight = FontWeight.SemiBold
                         )
                         Row (
                             verticalAlignment = Alignment.CenterVertically
                         )
-                        {
+                        { // Can probably change the button info (color) to mutable or have ternary operator on when their color is what but also opens up to maybe 2 at once
                             if (isFahrenheit) {
                                 Button(
                                     onClick = { // Click C button
                                         isFahrenheit = false
-                                        //settingsViewModel.changeSetting(context, false) // settingsDb
                                         onEvent(SettingEvent.SetTempUnit(false))
-                                        getDegree(isFahrenheit, context)
-                                    }, //expanded = !expanded },
+                                    },
                                     modifier = Modifier
                                         .padding(15.dp)
-                                        .width(100.dp)
+                                        .width(65.dp)
                                         .height(65.dp),
                                     shape = MaterialTheme.shapes.medium,
                                     colors = ButtonDefaults.buttonColors(
@@ -418,19 +400,19 @@ fun SettingsPage(
                                 ) {
                                     Text(
                                         text = "C",
-                                        modifier = Modifier
-                                            .padding(15.dp),
-                                        fontSize = 20.sp
+                                        fontSize = 30.sp,
+                                        textAlign = TextAlign.Center,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 }
 
-                                Spacer(modifier = Modifier.padding(10.dp))
+                                Spacer(modifier = Modifier.padding(30.dp))
 
                                 Button(
-                                    onClick = { getDegree(isFahrenheit, context) },
+                                    onClick = { }, // Cick F when already set to F
                                     modifier = Modifier
                                         .padding(15.dp)
-                                        .width(100.dp)
+                                        .width(65.dp)
                                         .height(65.dp),
                                     shape = MaterialTheme.shapes.medium,
                                     colors = ButtonDefaults.buttonColors(
@@ -441,17 +423,17 @@ fun SettingsPage(
                                 ) {
                                     Text(
                                         text = "F",
-                                        modifier = Modifier
-                                            .padding(15.dp),
-                                        fontSize = 20.sp
+                                        fontSize = 30.sp,
+                                        textAlign = TextAlign.Center,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 }
                             } else {
                                 Button(
-                                    onClick = { getDegree(isFahrenheit, context) },
+                                    onClick = { }, // Click c when already set to C
                                     modifier = Modifier
                                         .padding(15.dp)
-                                        .width(100.dp)
+                                        .width(65.dp)
                                         .height(65.dp),
                                     shape = MaterialTheme.shapes.medium,
                                     colors = ButtonDefaults.buttonColors(
@@ -461,23 +443,22 @@ fun SettingsPage(
                                 ) {
                                     Text(
                                         text = "C",
-                                        modifier = Modifier
-                                            .padding(15.dp),
-                                        fontSize = 20.sp
+                                        fontSize = 30.sp,
+                                        textAlign = TextAlign.Center,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 }
 
-                                Spacer(modifier = Modifier.padding(10.dp))
+                                Spacer(modifier = Modifier.padding(30.dp))
 
                                 Button(
                                     onClick = { // Click F when C is enabled
                                         isFahrenheit = true
                                         onEvent(SettingEvent.SetTempUnit(true))
-                                        getDegree(isFahrenheit, context)
                                     },
                                     modifier = Modifier
                                         .padding(15.dp)
-                                        .width(100.dp)
+                                        .width(65.dp)
                                         .height(65.dp),
                                     shape = MaterialTheme.shapes.medium,
                                     colors = ButtonDefaults.buttonColors(
@@ -487,9 +468,9 @@ fun SettingsPage(
                                 ) {
                                     Text(
                                         text = "F",
-                                        modifier = Modifier
-                                            .padding(15.dp),
-                                        fontSize = 20.sp
+                                        fontSize = 30.sp,
+                                        textAlign = TextAlign.Center,
+                                        fontWeight = FontWeight.Bold
                                     )
                                 }
                             }

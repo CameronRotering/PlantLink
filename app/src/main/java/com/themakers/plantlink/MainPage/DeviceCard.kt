@@ -24,8 +24,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.themakers.plantlink.PlantDataViewModel
 import com.themakers.plantlink.R
 import com.themakers.plantlink.data.PlantDevice
+import com.themakers.plantlink.data.SettingEvent
+import com.themakers.plantlink.data.SettingState
 
 val iconSize = 30.dp
 
@@ -37,7 +40,10 @@ fun DeviceCard(
     onCardClick: () -> Unit,
     context: Context,
     navController: NavHostController,
-    plantDevice: PlantDevice // Hold which plant this card pertains to
+    plantViewModel: PlantDataViewModel,
+    plantDevice: PlantDevice, // Hold which plant this card pertains to
+    state: SettingState,
+    onEvent: (SettingEvent) -> Unit,
 ) {
     Card(
         onClick = onCardClick,
@@ -86,7 +92,7 @@ fun DeviceCard(
 //                            fontSize = 20.sp
 //                        )
                     Text(
-                        text = "74° F ",
+                        text = "74" + "° " + if (state.isFahrenheit) "F " else "C ",
                         color = Color(0, 0, 0, 255),
                         textAlign = TextAlign.Right,
                         modifier = Modifier.fillMaxWidth(),

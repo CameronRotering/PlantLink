@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Card
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
@@ -39,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -47,11 +45,8 @@ import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.PlantDataViewModel
 import com.themakers.plantlink.R
 import com.themakers.plantlink.data.PlantDevice
-
-import com.themakers.plantlink.SettingsViewModel
 import com.themakers.plantlink.data.SettingEvent
 import com.themakers.plantlink.data.SettingState
-import com.themakers.plantlink.data.SettingsDatabase
 
 var handler: Handler = Handler(Looper.getMainLooper())
 var runnable: Runnable? = null
@@ -104,8 +99,6 @@ fun MainPage(
     navController: NavHostController,
     viewModel: BluetoothViewModel,
     plantViewModel: PlantDataViewModel,
-    settingsDb: SettingsDatabase,
-    settingsViewModel: SettingsViewModel,
     state: SettingState,
     onEvent: (SettingEvent) -> Unit
 ) {
@@ -282,7 +275,10 @@ fun MainPage(
                             },
                             context = context,
                             navController = navController,
+                            plantViewModel = plantViewModel,
                             plantDevice = device,
+                            state = state,
+                            onEvent = onEvent
                         )
 
                         if (rowItems.size == 1) {
