@@ -92,7 +92,7 @@ fun stopReadingSensorLoop() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
     context: Context,

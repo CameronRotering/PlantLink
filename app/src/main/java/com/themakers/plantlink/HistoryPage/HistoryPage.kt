@@ -38,7 +38,9 @@ import androidx.navigation.NavHostController
 import com.themakers.plantlink.R
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+/* TODO: Maybe have settings icon on this page to also allow you to get to that plants settings. */
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryPage(
     context: Context,
