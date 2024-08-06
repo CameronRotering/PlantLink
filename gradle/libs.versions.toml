@@ -1,6 +1,5 @@
 [versions]
 androidGradlePlugin = "8.5.1"
-
 activityCompose = "1.9.0"
 compiler = "1.5.14"
 coreKtx = "1.13.1"
@@ -14,6 +13,7 @@ materialVersion = "1.12.0"
 navigationCompose = "2.7.7"
 roomKtx = "2.6.1"
 uiTestJunit4 = "1.6.8"
+ycharts = "2.1.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -35,6 +35,7 @@ androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref =
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiTestJunit4" }
 junit = { module = "junit:junit", version.ref = "junitVersion" }
 material = { module = "com.google.android.material:material", version.ref = "materialVersion" }
+ycharts = { module = "co.yml:ycharts", version.ref = "ycharts" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

@@ -27,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -35,8 +34,36 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import co.yml.charts.common.model.Point
+import co.yml.charts.ui.linechart.LineChart
 import com.themakers.plantlink.R
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
+import com.themakers.plantlink.SimpleLineChart
+
+
+val tempOverTime: List<Point> =
+    listOf(
+        Point(0.0f, 83.45f),
+        Point(1.0f, 91.78f),
+        Point(2.0f, 67.92f),
+        Point(3.0f, 105.31f),
+        Point(4.0f, 72.68f),
+        Point(5.0f, 98.03f),
+        Point(6.0f, 62.19f),
+        Point(7.0f, 89.54f),
+        Point(8.0f, 101.28f),
+        Point(9.0f, 76.35f),
+        Point(10.0f, 94.81f),
+        Point(11.0f, 69.07f),
+        Point(12.0f, 85.62f),
+        Point(13.0f, 108.95f),
+        Point(14.0f, 73.41f),
+        Point(15.0f, 90.28f),
+        Point(16.0f, 65.74f),
+        Point(17.0f, 81.99f),
+        Point(18.0f, 103.63f),
+        Point(19.0f, 77.17f)
+    )
 
 /* TODO: Maybe have settings icon on this page to also allow you to get to that plants settings. */
 
@@ -69,7 +96,7 @@ fun HistoryPage(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.popBackStack()
+                        navController.navigateUp()
 
                         plantViewModel.currClickedPlant = null
                     }) {
@@ -98,10 +125,9 @@ fun HistoryPage(
                     ),
                     selected = false,
                     onClick = {
-                        plantViewModel.currClickedPlant = null
-
-
                         navController.navigate("Home")
+
+                        plantViewModel.currClickedPlant = null
                     },
                     label = {
                         Text(
@@ -125,9 +151,9 @@ fun HistoryPage(
                     ),
                     selected = false,
                     onClick = {
-                        plantViewModel.currClickedPlant = null
-
                         navController.navigate("Settings")
+
+                        plantViewModel.currClickedPlant = null
                     },
                     label = {
                         Text(
@@ -169,7 +195,13 @@ fun HistoryPage(
                     backgroundColor = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.colorScheme.secondary
                 ) {
-
+                    //SimpleLineChart(pointsData = tempOverTime)
+                    
+                    LineChart(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp),
+                        lineChartData = SimpleLineChart(pointsData = tempOverTime)
+                    )
                 }
             }
         }

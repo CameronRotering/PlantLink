@@ -56,6 +56,7 @@ android {
 
 dependencies {
 
+    implementation(libs.ycharts)
 
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)

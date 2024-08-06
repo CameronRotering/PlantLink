@@ -116,10 +116,9 @@ fun PlantSettingsPage(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
+                        navController.navigateUp()
+
                         plantViewModel.currClickedPlant = null
-
-
-                        navController.popBackStack()
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -146,10 +145,9 @@ fun PlantSettingsPage(
                     ),
                     selected = false,
                     onClick = {
-                        plantViewModel.currClickedPlant = null
-
-
                         navController.navigate("Home")
+
+                        plantViewModel.currClickedPlant = null
                     },
                     label = {
                         Text(
@@ -173,9 +171,9 @@ fun PlantSettingsPage(
                     ),
                     selected = false,
                     onClick = {
-                        plantViewModel.currClickedPlant = null
-
                         navController.navigate("Settings")
+
+                        plantViewModel.currClickedPlant = null
                     },
                     label = {
                         Text(
