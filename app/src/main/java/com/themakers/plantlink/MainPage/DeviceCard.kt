@@ -42,7 +42,7 @@ val iconSize = 30.dp
 fun DeviceCard(
     //card: StoriesData,
     modifier: Modifier = Modifier,
-    onCardClick: () -> Unit,
+    //onCardClick: () -> Unit,
     context: Context,
     navController: NavHostController,
     plantViewModel: PlantDataViewModel,
@@ -52,7 +52,11 @@ fun DeviceCard(
     clickedPlantViewModel: CurrClickedPlantViewModel
 ) {
     Card(
-        onClick = onCardClick,
+        onClick = {
+            clickedPlantViewModel.currClickedPlant = plantDevice
+
+            navController.navigate("HistoryPage")
+        },
         modifier = modifier,
         shape = MaterialTheme.shapes.medium,
         backgroundColor = Color(217, 217, 217, 255), //MaterialTheme.colorScheme.background,
@@ -161,7 +165,7 @@ fun DeviceCard(
 //                        fontSize = 20.sp
 //                    )
                     Text(
-                        text = "75.32 %",
+                        text = "75.32%",
                         color = Color(0, 0, 0, 255),
                         textAlign = TextAlign.Right,
                         modifier = Modifier.fillMaxWidth(),
@@ -192,7 +196,7 @@ fun DeviceCard(
 //                        fontSize = 20.sp
 //                    )
                     Text(
-                        text = "99.99 %",
+                        text = "99.99%",
                         color = Color(0, 0, 0, 255),
                         textAlign = TextAlign.Right,
                         modifier = Modifier.fillMaxWidth(),

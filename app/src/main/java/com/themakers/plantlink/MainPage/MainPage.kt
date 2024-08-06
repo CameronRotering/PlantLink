@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -155,12 +154,6 @@ fun MainPage(
                     ),
                     selected = true,
                     onClick = {
-                        Toast.makeText(
-                            context,
-                            state.isFahrenheit.toString(), //if (state.isFahrenheit == false) "Celsius" else "Fahrenheit", // Null and true are Fahrenheit (default is fahrenheit)
-                            Toast.LENGTH_LONG
-                        ).show()
-
                         viewModel.connectedThread?.sendData()
                     },
                     label = {
@@ -202,31 +195,6 @@ fun MainPage(
                         )
                     }
                 )
-                //NavigationBarItem(
-                //    colors = NavigationBarItemDefaults.colors(
-                //        unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                //        selectedIconColor = MaterialTheme.colorScheme.secondary,
-                //        indicatorColor = MaterialTheme.colorScheme.background
-                //    ),
-                //    selected = false,
-                //    onClick = {
-                //        stopReadingSensorLoop()
-                //        navController.navigate("history")
-                //    },
-                //    label = {
-                //        Text(
-                //            text = "History",
-                //            color = MaterialTheme.colorScheme.secondary,
-                //            fontSize = 15.sp
-                //        )
-                //    },
-                //    icon = {
-                //        Icon(
-                //            painter = painterResource(R.drawable.baseline_bar_chart_24),
-                //            contentDescription = "Bar Chart"
-                //        )
-                //    }
-                //)
             }
         }
     ) { padding ->
@@ -268,13 +236,6 @@ fun MainPage(
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(deviceBoxPadding),
-                            onCardClick = {
-                                Toast.makeText(
-                                    context,
-                                    "Navigate to history page for this plant",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            },
                             context = context,
                             navController = navController,
                             plantViewModel = plantViewModel,

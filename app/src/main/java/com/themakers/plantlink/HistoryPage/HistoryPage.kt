@@ -1,7 +1,6 @@
 package com.themakers.plantlink.HistoryPage
 
 import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.Card
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,12 +36,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.themakers.plantlink.R
+import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun HistoryPage(
     context: Context,
-    navController: NavHostController
+    navController: NavHostController,
+    plantViewModel: CurrClickedPlantViewModel
 ) {
     val lazyListState = rememberLazyListState()
 
@@ -55,30 +57,27 @@ fun HistoryPage(
                 ),
                 title = {
                     Text(
-                        text = "History",
+                        text = (plantViewModel.currClickedPlant?.name ?: "Plant Name") + "'s History",
                         color = MaterialTheme.colorScheme.secondary,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(0.dp, 0.dp, 50.dp, 0.dp),
+                            .padding(end = 50.dp),
                     )
                 },
                 navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            Toast.makeText(
-                                context,
-                                "Bluetooth",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    ) {
+                    IconButton(onClick = {
+                        navController.popBackStack()
+
+                        plantViewModel.currClickedPlant = null
+                    }) {
                         Icon(
-                            painter = painterResource(R.drawable.baseline_bluetooth_24),
-                            contentDescription = "Bluetooth",
-                            tint = Color.Black,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
                             modifier = Modifier
-                                .size(40.dp)
+                                .size(40.dp),
+                            tint = Color.Black
+
                         )
                     }
                 }
@@ -97,6 +96,9 @@ fun HistoryPage(
                     ),
                     selected = false,
                     onClick = {
+                        plantViewModel.currClickedPlant = null
+
+
                         navController.navigate("Home")
                     },
                     label = {
@@ -121,6 +123,8 @@ fun HistoryPage(
                     ),
                     selected = false,
                     onClick = {
+                        plantViewModel.currClickedPlant = null
+
                         navController.navigate("Settings")
                     },
                     label = {
@@ -134,28 +138,6 @@ fun HistoryPage(
                         Icon(
                             imageVector = Icons.Outlined.Settings,
                             contentDescription = "Settings"
-                        )
-                    }
-                )
-                NavigationBarItem(
-                    colors = NavigationBarItemDefaults.colors(
-                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                        selectedIconColor = Color(0, 0, 0, 255),
-                        indicatorColor = MaterialTheme.colorScheme.background
-                    ),
-                    selected = true,
-                    onClick = {},
-                    label = {
-                        Text(
-                            text = "History",
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 15.sp
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_bar_chart_24),
-                            contentDescription = "Bar Chart"
                         )
                     }
                 )

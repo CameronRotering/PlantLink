@@ -35,6 +35,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
+import com.themakers.plantlink.HistoryPage.HistoryPage
 import com.themakers.plantlink.MainPage.MainPage
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
 import com.themakers.plantlink.SettingsPage.PlantSettingsPage
@@ -233,12 +234,13 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        //composable("History") {
-                        //    HistoryPage(
-                        //        navController = navController,
-                        //        context = applicationContext
-                        //    )
-                        //}
+                        composable("HistoryPage") {
+                            HistoryPage(
+                                navController = navController,
+                                context = applicationContext,
+                                plantViewModel = selectedPlantViewModel
+                            )
+                        }
 
                         composable("BluetoothConnect") {
                             BluetoothConnectScreen(
