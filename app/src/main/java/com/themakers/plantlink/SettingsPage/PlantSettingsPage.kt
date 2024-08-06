@@ -273,7 +273,7 @@ fun PlantSettingsPage(
                                 //visualTransformation = CharacterLimitVisualTransformation(), Re-enable if wanting to limit to a length
                                 placeholder = {
                                     Text(
-                                        text = plantViewModel.currClickedPlant?.name ?: "", // Eventually make this the value stored in the arduino
+                                        text = plantViewModel.currClickedPlant?.name ?: "Plant Name", // Eventually make this the value stored in the arduino
                                         //backgroundColor = MaterialTheme.colorScheme.background,
                                         color = MaterialTheme.colorScheme.secondary,
                                         textAlign = TextAlign.Center
