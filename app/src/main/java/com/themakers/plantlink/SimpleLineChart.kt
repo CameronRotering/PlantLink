@@ -13,10 +13,23 @@ import co.yml.charts.ui.linechart.model.LineStyle
 import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
 import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+val dateTimeFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy")
+
+fun getPreviousDate(daysAgo: Int): String {
+    val today = LocalDate.now()
+
+    return today.minusDays(daysAgo.toLong()).format(dateTimeFormat)
+}
 
 @SuppressLint("DefaultLocale")
 fun SimpleLineChart(
-    pointsData: List<Point>
+    pointsData: List<Point>,
+    dataType: String = "",
+    xLabel: String = "",
+    yLabel: String = "",
 ): LineChartData {
     val minValue = pointsData.minOf { it.y }
     val maxValue = pointsData.maxOf { it.y }
@@ -26,8 +39,13 @@ fun SimpleLineChart(
         .axisStepSize(100.dp)
         .backgroundColor(Color.White)
         .steps(pointsData.size - 1)
-        .labelData { i -> i.toString() }
+        .labelData { i ->
+            getPreviousDate(i)
+        }
         .labelAndAxisLinePadding(15.dp)
+        .axisLabelDescription{ _ ->
+            xLabel
+        }
         .build()
 
     val yAxisData = AxisData.Builder()
@@ -35,10 +53,36 @@ fun SimpleLineChart(
         .backgroundColor(Color.White)
         .labelAndAxisLinePadding(20.dp)
         .labelData { i ->
+            var returnData = ""
+            val dataAsFloat: Float
             val stepSize = (maxValue - minValue) / (steps) // Calculate the size of each step
-            val labelValue = minValue + i * stepSize
-            String.format("%.0f", labelValue)
-        }.build()
+
+            if (dataType == "temperature") {
+                dataAsFloat = minValue + i * stepSize
+
+                returnData = "${dataAsFloat.toInt()} °F"
+            } else if (dataType == "humidity") {
+                dataAsFloat = minValue + i * stepSize
+
+                returnData = "${dataAsFloat.toInt()} RH"
+            } else if (dataType == "moisture" || dataType == "light") {
+                dataAsFloat = minValue + i * stepSize
+
+                returnData = "${dataAsFloat.toInt()}%"
+            }
+
+            returnData
+
+
+
+//            val labelValue = minValue + i * stepSize
+//
+//            "${labelValue.toInt()} °F"
+        }
+        .axisLabelDescription{ _ ->
+            yLabel
+        }
+        .build()
 
     val lineChartData = LineChartData(
         linePlotData = LinePlotData(

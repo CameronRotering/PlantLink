@@ -3,6 +3,7 @@ package com.themakers.plantlink.HistoryPage
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,10 +37,36 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import co.yml.charts.common.model.Point
 import co.yml.charts.ui.linechart.LineChart
+import com.github.aachartmodel.aainfographics.aachartcreator.AAChartModel
+import com.github.aachartmodel.aainfographics.aachartcreator.AAChartType
+import com.github.aachartmodel.aainfographics.aachartcreator.AASeriesElement
 import com.themakers.plantlink.R
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
 import com.themakers.plantlink.SimpleLineChart
+import java.time.LocalDate
 
+//val xData = listOf("2022-01-01", "2022-01-02", "2022-01-03", "2022-01-04", "2022-01-05")
+//val yData = listOf(100, 150, 120, 180, 200)
+//
+//fun getPreviousDate(daysAgo: Float): String {
+//    val today = LocalDate.now()
+//
+//    return today.minusDays(daysAgo.toLong()).toString()
+//}
+
+
+
+//val aaChartModel = AAChartModel()
+//    .chartType(AAChartType.Line)
+//    .dataLabelsEnabled(false)
+//    .categories(xData.toTypedArray())
+//    .series(
+//        arrayOf(
+//            AASeriesElement()
+//                .name("Line Chart")
+//                .data(yData.toTypedArray())
+//        )
+//    )
 
 val tempOverTime: List<Point> =
     listOf(
@@ -187,7 +214,8 @@ fun HistoryPage(
         }
         LazyColumn(
             contentPadding = padding,
-            state = lazyListState
+            state = lazyListState,
+            modifier = Modifier.fillMaxSize()
         ) {
             item {
                 Card (
@@ -196,11 +224,82 @@ fun HistoryPage(
                     contentColor = MaterialTheme.colorScheme.secondary
                 ) {
                     //SimpleLineChart(pointsData = tempOverTime)
-                    
-                    LineChart(modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp),
-                        lineChartData = SimpleLineChart(pointsData = tempOverTime)
+
+                    LineChart(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp),
+                        lineChartData = SimpleLineChart(pointsData = tempOverTime, dataType = "temperature")
+                    )
+                    //LineChartWithDates()
+//
+//
+//                        AAChartComposable(aaChartModel = aaChartModel)
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+
+            item {
+                Card(
+                    shape = MaterialTheme.shapes.medium,
+                    backgroundColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.secondary
+                ) {
+                    LineChart(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp),
+                        lineChartData = SimpleLineChart(
+                            pointsData = tempOverTime,
+                            dataType = "humidity"
+                        )
+                    )
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+
+            item {
+                Card(
+                    shape = MaterialTheme.shapes.medium,
+                    backgroundColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.secondary
+                ) {
+                    LineChart(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp),
+                        lineChartData = SimpleLineChart(
+                            pointsData = tempOverTime,
+                            dataType = "moisture"
+                        )
+                    )
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+
+            item {
+                Card(
+                    shape = MaterialTheme.shapes.medium,
+                    backgroundColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.secondary
+                ) {
+                    LineChart(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp),
+                        lineChartData = SimpleLineChart(
+                            pointsData = tempOverTime,
+                            dataType = "light"
+                        )
                     )
                 }
             }
