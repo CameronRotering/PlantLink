@@ -14,8 +14,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.Card
+import androidx.compose.material3.Card
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,36 +39,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import co.yml.charts.common.model.Point
 import co.yml.charts.ui.linechart.LineChart
-import com.github.aachartmodel.aainfographics.aachartcreator.AAChartModel
-import com.github.aachartmodel.aainfographics.aachartcreator.AAChartType
-import com.github.aachartmodel.aainfographics.aachartcreator.AASeriesElement
 import com.themakers.plantlink.R
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
 import com.themakers.plantlink.SimpleLineChart
-import java.time.LocalDate
-
-//val xData = listOf("2022-01-01", "2022-01-02", "2022-01-03", "2022-01-04", "2022-01-05")
-//val yData = listOf(100, 150, 120, 180, 200)
-//
-//fun getPreviousDate(daysAgo: Float): String {
-//    val today = LocalDate.now()
-//
-//    return today.minusDays(daysAgo.toLong()).toString()
-//}
-
-
-
-//val aaChartModel = AAChartModel()
-//    .chartType(AAChartType.Line)
-//    .dataLabelsEnabled(false)
-//    .categories(xData.toTypedArray())
-//    .series(
-//        arrayOf(
-//            AASeriesElement()
-//                .name("Line Chart")
-//                .data(yData.toTypedArray())
-//        )
-//    )
+import com.themakers.plantlink.data.SettingState
 
 val tempOverTime: List<Point> =
     listOf(
@@ -99,7 +75,8 @@ val tempOverTime: List<Point> =
 fun HistoryPage(
     context: Context,
     navController: NavHostController,
-    plantViewModel: CurrClickedPlantViewModel
+    plantViewModel: CurrClickedPlantViewModel,
+    state: SettingState
 ) {
     val lazyListState = rememberLazyListState()
 
@@ -217,11 +194,16 @@ fun HistoryPage(
             state = lazyListState,
             modifier = Modifier.fillMaxSize()
         ) {
+            /* TODO: Put title above each chart. Add average below the graphs. Maybe group all the averages? (Probably not) */
+
+
             item {
                 Card (
                     shape = MaterialTheme.shapes.medium,
-                    backgroundColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.secondary
+                    colors = cardColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.secondary
+                    )
                 ) {
                     //SimpleLineChart(pointsData = tempOverTime)
 
@@ -229,7 +211,11 @@ fun HistoryPage(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(300.dp),
-                        lineChartData = SimpleLineChart(pointsData = tempOverTime, dataType = "temperature")
+                        lineChartData = SimpleLineChart(
+                            pointsData = tempOverTime,
+                            dataType = "temperature",
+                            state = state
+                        )
                     )
                     //LineChartWithDates()
 //
@@ -245,8 +231,10 @@ fun HistoryPage(
             item {
                 Card(
                     shape = MaterialTheme.shapes.medium,
-                    backgroundColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.secondary
+                    colors = cardColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.secondary
+                    )
                 ) {
                     LineChart(
                         modifier = Modifier
@@ -267,8 +255,10 @@ fun HistoryPage(
             item {
                 Card(
                     shape = MaterialTheme.shapes.medium,
-                    backgroundColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.secondary
+                    colors = cardColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.secondary
+                    )
                 ) {
                     LineChart(
                         modifier = Modifier
@@ -289,8 +279,10 @@ fun HistoryPage(
             item {
                 Card(
                     shape = MaterialTheme.shapes.medium,
-                    backgroundColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.secondary
+                    colors = cardColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.secondary
+                    )
                 ) {
                     LineChart(
                         modifier = Modifier

@@ -238,7 +238,8 @@ class MainActivity : ComponentActivity() {
                             HistoryPage(
                                 navController = navController,
                                 context = applicationContext,
-                                plantViewModel = selectedPlantViewModel
+                                plantViewModel = selectedPlantViewModel,
+                                state = settingsState
                             )
                         }
 

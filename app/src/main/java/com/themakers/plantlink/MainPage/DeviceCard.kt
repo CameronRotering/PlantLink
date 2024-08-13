@@ -1,6 +1,7 @@
 package com.themakers.plantlink.MainPage
 
 import android.content.Context
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,11 +11,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Card
+import androidx.compose.material3.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -52,16 +54,47 @@ fun DeviceCard(
     clickedPlantViewModel: CurrClickedPlantViewModel
 ) {
     Card(
-        onClick = {
-            clickedPlantViewModel.currClickedPlant = plantDevice
+        modifier = modifier
+            .clickable {
+                clickedPlantViewModel.currClickedPlant = plantDevice
 
-            navController.navigate("HistoryPage")
-        },
-        modifier = modifier,
+                navController.navigate("HistoryPage")
+            },
         shape = MaterialTheme.shapes.medium,
-        backgroundColor = Color(217, 217, 217, 255), //MaterialTheme.colorScheme.background,
-        contentColor = MaterialTheme.colorScheme.secondary
+        colors = cardColors(
+            containerColor = Color(217, 217, 217, 255),
+            contentColor = MaterialTheme.colorScheme.secondary
+        )
     ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            horizontalArrangement = Arrangement.End
+        )
+        {
+            IconButton(
+                onClick = {
+                    /* TODO: Take to history page which loads average data of that plant */
+                    /* TODO: Images above name of plant, maybe just template picture as soon as possible */
+
+                    clickedPlantViewModel.currClickedPlant = plantDevice
+
+                    navController.navigate("PlantLinkSettings")
+
+                },
+
+                ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "Plant Settings",
+                    tint = Color.Black,
+                    modifier = Modifier
+                        .size(20.dp)
+                )
+            }
+        }
+
         Column {
 //              Image would go here
 
@@ -203,42 +236,6 @@ fun DeviceCard(
                         fontSize = 30.sp
                     )
                 }
-            }
-        }
-
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
-            horizontalArrangement = Arrangement.End
-        )
-        {
-            IconButton(
-                onClick = {
-                    /* TODO: Take to history page which loads average data of that plant */
-                    /* TODO: Images above name of plant, maybe just template picture as soon as possible */
-
-//                    Toast.makeText(
-//                        context,
-//                        "Navigate to plant settings",
-//                        Toast.LENGTH_LONG
-//                    ).show()
-
-                    clickedPlantViewModel.currClickedPlant = plantDevice
-
-                    navController.navigate("PlantLinkSettings")
-
-                },
-
-                ) {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = "Plant Settings",
-                    tint = Color.Black,
-                    modifier = Modifier
-                        .size(20.dp)
-                )
             }
         }
     }

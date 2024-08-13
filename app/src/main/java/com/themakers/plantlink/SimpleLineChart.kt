@@ -13,6 +13,7 @@ import co.yml.charts.ui.linechart.model.LineStyle
 import co.yml.charts.ui.linechart.model.SelectionHighlightPoint
 import co.yml.charts.ui.linechart.model.SelectionHighlightPopUp
 import co.yml.charts.ui.linechart.model.ShadowUnderLine
+import com.themakers.plantlink.data.SettingState
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -30,6 +31,7 @@ fun SimpleLineChart(
     dataType: String = "",
     xLabel: String = "",
     yLabel: String = "",
+    state: SettingState? = null,
 ): LineChartData {
     val minValue = pointsData.minOf { it.y }
     val maxValue = pointsData.maxOf { it.y }
@@ -60,7 +62,7 @@ fun SimpleLineChart(
             if (dataType == "temperature") {
                 dataAsFloat = minValue + i * stepSize
 
-                returnData = "${dataAsFloat.toInt()} °F"
+                returnData = "${dataAsFloat.toInt()} ° " + if (state!!.isFahrenheit) "F" else "C"
             } else if (dataType == "humidity") {
                 dataAsFloat = minValue + i * stepSize
 
