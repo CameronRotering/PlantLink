@@ -3,7 +3,9 @@ package com.themakers.plantlink.HistoryPage
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,7 +18,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -67,6 +69,16 @@ val tempOverTime: List<Point> =
         Point(18.0f, 103.63f),
         Point(19.0f, 77.17f)
     )
+
+fun averageOfPoints(points: List<Point>): Float {
+    var sum = 0f
+
+    for (point in points) {
+        sum += point.y
+    }
+
+    return sum / points.size
+}
 
 /* TODO: Maybe have settings icon on this page to also allow you to get to that plants settings. */
 
@@ -217,10 +229,22 @@ fun HistoryPage(
                             state = state
                         )
                     )
-                    //LineChartWithDates()
-//
-//
-//                        AAChartComposable(aaChartModel = aaChartModel)
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Average: " + averageOfPoints(tempOverTime).toString() + "° " + if (state.isFahrenheit) "F" else "C",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Left,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontSize = 30.sp
+                        )
+                    }
                 }
             }
 
@@ -245,6 +269,22 @@ fun HistoryPage(
                             dataType = "humidity"
                         )
                     )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Average: " + "34.7 RH",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontSize = 30.sp
+                        )
+                    }
                 }
             }
 
@@ -269,6 +309,22 @@ fun HistoryPage(
                             dataType = "moisture"
                         )
                     )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Average: " + "75.32%",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontSize = 30.sp
+                        )
+                    }
                 }
             }
 
@@ -293,6 +349,22 @@ fun HistoryPage(
                             dataType = "light"
                         )
                     )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Average: " + "99.99%",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontSize = 30.sp
+                        )
+                    }
                 }
             }
         }

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -39,12 +38,9 @@ import com.themakers.plantlink.data.SettingState
 
 val iconSize = 30.dp
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DeviceCard(
-    //card: StoriesData,
     modifier: Modifier = Modifier,
-    //onCardClick: () -> Unit,
     context: Context,
     navController: NavHostController,
     plantViewModel: PlantDataViewModel,
