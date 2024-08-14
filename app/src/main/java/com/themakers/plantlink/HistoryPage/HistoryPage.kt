@@ -240,7 +240,7 @@ fun HistoryPage(
                         Text(
                             text = "Average: " + averageOfPoints(tempOverTime).toString() + "° " + if (state.isFahrenheit) "F" else "C",
                             color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Left,
+                            textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
                             fontSize = 30.sp
                         )
@@ -320,7 +320,7 @@ fun HistoryPage(
                         Text(
                             text = "Average: " + "75.32%",
                             color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Right,
+                            textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
                             fontSize = 30.sp
                         )
