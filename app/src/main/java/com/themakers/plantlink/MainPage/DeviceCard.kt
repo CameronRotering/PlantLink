@@ -2,11 +2,11 @@ package com.themakers.plantlink.MainPage
 
 import android.content.Context
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -62,52 +62,54 @@ fun DeviceCard(
             contentColor = MaterialTheme.colorScheme.secondary
         )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
-            horizontalArrangement = Arrangement.End
-        )
-        {
-            IconButton(
-                onClick = {
-                    /* TODO: Take to history page which loads average data of that plant */
-                    /* TODO: Images above name of plant, maybe just template picture as soon as possible */
-
-                    clickedPlantViewModel.currClickedPlant = plantDevice
-
-                    navController.navigate("PlantLinkSettings")
-
-                },
-
-                ) {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = "Plant Settings",
-                    tint = Color.Black,
-                    modifier = Modifier
-                        .size(20.dp)
-                )
-            }
-        }
-
         Column {
 //              Image would go here
-
-
             Column(
-                //modifier = Modifier.padding(16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
             ) {
-                Text(
-                    text = plantDevice.name,
-                    color = Color(0, 0, 0, 255),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    textAlign = TextAlign.Center,
+                Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp)
+                        .fillMaxSize(),
+                    //horizontalArrangement = Arrangement.End
                 )
+                {
+                    Text(
+                        text = plantDevice.name,
+                        color = Color(0, 0, 0, 255),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .fillMaxHeight()
+                            .padding(top = 10.dp)
+                    )
+
+                    IconButton(
+                        onClick = {
+                            /* TODO: Take to history page which loads average data of that plant */
+                            /* TODO: Images above name of plant, maybe just template picture as soon as possible */
+
+                            clickedPlantViewModel.currClickedPlant = plantDevice
+
+                            navController.navigate("PlantLinkSettings")
+
+                        },
+
+                        ) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "Plant Settings",
+                            tint = Color.Black,
+                            modifier = Modifier
+                                .size(20.dp),
+
+                        )
+                    }
+                }
+
+
 
                 Spacer(modifier = Modifier.height(8.dp))
 
