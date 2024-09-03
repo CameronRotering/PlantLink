@@ -4,9 +4,11 @@ import android.Manifest
 import android.app.PendingIntent
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.ServiceConnection
 import android.nfc.FormatException
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
@@ -16,6 +18,7 @@ import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -41,6 +44,7 @@ import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
 import com.themakers.plantlink.SettingsPage.PlantSettingsPage
 import com.themakers.plantlink.SettingsPage.SettingsPage
 import com.themakers.plantlink.data.AndroidBluetoothController
+import com.themakers.plantlink.data.BluetoothLeService
 import com.themakers.plantlink.data.SettingsDatabase
 import com.themakers.plantlink.ui.theme.PlantLInkTheme
 import java.io.IOException
@@ -79,9 +83,6 @@ fun activateNfc(myTag: Tag, context: Context) {
 }
 
 class MainActivity : ComponentActivity() {
-
-
-
     var pendingIntent: PendingIntent? = null
     var writeTagFilters: Array<IntentFilter?>? = null
     var writeMode = false
@@ -127,8 +128,31 @@ class MainActivity : ComponentActivity() {
         }
     )
 
+    private var bluetoothService : BluetoothLeService? = null
+
+
+    private val serviceConnection: ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(
+            componentName: ComponentName,
+            service: IBinder
+        ) {
+            bluetoothService = (service as BluetoothLeService.LocalBinder).getService()
+            bluetoothService?.let { bluetooth ->
+                // call functions on service to check connection and connect to devices
+                bluetooth.setAdapter(bluetoothAdapter!!)
+            }
+        }
+
+        override fun onServiceDisconnected(componentName: ComponentName) {
+            bluetoothService = null
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val gattServiceIntent = Intent(this, BluetoothLeService::class.java)
+        bindService(gattServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
 
         if (nfcAdapter == null) {
 
@@ -261,6 +285,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onStop() { // When out of application, disconnect from bluetooth (Just in case they keep app on for a long time). Might not even be doing but be safe
+        viewModel?.stopScan()
         viewModel?.connectedThread?.cancel()
         super.onStop()
     }

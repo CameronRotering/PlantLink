@@ -1,7 +1,6 @@
 package com.themakers.plantlink
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -45,7 +44,6 @@ import com.themakers.plantlink.Bluetooth.BluetoothUiState
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.Bluetooth.ConnectThread
 import com.themakers.plantlink.Bluetooth.ConnectedThread
-
 
 fun connectBluetoothDevice(context: Context, viewModel: BluetoothViewModel, plantViewModel: PlantDataViewModel, connectBluetooth: ConnectThread) {
     if (connectBluetooth.mSocket == null) { // Not connected
@@ -212,20 +210,29 @@ fun BluetoothConnectScreen(
                 scannedDevices = state.scannedDevices,
                 onClick = {device -> // When a bluetooth device is selected
 
-                    viewModel.stopScan() // Recommended to not be scanning while connecting
+                    viewModel.stopScan() // Recommended to not be scanning while connecting    Scanning is battery intensive
 
-                    if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") { // Invites possibilities of "PlantLink310" Working
+                    if (device.device == viewModel.btModule) {
+                        viewModel.setCharacteristicNotification()
+                        //viewModel.getServices()
+                    } else if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") { // Invites possibilities of "PlantLink310" Working
                         Log.e("Log", "PlantLink Clicked!")
 //                                                                          PROBLEM, no UUID
-                        if (device.device != viewModel.btModule && device.device!!.uuids[0].uuid != viewModel.uuid) { // If connecting to different device or first device to connect to
+                        if (device.device != viewModel.btModule) {// && device.device!!.uuids[0].uuid != viewModel.uuid) { // If connecting to different device or first device to connect to
                             connectBluetooth.mSocket = null
 
-                            viewModel.setGatt(device.device.connectGatt(context, false, null))
+                            viewModel.setGatt(
+                                context = context,
+                                device = device.device!!,
+                                autoConnect = false
+                            )
 
-                            viewModel.setUUID(device.device!!.uuids[0].uuid)
-                            viewModel.setModule(device.device)
 
-                            connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
+
+                            //viewModel.setUUID(device.device!!.uuids[0].uuid)
+                            //viewModel.setModule(device.device)
+//
+                            //connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
                         } else if (connectBluetooth.mSocket == null) { // If the socket is null (possibly due to error in connection) allow retry of connection
                             connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
                         }   // If same device and socket isn't null, do nothing

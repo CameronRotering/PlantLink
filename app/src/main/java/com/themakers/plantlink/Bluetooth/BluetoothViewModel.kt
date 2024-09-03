@@ -1,10 +1,13 @@
 package com.themakers.plantlink.Bluetooth
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCharacteristic
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.themakers.plantlink.data.AndroidBluetoothController
@@ -44,6 +47,10 @@ class BluetoothViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _state.value)
 
+    fun getServices() : BluetoothGattCharacteristic {
+        return bluetoothController.services.value[2].getCharacteristic(UUID.fromString("7ccecf3a-cb17-4f62-b22d-671639009fc8"))
+    }
+
     fun isConnected(): Boolean {
         return connectedThread != null
     }
@@ -56,8 +63,22 @@ class BluetoothViewModel(
         bluetoothController.stopDiscovery()
     }
 
-    fun setGatt(gatt: BluetoothGatt) {
-        this.gatt = gatt
+    @SuppressLint("MissingPermission")
+    fun setGatt(context: Context, device: BluetoothDevice, autoConnect: Boolean) {
+        btModule = device
+        gatt = device.connectGatt(context, autoConnect, bluetoothController.gattCallback)
+    }
+
+    @SuppressLint("MissingPermission")
+    fun setCharacteristicNotification() {
+        gatt!!.services.forEach{ service ->
+            if (service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) {
+                service.characteristics.forEach { characteristic ->
+                    gatt!!.setCharacteristicNotification(characteristic, true)
+                }
+            }
+        }
+        //gatt!!.setCharacteristicNotification(characteristic, enabled)
     }
 
     fun setModule(module: BluetoothDevice) {
