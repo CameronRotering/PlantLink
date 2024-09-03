@@ -1,6 +1,7 @@
 package com.themakers.plantlink.Bluetooth
 
 import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothGatt
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -28,6 +29,9 @@ class BluetoothViewModel(
     var connectedThread: ConnectedThread? by mutableStateOf(null)
         private set
 
+    var gatt by mutableStateOf<BluetoothGatt?>(null)
+        private set
+
 
     val state = combine(
         bluetoothController.scannedDevices,
@@ -52,6 +56,9 @@ class BluetoothViewModel(
         bluetoothController.stopDiscovery()
     }
 
+    fun setGatt(gatt: BluetoothGatt) {
+        this.gatt = gatt
+    }
 
     fun setModule(module: BluetoothDevice) {
         btModule = module

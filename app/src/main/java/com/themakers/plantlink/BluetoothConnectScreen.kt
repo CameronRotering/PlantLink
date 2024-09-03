@@ -1,6 +1,7 @@
 package com.themakers.plantlink
 
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
@@ -215,9 +216,11 @@ fun BluetoothConnectScreen(
 
                     if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") { // Invites possibilities of "PlantLink310" Working
                         Log.e("Log", "PlantLink Clicked!")
-
+//                                                                          PROBLEM, no UUID
                         if (device.device != viewModel.btModule && device.device!!.uuids[0].uuid != viewModel.uuid) { // If connecting to different device or first device to connect to
                             connectBluetooth.mSocket = null
+
+                            viewModel.setGatt(device.device.connectGatt(context, false, null))
 
                             viewModel.setUUID(device.device!!.uuids[0].uuid)
                             viewModel.setModule(device.device)

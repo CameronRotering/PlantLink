@@ -185,6 +185,8 @@ class MainActivity : ComponentActivity() {
             //val bluetoothManager: BluetoothManager = getSystemService(BluetoothManager::class.java)
             //var bluetoothAdapter: BluetoothAdapter = bluetoothManager.adapter
 
+
+
             PlantLInkTheme {
                 viewModel = BluetoothViewModel(AndroidBluetoothController(applicationContext))
                 val state by viewModel!!.state.collectAsState()
@@ -192,8 +194,6 @@ class MainActivity : ComponentActivity() {
                 val settingsState by settingsViewModel.state.collectAsState()
 
                 val selectedPlantViewModel = CurrClickedPlantViewModel()
-
-
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
