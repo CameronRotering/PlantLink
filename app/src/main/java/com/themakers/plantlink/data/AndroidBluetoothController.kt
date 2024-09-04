@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.BluetoothLeScanner
@@ -19,15 +18,20 @@ import android.util.Log
 import android.widget.Toast
 import com.themakers.plantlink.Bluetooth.BluetoothController
 import com.themakers.plantlink.Bluetooth.BluetoothDeviceDomain
+import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.util.UUID
 
 @SuppressLint("MissingPermission")
 class AndroidBluetoothController(
-    private val context: Context
+    private val context: Context,
+    private val plantDevices: MutableList<PlantDevice>
 ): BluetoothController {
+    var viewModel: BluetoothViewModel? = null
+
     private val bluetoothManager by lazy {
         context.getSystemService(BluetoothManager::class.java)
     }
@@ -50,7 +54,7 @@ class AndroidBluetoothController(
     override val pairedDevices: StateFlow<List<BluetoothDeviceDomain>>
         get() = _pairedDevices.asStateFlow()
 
-    val services = MutableStateFlow<List<BluetoothGattService>>(emptyList())
+//    val services = MutableStateFlow<List<BluetoothGattService>>(emptyList())
 
     private val foundDeviceReceiver = FoundDeviceReceiver { device ->
         _scannedDevices.update { devices ->
@@ -62,6 +66,10 @@ class AndroidBluetoothController(
 
     init {
         updatePairedDevices()
+    }
+
+    fun assignViewModel(btViewModel: BluetoothViewModel) {
+        viewModel = btViewModel
     }
 
     private val leScanCallback: ScanCallback = object : ScanCallback() {
@@ -162,23 +170,45 @@ class AndroidBluetoothController(
             characteristic: BluetoothGattCharacteristic, //Characteristic that has been updated as a result of a remote notification event. This value cannot be null.
             value: ByteArray // notified characteristic value This value cannot be null.
         ) {
-            var buffer = ByteArray(256)
+            val buffer: ByteArray = value
 
-            buffer = value
+            for (i in plantDevices) {
+                if (i.device == characteristic.service) {
+                    when (characteristic.uuid) {
+                        UUID.fromString("7ccecf3a-cb17-4f62-b22d-671639009fc8") -> {
+                            i.setTemp(String(buffer, 0, buffer.size).toDouble())
+                        }
 
-            Log.w("CHARACTERISTIC CHANGED VALUE", String(buffer, 0, 6))
+                        UUID.fromString("75171ef4-4fc5-4fd4-a393-8f4cc2f9fbcd") -> { // Humidity
+                            i.setHumid(String(buffer, 0, buffer.size).toDouble())
+                        }
 
-            //broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic)
+                        UUID.fromString("e41a3376-0c2a-4366-bf6e-43e3b59ab962") -> { // Soil Moisture
+                            i.setMoist(String(buffer, 0, buffer.size).toDouble())
+                        }
+
+                        UUID.fromString("dd72366c-d8a0-4c29-9943-30234819a3a2") -> { // Light
+                            i.setLight(String(buffer, 0, buffer.size).toDouble())
+                        }
+                    }
+                    break // Don't look through any other services if already found and changed the one
+                }
+            }
+
+            Log.w("CHARACTERISTIC CHANGED VALUE", String(buffer, 0, buffer.size))
         }
 
         override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                // Iterate through the available services and characteristics.
-                // For example, to get a specific characteristic:
+                plantDevices.clear() // Clear any old services to link to any new
 
-                services.value = gatt.services
-                //val service = gatt.getService(UUID.fromString("YOUR_SERVICE_UUID"))
-                //val characteristic = service?.getCharacteristic(UUID.fromString("YOUR_CHARACTERISTIC_UUID"))
+                gatt.services.forEach { service ->
+                    if (service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) {
+                        plantDevices.add(PlantDevice("00:00:00:00:00:00", "Set Up Plant", "1", "10", service))
+                    }
+                }
+
+                viewModel?.setCharacteristicNotification()
             }
         }
 

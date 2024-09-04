@@ -11,10 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -134,7 +134,7 @@ fun DeviceCard(
 //                            fontSize = 20.sp
 //                        )
                     Text(
-                        text = "74" + "° " + if (state.isFahrenheit) "F " else "C ",
+                        text = plantDevice.getTempString(state.isFahrenheit) + "° " + if (state.isFahrenheit) "F " else "C ",
                         color = Color(0, 0, 0, 255),
                         textAlign = TextAlign.Right,
                         modifier = Modifier.fillMaxWidth(),
@@ -165,7 +165,7 @@ fun DeviceCard(
 //                            fontSize = 20.sp
 //                        )
                     Text(
-                        text = "34.7 RH ",
+                        text = plantDevice.humidity.toString() + " RH ",//"34.7 RH ",
                         color = Color(0, 0, 0, 255),
                         textAlign = TextAlign.Right,
                         modifier = Modifier.fillMaxWidth(),
@@ -196,7 +196,7 @@ fun DeviceCard(
 //                        fontSize = 20.sp
 //                    )
                     Text(
-                        text = "75.32%",
+                        text = plantDevice.moisture.toString() + " %",//"880 ",
                         color = Color(0, 0, 0, 255),
                         textAlign = TextAlign.Right,
                         modifier = Modifier.fillMaxWidth(),
@@ -227,7 +227,7 @@ fun DeviceCard(
 //                        fontSize = 20.sp
 //                    )
                     Text(
-                        text = "99.99%",
+                        text = plantDevice.light.toString() + " % ",//"34.7 RH ",
                         color = Color(0, 0, 0, 255),
                         textAlign = TextAlign.Right,
                         modifier = Modifier.fillMaxWidth(),

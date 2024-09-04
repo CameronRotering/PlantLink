@@ -52,16 +52,6 @@ var runnable: Runnable? = null
 var loopTime: Long = 750 // Faster than arduino so we don't get old information
 var deviceBoxPadding = PaddingValues(10.dp) // Was 30 dp for non-block version
 
-//val plantDeviceList: MutableList<PlantDevice> = mutableListOf()
-val plantDeviceList = mutableListOf<PlantDevice>(
-    PlantDevice(0, "00:00:00:00:00:00", "Galaxy Petunia", "1", "10"),
-    PlantDevice(1, "00:00:00:00:00:00", "Easter Cactus", "2", "20"),
-    PlantDevice(2, "00:00:00:00:00:00", "Acoma Crape Myrtle", "3", "30"),
-    PlantDevice(3, "00:00:00:00:00:00", "Katsura Tree", "4", "40"),
-    PlantDevice(4, "00:00:00:00:00:00", "Panda Plant", "5", "50"),
-)
-
-
 fun readSensors(viewModel: BluetoothViewModel) {
     if (viewModel.isConnected()) {
         viewModel.connectedThread?.read()
@@ -100,7 +90,8 @@ fun MainPage(
     plantViewModel: PlantDataViewModel,
     state: SettingState,
     onEvent: (SettingEvent) -> Unit,
-    clickedPlantViewModel: CurrClickedPlantViewModel
+    clickedPlantViewModel: CurrClickedPlantViewModel,
+    plantDeviceList: MutableList<PlantDevice>
 ) {
     val lazyListState = rememberLazyListState()
 
@@ -198,7 +189,7 @@ fun MainPage(
         }
     ) { padding ->
 
-        startSensorLoop(viewModel, navController)
+        //startSensorLoop(viewModel, navController)
 
         Column (
             verticalArrangement = Arrangement.Bottom,

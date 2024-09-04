@@ -212,10 +212,11 @@ fun BluetoothConnectScreen(
 
                     viewModel.stopScan() // Recommended to not be scanning while connecting    Scanning is battery intensive
 
-                    if (device.device == viewModel.btModule) {
-                        viewModel.setCharacteristicNotification()
+                    //if (device.device == viewModel.btModule) { // If clicking on the same device
+                        //viewModel.setCharacteristicNotification()
                         //viewModel.getServices()
-                    } else if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") { // Invites possibilities of "PlantLink310" Working
+                    //} else
+                    if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") { // Invites possibilities of "PlantLink310" Working
                         Log.e("Log", "PlantLink Clicked!")
 //                                                                          PROBLEM, no UUID
                         if (device.device != viewModel.btModule) {// && device.device!!.uuids[0].uuid != viewModel.uuid) { // If connecting to different device or first device to connect to
@@ -228,13 +229,14 @@ fun BluetoothConnectScreen(
                             )
 
 
+                            //viewModel.setCharacteristicNotification()
 
                             //viewModel.setUUID(device.device!!.uuids[0].uuid)
                             //viewModel.setModule(device.device)
 //
                             //connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
                         } else if (connectBluetooth.mSocket == null) { // If the socket is null (possibly due to error in connection) allow retry of connection
-                            connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
+                            //connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
                         }   // If same device and socket isn't null, do nothing
                     } else {
                         Toast.makeText(

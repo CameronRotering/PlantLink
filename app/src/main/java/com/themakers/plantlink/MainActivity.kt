@@ -45,6 +45,7 @@ import com.themakers.plantlink.SettingsPage.PlantSettingsPage
 import com.themakers.plantlink.SettingsPage.SettingsPage
 import com.themakers.plantlink.data.AndroidBluetoothController
 import com.themakers.plantlink.data.BluetoothLeService
+import com.themakers.plantlink.data.PlantDevice
 import com.themakers.plantlink.data.SettingsDatabase
 import com.themakers.plantlink.ui.theme.PlantLInkTheme
 import java.io.IOException
@@ -88,6 +89,10 @@ class MainActivity : ComponentActivity() {
     var writeMode = false
     var myTag: Tag? = null
     var nfcText = ""
+
+    val plantDeviceList = mutableListOf<PlantDevice>(
+        PlantDevice("00:00:00:00:00:00", "Galaxy Petunia", "1", "10")
+    )
 
 
     private val nfcManager by lazy {
@@ -212,10 +217,13 @@ class MainActivity : ComponentActivity() {
 
 
             PlantLInkTheme {
-                viewModel = BluetoothViewModel(AndroidBluetoothController(applicationContext))
-                val state by viewModel!!.state.collectAsState()
-
                 val settingsState by settingsViewModel.state.collectAsState()
+
+                viewModel = BluetoothViewModel(AndroidBluetoothController(applicationContext, plantDeviceList))
+
+                viewModel!!.setControllerViewModel(viewModel!!)
+
+                val state by viewModel!!.state.collectAsState()
 
                 val selectedPlantViewModel = CurrClickedPlantViewModel()
 
@@ -237,7 +245,8 @@ class MainActivity : ComponentActivity() {
                                 plantViewModel = plantViewModel,
                                 state = settingsState,
                                 onEvent = settingsViewModel::onEvent,
-                                clickedPlantViewModel = selectedPlantViewModel
+                                clickedPlantViewModel = selectedPlantViewModel,
+                                plantDeviceList = plantDeviceList
                             )
                         }
 
