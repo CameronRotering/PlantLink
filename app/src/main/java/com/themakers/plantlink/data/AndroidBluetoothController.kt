@@ -165,6 +165,48 @@ class AndroidBluetoothController(
             }
         }
 
+        override fun onCharacteristicRead(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            value: ByteArray,
+            status: Int
+        ) {
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                val buffer: ByteArray = value
+
+                for (i in plantDevices) {
+                    if (i.device == characteristic.service) {
+                        when (characteristic.uuid) {
+                            UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36") -> {
+                                i.setName(String(buffer, 0, buffer.size))
+                            }
+
+                            UUID.fromString("7ccecf3a-cb17-4f62-b22d-671639009fc8") -> {
+                                i.setTemp(String(buffer, 0, buffer.size).toDouble())
+                            }
+
+                            UUID.fromString("75171ef4-4fc5-4fd4-a393-8f4cc2f9fbcd") -> { // Humidity
+                                i.setHumid(String(buffer, 0, buffer.size).toDouble())
+                            }
+
+                            UUID.fromString("e41a3376-0c2a-4366-bf6e-43e3b59ab962") -> { // Soil Moisture
+                                i.setMoist(String(buffer, 0, buffer.size).toDouble())
+                            }
+
+                            UUID.fromString("dd72366c-d8a0-4c29-9943-30234819a3a2") -> { // Light
+                                i.setLight(String(buffer, 0, buffer.size).toDouble())
+                            }
+                        }
+                        break // Don't look through any other services if already found and changed the one
+                    }
+                }
+
+                Log.w("CHARACTERISTIC READ VALUE", String(buffer, 0, buffer.size))
+            } else {
+                Log.e("CHARACTERISTIC READ ERROR", "Error reading characteristic: ${characteristic.uuid} from server ${characteristic.service.uuid}")
+            }
+        }
+
         override fun onCharacteristicChanged(
             gatt: BluetoothGatt,
             characteristic: BluetoothGattCharacteristic, //Characteristic that has been updated as a result of a remote notification event. This value cannot be null.
@@ -175,6 +217,10 @@ class AndroidBluetoothController(
             for (i in plantDevices) {
                 if (i.device == characteristic.service) {
                     when (characteristic.uuid) {
+                        UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36") -> {
+                            i.setName(String(buffer, 0, buffer.size))
+                        }
+
                         UUID.fromString("7ccecf3a-cb17-4f62-b22d-671639009fc8") -> {
                             i.setTemp(String(buffer, 0, buffer.size).toDouble())
                         }
@@ -198,13 +244,18 @@ class AndroidBluetoothController(
             Log.w("CHARACTERISTIC CHANGED VALUE", String(buffer, 0, buffer.size))
         }
 
-        override fun onServicesDiscovered(gatt: BluetoothGatt, status: Int) {
+        override fun onServicesDiscovered(
+            gatt: BluetoothGatt,
+            status: Int
+        ) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 plantDevices.clear() // Clear any old services to link to any new
 
                 gatt.services.forEach { service ->
                     if (service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) {
                         plantDevices.add(PlantDevice("00:00:00:00:00:00", "Set Up Plant", "1", "10", service))
+
+                        gatt.readCharacteristic(service.getCharacteristic(UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36"))) // Read the name of the plant
                     }
                 }
 

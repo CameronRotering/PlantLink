@@ -15,6 +15,9 @@ data class PlantDevice (
     val maxMoisture: String = "0",
     val device: BluetoothGattService? = null
 ) {
+    var plantName: String by mutableStateOf(name)
+        private set
+
     var finalTemp: BigDecimal by mutableStateOf(BigDecimal(0))
         private set
 
@@ -27,6 +30,10 @@ data class PlantDevice (
     var light: BigDecimal by mutableStateOf(BigDecimal(0))
         private set
 
+
+    fun setName(pName: String) {
+        plantName = pName
+    }
 
     fun setTemp(pTemp: Double) {
         //temperatureC = BigDecimal(pTemp).setScale(2, RoundingMode.HALF_EVEN)

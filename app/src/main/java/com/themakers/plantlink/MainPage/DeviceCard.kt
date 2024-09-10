@@ -75,7 +75,7 @@ fun DeviceCard(
                 )
                 {
                     Text(
-                        text = plantDevice.name,
+                        text = plantDevice.plantName,
                         color = Color(0, 0, 0, 255),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
