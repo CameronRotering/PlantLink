@@ -102,7 +102,7 @@ fun HistoryPage(
                 ),
                 title = {
                     Text(
-                        text = (plantViewModel.currClickedPlant?.name ?: "Plant Name") + "'s History",
+                        text = (plantViewModel.currClickedPlant?.plantName ?: "Plant Name") + "'s History",
                         color = MaterialTheme.colorScheme.secondary,
                         textAlign = TextAlign.Center,
                         modifier = Modifier

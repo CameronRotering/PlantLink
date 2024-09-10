@@ -1,6 +1,10 @@
 package com.themakers.plantlink.SettingsPage
 
+import android.annotation.SuppressLint
+import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -61,7 +65,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.R
+import java.util.UUID
 
 class CharacterLimitVisualTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
@@ -75,12 +81,15 @@ class CharacterLimitVisualTransformation : VisualTransformation {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlantSettingsPage(
     context: Context,
     navController: NavHostController,
-    plantViewModel: CurrClickedPlantViewModel
+    plantViewModel: CurrClickedPlantViewModel,
+    btViewModel: BluetoothViewModel
 ) {
     val lazyListState = rememberLazyListState()
     var minSoilMoisture by rememberSaveable(stateSaver = TextFieldValue.Saver) {
@@ -90,8 +99,10 @@ fun PlantSettingsPage(
         mutableStateOf(TextFieldValue(text = plantViewModel.currClickedPlant?.maxMoisture ?: "Max", TextRange(0, 3)))
     }
     var plantName by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(text = plantViewModel.currClickedPlant?.name ?: ""))
+        mutableStateOf(TextFieldValue(text = plantViewModel.currClickedPlant?.plantName ?: ""))
     }
+
+    val service = plantViewModel.currClickedPlant?.device
 
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -247,7 +258,7 @@ fun PlantSettingsPage(
                                 //visualTransformation = CharacterLimitVisualTransformation(), Re-enable if wanting to limit to a length
                                 placeholder = {
                                     Text(
-                                        text = plantViewModel.currClickedPlant?.name ?: "Plant Name", // Eventually make this the value stored in the arduino
+                                        text = plantViewModel.currClickedPlant?.plantName ?: "Plant Name", // Eventually make this the value stored in the arduino
                                         //backgroundColor = MaterialTheme.colorScheme.background,
                                         color = MaterialTheme.colorScheme.secondary,
                                         textAlign = TextAlign.Center
@@ -260,7 +271,14 @@ fun PlantSettingsPage(
                                     .focusRequester(focusRequester),
                                 keyboardActions = KeyboardActions(
                                     onDone = {
-                                        focusManager.clearFocus()
+                                        btViewModel.gatt!!.writeCharacteristic(service!!.getCharacteristic(
+                                            UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36")), plantName.text.toByteArray(), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
+
+                                        //plantViewModel.ga
+
+                                        plantViewModel.currClickedPlant?.setName(plantName.text)
+
+                                        focusManager.clearFocus() // Hide keyboard
                                     }
                                 ),
                                 keyboardOptions = KeyboardOptions(
