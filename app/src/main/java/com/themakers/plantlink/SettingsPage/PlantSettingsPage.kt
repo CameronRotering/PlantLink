@@ -42,6 +42,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -67,6 +68,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.R
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class CharacterLimitVisualTransformation : VisualTransformation {
@@ -103,6 +106,8 @@ fun PlantSettingsPage(
     }
 
     val service = plantViewModel.currClickedPlant?.device
+
+    val scope = rememberCoroutineScope()
 
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -274,7 +279,6 @@ fun PlantSettingsPage(
                                         btViewModel.gatt!!.writeCharacteristic(service!!.getCharacteristic(
                                             UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36")), plantName.text.toByteArray(), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
 
-                                        //plantViewModel.ga
 
                                         plantViewModel.currClickedPlant?.setName(plantName.text)
 
@@ -341,7 +345,7 @@ fun PlantSettingsPage(
                                 visualTransformation = CharacterLimitVisualTransformation(),
                                 placeholder = {
                                     Text(
-                                        text = "Min", // Eventually make this the value stored in the arduino
+                                        text = plantViewModel.currClickedPlant?.minMoisture ?: "Min", // Eventually make this the value stored in the arduino
                                         //backgroundColor = MaterialTheme.colorScheme.background,
                                         color = MaterialTheme.colorScheme.secondary,
                                         textAlign = TextAlign.Center
@@ -354,6 +358,22 @@ fun PlantSettingsPage(
                                     .focusRequester(focusRequester),
                                 keyboardActions = KeyboardActions(
                                     onDone = {
+                                        scope.launch {
+                                            btViewModel.gatt!!.writeCharacteristic(service!!.getCharacteristic(
+                                                UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9")), minSoilMoisture.text.toByteArray(), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
+
+
+                                            plantViewModel.currClickedPlant?.setMinMoist(minSoilMoisture.text)
+
+                                            delay(250) // Without this, it only updates one
+
+                                            btViewModel.gatt!!.writeCharacteristic(service.getCharacteristic(
+                                                UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1")), maxSoilMoisture.text.toByteArray(), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
+
+
+                                            plantViewModel.currClickedPlant?.setMaxMoist(maxSoilMoisture.text)
+                                        }
+
                                         focusManager.clearFocus()
                                     }
                                 ),
@@ -393,7 +413,7 @@ fun PlantSettingsPage(
                                 visualTransformation = CharacterLimitVisualTransformation(),
                                 placeholder = {
                                     Text(
-                                        text = "Max",
+                                        text = plantViewModel.currClickedPlant?.maxMoisture ?: "Max",
                                         //backgroundColor = MaterialTheme.colorScheme.background,
                                         color = MaterialTheme.colorScheme.secondary,
                                         textAlign = TextAlign.Center
@@ -407,6 +427,22 @@ fun PlantSettingsPage(
                                     .align(Alignment.CenterVertically),
                                 keyboardActions = KeyboardActions(
                                     onDone = {
+                                        scope.launch {
+                                            btViewModel.gatt!!.writeCharacteristic(service!!.getCharacteristic(
+                                                UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9")), minSoilMoisture.text.toByteArray(), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
+
+
+                                            plantViewModel.currClickedPlant?.setMinMoist(minSoilMoisture.text)
+
+                                            delay(250) // Without this, it only updates one
+
+                                            btViewModel.gatt!!.writeCharacteristic(service.getCharacteristic(
+                                                UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1")), maxSoilMoisture.text.toByteArray(), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
+
+
+                                            plantViewModel.currClickedPlant?.setMaxMoist(maxSoilMoisture.text)
+                                        }
+
                                         focusManager.clearFocus()
                                     }
                                 ),

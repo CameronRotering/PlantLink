@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.BluetoothLeScanner
@@ -16,14 +17,19 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.rememberCoroutineScope
 import com.themakers.plantlink.Bluetooth.BluetoothController
 import com.themakers.plantlink.Bluetooth.BluetoothDeviceDomain
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.util.UUID
+
+
 
 @SuppressLint("MissingPermission")
 class AndroidBluetoothController(
@@ -31,6 +37,8 @@ class AndroidBluetoothController(
     private val plantDevices: MutableList<PlantDevice>
 ): BluetoothController {
     var viewModel: BluetoothViewModel? = null
+
+
 
     private val bluetoothManager by lazy {
         context.getSystemService(BluetoothManager::class.java)
@@ -66,6 +74,12 @@ class AndroidBluetoothController(
 
     init {
         updatePairedDevices()
+    }
+
+    fun readSettings(gatt: BluetoothGatt, service: BluetoothGattService) {
+        gatt.readCharacteristic(service.getCharacteristic(UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36")))
+        gatt.readCharacteristic(service.getCharacteristic(UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9")))
+        gatt.readCharacteristic(service.getCharacteristic(UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1")))
     }
 
     fun assignViewModel(btViewModel: BluetoothViewModel) {
@@ -177,9 +191,21 @@ class AndroidBluetoothController(
                 for (i in plantDevices) {
                     if (i.device == characteristic.service) {
                         when (characteristic.uuid) {
+                            // Settings characteristics
+
                             UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36") -> {
                                 i.setName(String(buffer, 0, buffer.size))
                             }
+
+                            UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9") -> {
+                                i.setMinMoist(String(buffer, 0, buffer.size))
+                            }
+
+                            UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1") -> {
+                                i.setMaxMoist(String(buffer, 0, buffer.size))
+                            }
+
+                            // End of Settings
 
                             UUID.fromString("7ccecf3a-cb17-4f62-b22d-671639009fc8") -> {
                                 i.setTemp(String(buffer, 0, buffer.size).toDouble())
@@ -217,9 +243,21 @@ class AndroidBluetoothController(
             for (i in plantDevices) {
                 if (i.device == characteristic.service) {
                     when (characteristic.uuid) {
+                        // Settings characteristics
+
                         UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36") -> {
                             i.setName(String(buffer, 0, buffer.size))
                         }
+
+                        UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9") -> {
+                            i.setMinMoist(String(buffer, 0, buffer.size))
+                        }
+
+                        UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1") -> {
+                            i.setMaxMoist(String(buffer, 0, buffer.size))
+                        }
+
+                        // End of Settings
 
                         UUID.fromString("7ccecf3a-cb17-4f62-b22d-671639009fc8") -> {
                             i.setTemp(String(buffer, 0, buffer.size).toDouble())
@@ -255,7 +293,7 @@ class AndroidBluetoothController(
                     if (service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) {
                         plantDevices.add(PlantDevice("00:00:00:00:00:00", "Set Up Plant", "1", "10", service))
 
-                        gatt.readCharacteristic(service.getCharacteristic(UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36"))) // Read the name of the plant
+                        readSettings(gatt, service)
                     }
                 }
 

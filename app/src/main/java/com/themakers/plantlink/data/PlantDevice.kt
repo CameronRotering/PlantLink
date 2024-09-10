@@ -11,11 +11,17 @@ data class PlantDevice (
     //val id: Int,
     val macAddress: String, // I don't think I need this
     val name: String,
-    val minMoisture: String = "0",
-    val maxMoisture: String = "0",
+    val mMinMoisture: String = "0",
+    val mMaxMoisture: String = "0",
     val device: BluetoothGattService? = null
 ) {
     var plantName: String by mutableStateOf(name)
+        private set
+
+    var minMoisture: String by mutableStateOf(mMinMoisture)
+        private set
+
+    var maxMoisture: String by mutableStateOf(mMaxMoisture)
         private set
 
     var finalTemp: BigDecimal by mutableStateOf(BigDecimal(0))
@@ -34,6 +40,15 @@ data class PlantDevice (
     fun setName(pName: String) {
         plantName = pName
     }
+
+    fun setMinMoist(pMin: String) {
+        minMoisture = pMin
+    }
+
+    fun setMaxMoist(pMax: String) {
+        maxMoisture = pMax
+    }
+
 
     fun setTemp(pTemp: Double) {
         //temperatureC = BigDecimal(pTemp).setScale(2, RoundingMode.HALF_EVEN)
