@@ -10,10 +10,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.themakers.plantlink.data.AndroidBluetoothController
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class BluetoothViewModel(
@@ -73,6 +75,14 @@ class BluetoothViewModel(
             if (service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) {
                 service.characteristics.forEach { characteristic ->
                     gatt!!.setCharacteristicNotification(characteristic, true)
+                }
+
+                viewModelScope.launch {
+                    gatt!!.readCharacteristic(service.getCharacteristic(UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36")))
+                    delay(100)
+                    gatt!!.readCharacteristic(service.getCharacteristic(UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9")))
+                    delay(100)
+                    gatt!!.readCharacteristic(service.getCharacteristic(UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1")))
                 }
             }
         }
