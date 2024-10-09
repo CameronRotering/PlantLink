@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -75,6 +76,9 @@ fun DeviceCard(
                 )
                 {
                     Text(
+                        maxLines = 2,
+                        minLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         text = plantDevice.plantName,
                         color = Color(0, 0, 0, 255),
                         fontSize = 20.sp,
@@ -83,12 +87,11 @@ fun DeviceCard(
                         modifier = Modifier
                             .fillMaxWidth(0.9f)
                             .fillMaxHeight()
-                            .padding(top = 10.dp)
+                            .padding(top = 10.dp),
                     )
 
                     IconButton(
                         onClick = {
-                            /* TODO: Take to history page which loads average data of that plant */
                             /* TODO: Images above name of plant, maybe just template picture as soon as possible */
 
                             clickedPlantViewModel.currClickedPlant = plantDevice
@@ -127,12 +130,6 @@ fun DeviceCard(
                             .size(iconSize)
                             .padding(start = 5.dp)
                     )
-//                        Text(
-//                            text = "Temperature",
-//                            color = Color(0, 0, 0, 255),
-//                            textAlign = TextAlign.Left,
-//                            fontSize = 20.sp
-//                        )
                     Text(
                         text = plantDevice.getTempString(state.isFahrenheit) + "° " + if (state.isFahrenheit) "F " else "C ",
                         color = Color(0, 0, 0, 255),
@@ -158,12 +155,6 @@ fun DeviceCard(
                             .size(iconSize)
                             .padding(start = 5.dp)
                     )
-//                        Text(
-//                            text = "Humidity",
-//                            color = Color(0, 0, 0, 255),
-//                            textAlign = TextAlign.Left,
-//                            fontSize = 20.sp
-//                        )
                     Text(
                         text = plantDevice.humidity.toString() + " RH ",//"34.7 RH ",
                         color = Color(0, 0, 0, 255),
@@ -189,14 +180,8 @@ fun DeviceCard(
                             .size(iconSize)
                             .padding(start = 5.dp)
                     )
-//                    Text(
-//                        text = "Soil Moisture",
-//                        color = Color(0, 0, 0, 255),
-//                        textAlign = TextAlign.Left,
-//                        fontSize = 20.sp
-//                    )
                     Text(
-                        text = plantDevice.moisture.toString() + " %",//"880 ",
+                        text = plantDevice.moisture.toString() + " % ",//"880 ",
                         color = Color(0, 0, 0, 255),
                         textAlign = TextAlign.Right,
                         modifier = Modifier.fillMaxWidth(),
@@ -220,12 +205,6 @@ fun DeviceCard(
                             .size(iconSize)
                             .padding(start = 5.dp)
                     )
-//                    Text(
-//                        text = " Light",
-//                        color = Color(0, 0, 0, 255),
-//                        textAlign = TextAlign.Left,
-//                        fontSize = 20.sp
-//                    )
                     Text(
                         text = plantDevice.light.toString() + " % ",//"34.7 RH ",
                         color = Color(0, 0, 0, 255),

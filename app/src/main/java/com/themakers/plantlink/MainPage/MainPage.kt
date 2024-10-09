@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -93,7 +96,7 @@ fun MainPage(
     clickedPlantViewModel: CurrClickedPlantViewModel,
     plantDeviceList: MutableList<PlantDevice>
 ) {
-    val lazyListState = rememberLazyListState()
+    val lazyGridState = rememberLazyGridState()
 
     Scaffold(
         topBar = {
@@ -204,42 +207,27 @@ fun MainPage(
                     .height(450.dp)
             )
         }
-        LazyColumn(
+        LazyVerticalGrid (
             modifier = Modifier
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalArrangement = Arrangement.Start,
             contentPadding = padding,
-            state = lazyListState
+            state = lazyGridState,
+            columns = GridCells.Adaptive(150.dp)
         ) {
-            val chunkedDevices = plantDeviceList.chunked(2)
-
-            items(plantDeviceList.chunked(2).size) { rowIndex -> // Figure out how many rows we need (must convert to double and int)
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
-                    val rowItems = chunkedDevices[rowIndex]
-
-                    for (device in rowItems) {
-                        DeviceCard(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(deviceBoxPadding),
-                            context = context,
-                            navController = navController,
-                            plantViewModel = plantViewModel,
-                            plantDevice = device,
-                            state = state,
-                            onEvent = onEvent,
-                            clickedPlantViewModel = clickedPlantViewModel
-                        )
-
-                        if (rowItems.size == 1) {
-                            Spacer(Modifier.weight(1f))
-                        }
-                    }
-                }
+            items(plantDeviceList.size) { deviceIndex ->
+                DeviceCard(
+                    modifier = Modifier
+                        .padding(deviceBoxPadding),
+                    context = context,
+                    navController = navController,
+                    plantViewModel = plantViewModel,
+                    plantDevice = plantDeviceList[deviceIndex],
+                    state = state,
+                    onEvent = onEvent,
+                    clickedPlantViewModel = clickedPlantViewModel
+                )
             }
         }
     }
