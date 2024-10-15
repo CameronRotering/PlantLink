@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.Icon
@@ -74,40 +74,42 @@ fun DeviceCard(
                         .fillMaxSize(),
                 )
                 {
-                    Text(
-                        maxLines = 2,
-                        minLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        text = plantDevice.plantName,
-                        color = Color(0, 0, 0, 255),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth(0.9f)
-                            .fillMaxHeight()
-                            .padding(top = 10.dp),
-                    )
-
-                    IconButton(
-                        onClick = {
-                            /* TODO: Images above name of plant, maybe just template picture as soon as possible */
-
-                            clickedPlantViewModel.currClickedPlant = plantDevice
-
-                            navController.navigate("PlantLinkSettings")
-                        },
-
-                        ) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Plant Settings",
-                            tint = Color.Black,
+                        Text(
+                            maxLines = 2,
+                            minLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            text = plantDevice.plantName,
+                            color = Color(0, 0, 0, 255),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            textAlign = TextAlign.Center,
                             modifier = Modifier
-                                .size(20.dp),
-
+                                .fillMaxWidth(0.8f)
+                                .fillMaxHeight()
+                                .padding(start = 5.dp, top = 10.dp),
                         )
-                    }
+
+                        IconButton(
+                            onClick = {
+                                /* TODO: Images above name of plant, maybe just template picture as soon as possible */
+
+                                clickedPlantViewModel.currClickedPlant = plantDevice
+
+                                navController.navigate("PlantLinkSettings")
+                            },
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = "Plant Settings",
+                                tint = Color.Black,
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .fillMaxSize()
+                                    .padding(end = 10.dp)
+                                )
+                        }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
