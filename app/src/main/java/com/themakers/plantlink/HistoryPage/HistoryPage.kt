@@ -93,7 +93,6 @@ fun HistoryPage(
     val lazyListState = rememberLazyListState()
 
     Scaffold(
-        //backgroundColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -217,8 +216,6 @@ fun HistoryPage(
                         contentColor = MaterialTheme.colorScheme.secondary
                     )
                 ) {
-                    //SimpleLineChart(pointsData = tempOverTime)
-
                     LineChart(
                         modifier = Modifier
                             .fillMaxWidth()

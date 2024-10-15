@@ -225,7 +225,6 @@ fun PlantSettingsPage(
             contentPadding = padding,
             state = lazyListState
         ) {
-
             /* TODO: To have an image set for each plant, item would go here to upload/change */
 
 

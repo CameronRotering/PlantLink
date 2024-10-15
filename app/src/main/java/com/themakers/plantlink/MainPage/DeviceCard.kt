@@ -72,7 +72,6 @@ fun DeviceCard(
                 Row(
                     modifier = Modifier
                         .fillMaxSize(),
-                    //horizontalArrangement = Arrangement.End
                 )
                 {
                     Text(
@@ -97,7 +96,6 @@ fun DeviceCard(
                             clickedPlantViewModel.currClickedPlant = plantDevice
 
                             navController.navigate("PlantLinkSettings")
-
                         },
 
                         ) {
@@ -111,8 +109,6 @@ fun DeviceCard(
                         )
                     }
                 }
-
-
 
                 Spacer(modifier = Modifier.height(8.dp))
 
