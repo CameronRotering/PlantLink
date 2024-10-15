@@ -56,7 +56,6 @@ fun SettingsPage(
     var isFahrenheit = state.isFahrenheit
 
     Scaffold(
-        //backgroundColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(

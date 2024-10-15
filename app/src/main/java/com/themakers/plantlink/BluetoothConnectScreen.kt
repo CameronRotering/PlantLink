@@ -2,19 +2,17 @@ package com.themakers.plantlink
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
@@ -157,27 +155,49 @@ fun BluetoothConnectScreen(
                 .padding(padding)
         ) {
 
-            Row(
+            LazyRow (
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
-                Button(onClick = onStartScan) {
-                    Text(text = "Start Scan")
+                item {
+                    Button(
+                        onClick = onStartScan,
+                        modifier = Modifier
+                            .padding(15.dp),
+                        //.height(65.dp)
+                        shape = MaterialTheme.shapes.medium,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(220, 220, 220),
+                            contentColor = Color(0, 0, 0),
+                        )
+                    ) {
+                        Text(
+                            text = "Start Scan",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
 
-                Button(
-                    onClick = onStopScan,
-                    modifier = Modifier
-                        .padding(15.dp)
-                        .width(65.dp)
-                        .height(65.dp),
-                    shape = MaterialTheme.shapes.medium,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(220, 220, 220),
-                        contentColor = Color(0, 0, 0),
-                    )
-                ) {
-                    Text(text = "Stop Scan")
+                item {
+                    Button(
+                        onClick = onStopScan,
+                        modifier = Modifier
+                            .padding(15.dp),
+                        shape = MaterialTheme.shapes.medium,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(220, 220, 220),
+                            contentColor = Color(0, 0, 0),
+                        )
+                    ) {
+                        Text(
+                            text = "Stop Scan",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
 
@@ -189,11 +209,7 @@ fun BluetoothConnectScreen(
                     viewModel.stopScan() // Recommended to not be scanning while connecting    Scanning is battery intensive
 
                     if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") { // Invites possibilities of "PlantLink310" Working
-                        Log.e("Log", "PlantLink Clicked!")
-//                                                                          PROBLEM, no UUID
                         if (device.device != viewModel.btModule) {// && device.device!!.uuids[0].uuid != viewModel.uuid) { // If connecting to different device or first device to connect to
-                            //connectBluetooth.mSocket = null
-
                             viewModel.setGatt(
                                 context = context,
                                 device = device.device!!,
