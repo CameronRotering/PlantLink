@@ -12,14 +12,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Button
+import androidx.compose.material3.Button
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -42,22 +44,6 @@ import androidx.navigation.NavHostController
 import com.themakers.plantlink.Bluetooth.BluetoothDevice
 import com.themakers.plantlink.Bluetooth.BluetoothUiState
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
-import com.themakers.plantlink.Bluetooth.ConnectThread
-import com.themakers.plantlink.Bluetooth.ConnectedThread
-
-fun connectBluetoothDevice(context: Context, viewModel: BluetoothViewModel, plantViewModel: PlantDataViewModel, connectBluetooth: ConnectThread) {
-    if (connectBluetooth.mSocket == null) { // Not connected
-        connectBluetooth.setThread(viewModel.btModule!!, viewModel.uuid, context)
-        //connectBluetooth = ConnectThread(viewModel.btModule!!, viewModel.uuid, context)
-        connectBluetooth.run()
-    }
-
-    if (connectBluetooth.getSocket()?.isConnected == true) {
-        if (viewModel.connectedThread == null) {
-            viewModel.setThread(ConnectedThread(connectBluetooth.getSocket()!!, plantViewModel))
-        }
-    }
-}
 
 
 @SuppressLint("MissingPermission")
@@ -74,10 +60,7 @@ fun BluetoothConnectScreen(
 ) {
     val lazyListState = rememberLazyListState()
 
-    val connectBluetooth = ConnectThread()
-
     Scaffold(
-        //backgroundColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -109,6 +92,8 @@ fun BluetoothConnectScreen(
                     ),
                     selected = false,
                     onClick = {
+                        viewModel.stopScan()
+
                         navController.navigate("Home")
                     },
                     label = {
@@ -133,6 +118,8 @@ fun BluetoothConnectScreen(
                     ),
                     selected = false,
                     onClick = {
+                        viewModel.stopScan()
+
                         navController.navigate("Settings")
                     },
                     label = {
@@ -149,28 +136,6 @@ fun BluetoothConnectScreen(
                         )
                     }
                 )
-                //NavigationBarItem(
-                //    colors = NavigationBarItemDefaults.colors(
-                //        unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                //        selectedIconColor = Color(0, 0, 0, 255),
-                //        indicatorColor = MaterialTheme.colorScheme.background
-                //    ),
-                //    selected = false,
-                //    onClick = {},
-                //    label = {
-                //        Text(
-                //            text = "History",
-                //            color = MaterialTheme.colorScheme.secondary,
-                //            fontSize = 15.sp
-                //        )
-                //    },
-                //    icon = {
-                //        Icon(
-                //            painter = painterResource(R.drawable.baseline_bar_chart_24),
-                //            contentDescription = "Bar Chart"
-                //        )
-                //    }
-                //)
             }
         }
     ) { padding ->
@@ -200,7 +165,18 @@ fun BluetoothConnectScreen(
                     Text(text = "Start Scan")
                 }
 
-                Button(onClick = onStopScan) {
+                Button(
+                    onClick = onStopScan,
+                    modifier = Modifier
+                        .padding(15.dp)
+                        .width(65.dp)
+                        .height(65.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(220, 220, 220),
+                        contentColor = Color(0, 0, 0),
+                    )
+                ) {
                     Text(text = "Stop Scan")
                 }
             }
@@ -212,32 +188,18 @@ fun BluetoothConnectScreen(
 
                     viewModel.stopScan() // Recommended to not be scanning while connecting    Scanning is battery intensive
 
-                    //if (device.device == viewModel.btModule) { // If clicking on the same device
-                        //viewModel.setCharacteristicNotification()
-                        //viewModel.getServices()
-                    //} else
                     if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") { // Invites possibilities of "PlantLink310" Working
                         Log.e("Log", "PlantLink Clicked!")
 //                                                                          PROBLEM, no UUID
                         if (device.device != viewModel.btModule) {// && device.device!!.uuids[0].uuid != viewModel.uuid) { // If connecting to different device or first device to connect to
-                            connectBluetooth.mSocket = null
+                            //connectBluetooth.mSocket = null
 
                             viewModel.setGatt(
                                 context = context,
                                 device = device.device!!,
                                 autoConnect = false
                             )
-
-
-                            //viewModel.setCharacteristicNotification()
-
-                            //viewModel.setUUID(device.device!!.uuids[0].uuid)
-                            //viewModel.setModule(device.device)
-//
-                            //connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
-                        } else if (connectBluetooth.mSocket == null) { // If the socket is null (possibly due to error in connection) allow retry of connection
-                            //connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
-                        }   // If same device and socket isn't null, do nothing
+                        }
                     } else {
                         Toast.makeText(
                             context,

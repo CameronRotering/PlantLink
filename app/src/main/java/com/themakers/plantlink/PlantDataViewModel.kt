@@ -7,13 +7,6 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 
 class PlantDataViewModel {
-
-    //var temperatureC: BigDecimal by mutableStateOf(BigDecimal(0))
-    //    private set
-//
-    //var temperatureF: BigDecimal by mutableStateOf(BigDecimal(0))
-    //    private set
-
     var finalTemp: BigDecimal by mutableStateOf(BigDecimal(0))
         private set
 
@@ -44,8 +37,6 @@ class PlantDataViewModel {
     }
 
     fun setLight(pLight: Double) {
-        //light = BigDecimal(pLight).setScale(2, RoundingMode.HALF_EVEN)
-
         light = BigDecimal(100 *
                 (pLight.coerceIn(0.0, 666.0) / 666)).setScale(2, RoundingMode.HALF_EVEN) // 666 seems to be around max amount (When tested with phone flashlight on max, it got mostly below 660 except for one being 661. When tested in direct sunlight it got up to 667)
     }

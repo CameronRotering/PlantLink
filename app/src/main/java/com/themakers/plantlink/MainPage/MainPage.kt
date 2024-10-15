@@ -1,9 +1,6 @@
 package com.themakers.plantlink.MainPage
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -45,46 +42,14 @@ import com.themakers.plantlink.data.PlantDevice
 import com.themakers.plantlink.data.SettingEvent
 import com.themakers.plantlink.data.SettingState
 
-var handler: Handler = Handler(Looper.getMainLooper())
-var runnable: Runnable? = null
-var loopTime: Long = 750 // Faster than arduino so we don't get old information
 var deviceBoxPadding = PaddingValues(10.dp) // Was 30 dp for non-block version
 
-fun readSensors(viewModel: BluetoothViewModel) {
-    if (viewModel.isConnected()) {
-        viewModel.connectedThread?.read()
-    }
-}
-
-fun startSensorLoop(viewModel: BluetoothViewModel, navController: NavHostController) {
-    // (If on home page) and if not already running and connected to a socket
-    // Home page check because when leaving home page though it stops, it likes to start right after.
-    if ((navController.currentDestination!!.route == "Home") && runnable == null && viewModel.isConnected()) {
-        Log.e("Sensor Info", "Starting sensor loop")
-
-        handler.postDelayed(Runnable {
-            handler.postDelayed(runnable!!, loopTime)
-            readSensors(viewModel)
-        }.also { runnable = it }, loopTime)
-    }
-}
-
-fun stopReadingSensorLoop() {
-    if (runnable != null) {
-        Log.e("Sensor Info", "Stopped sensor loop")
-
-        handler.removeCallbacks(runnable!!)
-
-        runnable = null // Only run if it isn't null, slight performance gain
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
     context: Context,
     navController: NavHostController,
-    viewModel: BluetoothViewModel,
     plantViewModel: PlantDataViewModel,
     state: SettingState,
     onEvent: (SettingEvent) -> Unit,
@@ -113,8 +78,6 @@ fun MainPage(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            stopReadingSensorLoop()
-
                             navController.navigate("BluetoothConnect")
                         }
                     ) {
@@ -131,7 +94,7 @@ fun MainPage(
         },
         bottomBar = {
             NavigationBar(
-                containerColor = Color(226, 114, 91, 255),//MaterialTheme.colorScheme.primary,
+                containerColor = Color(226, 114, 91, 255),
                 contentColor = MaterialTheme.colorScheme.secondary
             ) {
                 NavigationBarItem(
@@ -141,9 +104,7 @@ fun MainPage(
                         indicatorColor = MaterialTheme.colorScheme.background
                     ),
                     selected = true,
-                    onClick = {
-                        viewModel.connectedThread?.sendData()
-                    },
+                    onClick = {},
                     label = {
                         Text(
                             text = "Home",
@@ -166,7 +127,6 @@ fun MainPage(
                     ),
                     selected = false,
                     onClick = {
-                        stopReadingSensorLoop()
                         navController.navigate("settings")
                     },
                     label = {
@@ -186,9 +146,6 @@ fun MainPage(
             }
         }
     ) { padding ->
-
-        //startSensorLoop(viewModel, navController)
-
         Column (
             verticalArrangement = Arrangement.Bottom,
             modifier = Modifier.fillMaxSize()

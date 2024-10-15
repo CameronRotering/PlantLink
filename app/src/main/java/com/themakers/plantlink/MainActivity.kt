@@ -95,14 +95,12 @@ class MainActivity : ComponentActivity() {
         PlantDevice("00:00:00:00:00:00", "Galaxy Petunia", "1", "10")
     )
 
-
     private val nfcManager by lazy {
         applicationContext.getSystemService(NfcManager::class.java)
     }
     private val nfcAdapter by lazy {
         nfcManager.defaultAdapter
     }
-
 
     private val bluetoothManager by lazy {
         applicationContext.getSystemService(BluetoothManager::class.java)
@@ -168,10 +166,8 @@ class MainActivity : ComponentActivity() {
                 "This device does not support NFC.",
                 Toast.LENGTH_LONG
             ).show()
-            //finish()
         }
 
-        //readFromIntent(intent)
         pendingIntent = PendingIntent.getActivity(applicationContext, 0, Intent(applicationContext, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_IMMUTABLE) // was 0
         val tagDetected = IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED)
@@ -211,13 +207,6 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-
-            // Instances of BT manager and BT adapter needed to work with BT in android // Disable because when committing it said bluetoothAdapter never used and it was set above
-            //val bluetoothManager: BluetoothManager = getSystemService(BluetoothManager::class.java)
-            //var bluetoothAdapter: BluetoothAdapter = bluetoothManager.adapter
-
-
-
             PlantLInkTheme {
                 val settingsState by settingsViewModel.state.collectAsState()
 
@@ -243,7 +232,6 @@ class MainActivity : ComponentActivity() {
                             MainPage(
                                 context = applicationContext,
                                 navController = navController,
-                                viewModel = viewModel!!,
                                 plantViewModel = plantViewModel,
                                 state = settingsState,
                                 onEvent = settingsViewModel::onEvent,
@@ -298,7 +286,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() { // When out of application, disconnect from bluetooth (Just in case they keep app on for a long time). Might not even be doing but be safe
         viewModel?.stopScan()
-        viewModel?.connectedThread?.cancel()
         super.onStop()
     }
 

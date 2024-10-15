@@ -26,12 +26,6 @@ class BluetoothViewModel(
     var btModule: BluetoothDevice? by mutableStateOf(null)
         private set
 
-    var uuid by mutableStateOf(UUID.randomUUID())
-        private set
-
-    var connectedThread: ConnectedThread? by mutableStateOf(null)
-        private set
-
     var gatt by mutableStateOf<BluetoothGatt?>(null)
         private set
 
@@ -49,10 +43,6 @@ class BluetoothViewModel(
 
     fun setControllerViewModel(btViewModel: BluetoothViewModel) {
         bluetoothController.assignViewModel(btViewModel)
-    }
-
-    fun isConnected(): Boolean {
-        return connectedThread != null
     }
 
     fun startScan() {
@@ -86,18 +76,5 @@ class BluetoothViewModel(
                 }
             }
         }
-        //gatt!!.setCharacteristicNotification(characteristic, enabled)
-    }
-
-    fun setModule(module: BluetoothDevice) {
-        btModule = module
-    }
-
-    fun setUUID(_UUID: UUID) {
-        uuid = _UUID
-    }
-
-    fun setThread(mConnectedThread: ConnectedThread) {
-        connectedThread = mConnectedThread
     }
 }
