@@ -4,9 +4,11 @@ import android.Manifest
 import android.app.PendingIntent
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.ServiceConnection
 import android.nfc.FormatException
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
@@ -16,25 +18,36 @@ import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.room.Room
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.HistoryPage.HistoryPage
 import com.themakers.plantlink.MainPage.MainPage
+import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
+import com.themakers.plantlink.SettingsPage.PlantSettingsPage
 import com.themakers.plantlink.SettingsPage.SettingsPage
 import com.themakers.plantlink.data.AndroidBluetoothController
+import com.themakers.plantlink.data.BluetoothLeService
+import com.themakers.plantlink.data.PlantDevice
+import com.themakers.plantlink.data.SettingsDatabase
 import com.themakers.plantlink.ui.theme.PlantLInkTheme
 import java.io.IOException
 import java.io.UnsupportedEncodingException
@@ -72,12 +85,15 @@ fun activateNfc(myTag: Tag, context: Context) {
 }
 
 class MainActivity : ComponentActivity() {
-
     var pendingIntent: PendingIntent? = null
     var writeTagFilters: Array<IntentFilter?>? = null
     var writeMode = false
     var myTag: Tag? = null
     var nfcText = ""
+
+    val plantDeviceList = mutableListOf<PlantDevice>(
+        PlantDevice("00:00:00:00:00:00", "Galaxy Petunia", "1", "10")
+    )
 
 
     private val nfcManager by lazy {
@@ -100,10 +116,50 @@ class MainActivity : ComponentActivity() {
 
     var viewModel: BluetoothViewModel? = null
 
+    private val settingsDb by lazy {
+        Room.databaseBuilder(
+            applicationContext,
+            SettingsDatabase::class.java,
+            "settings.db"
+        ).build()
+    }
+
+    private val settingsViewModel by viewModels<SettingsViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return SettingsViewModel(settingsDb.settingsDao()) as T
+                }
+            }
+        }
+    )
+
+    private var bluetoothService : BluetoothLeService? = null
 
 
+    private val serviceConnection: ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(
+            componentName: ComponentName,
+            service: IBinder
+        ) {
+            bluetoothService = (service as BluetoothLeService.LocalBinder).getService()
+            bluetoothService?.let { bluetooth ->
+                // call functions on service to check connection and connect to devices
+                bluetooth.setAdapter(bluetoothAdapter!!)
+            }
+        }
+
+        override fun onServiceDisconnected(componentName: ComponentName) {
+            bluetoothService = null
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val gattServiceIntent = Intent(this, BluetoothLeService::class.java)
+        bindService(gattServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
 
         if (nfcAdapter == null) {
 
@@ -115,7 +171,6 @@ class MainActivity : ComponentActivity() {
             //finish()
         }
 
-
         //readFromIntent(intent)
         pendingIntent = PendingIntent.getActivity(applicationContext, 0, Intent(applicationContext, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_IMMUTABLE) // was 0
@@ -125,6 +180,7 @@ class MainActivity : ComponentActivity() {
 
 
         val plantViewModel = PlantDataViewModel()
+
 
         val enableBluetoothLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -160,10 +216,18 @@ class MainActivity : ComponentActivity() {
             //val bluetoothManager: BluetoothManager = getSystemService(BluetoothManager::class.java)
             //var bluetoothAdapter: BluetoothAdapter = bluetoothManager.adapter
 
+
+
             PlantLInkTheme {
-                viewModel = BluetoothViewModel(AndroidBluetoothController(applicationContext))
+                val settingsState by settingsViewModel.state.collectAsState()
+
+                viewModel = BluetoothViewModel(AndroidBluetoothController(applicationContext, plantDeviceList))
+
+                viewModel!!.setControllerViewModel(viewModel!!)
+
                 val state by viewModel!!.state.collectAsState()
-                
+
+                val selectedPlantViewModel = CurrClickedPlantViewModel()
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -180,23 +244,40 @@ class MainActivity : ComponentActivity() {
                                 context = applicationContext,
                                 navController = navController,
                                 viewModel = viewModel!!,
-                                plantViewModel = plantViewModel
+                                plantViewModel = plantViewModel,
+                                state = settingsState,
+                                onEvent = settingsViewModel::onEvent,
+                                clickedPlantViewModel = selectedPlantViewModel,
+                                plantDeviceList = plantDeviceList
                             )
                         }
 
                         composable("Settings") {
                             SettingsPage(
                                 navController = navController,
-                                context = applicationContext
+                                context = applicationContext,
+                                state = settingsState,
+                                onEvent = settingsViewModel::onEvent
                             )
                         }
 
-                        //composable("History") {
-                        //    HistoryPage(
-                        //        navController = navController,
-                        //        context = applicationContext
-                        //    )
-                        //}
+                        composable("PlantLinkSettings") {
+                            PlantSettingsPage(
+                                navController = navController,
+                                context = applicationContext,
+                                plantViewModel = selectedPlantViewModel,
+                                btViewModel = viewModel!!
+                            )
+                        }
+
+                        composable("HistoryPage") {
+                            HistoryPage(
+                                navController = navController,
+                                context = applicationContext,
+                                plantViewModel = selectedPlantViewModel,
+                                state = settingsState
+                            )
+                        }
 
                         composable("BluetoothConnect") {
                             BluetoothConnectScreen(
@@ -216,6 +297,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onStop() { // When out of application, disconnect from bluetooth (Just in case they keep app on for a long time). Might not even be doing but be safe
+        viewModel?.stopScan()
         viewModel?.connectedThread?.cancel()
         super.onStop()
     }
