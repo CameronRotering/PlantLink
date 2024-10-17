@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,10 +22,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Card
+import androidx.compose.material.DropdownMenu
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,7 +54,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -65,6 +73,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavHostController
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.R
@@ -111,6 +120,24 @@ fun PlantSettingsPage(
 
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
+
+
+    // For drop-down menu
+    var mExpanded by remember { mutableStateOf(false) }
+
+    // List of plants for preset
+    val mPlants = listOf("Galaxy Petunia", "Plant 2", "Plant 3")
+
+    // Create a string value to store the selected city
+    var mSelectedText by remember { mutableStateOf("") }
+
+    var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
+
+    // Up Icon when expanded and down icon when collapsed
+    val icon = if (mExpanded)
+        Icons.Filled.KeyboardArrowUp
+    else
+        Icons.Filled.KeyboardArrowDown
 
     Scaffold(
         //backgroundColor = MaterialTheme.colorScheme.background,
@@ -218,15 +245,19 @@ fun PlantSettingsPage(
                 tint = Color(61, 168, 44),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(450.dp)
+                    .height(450.dp) // Maybe make float so it goes to a certain percentage
             )
         }
+
         LazyColumn(
             contentPadding = padding,
-            state = lazyListState
+            state = lazyListState,
         ) {
             /* TODO: To have an image set for each plant, item would go here to upload/change */
 
+            item {
+                Spacer(modifier = Modifier.height(100.dp))
+            }
 
             item {
                 Card (
@@ -465,6 +496,80 @@ fun PlantSettingsPage(
                         }
                     }
                 }
+            }
+        }
+
+        LazyColumn(
+            contentPadding = padding,
+            state = lazyListState,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            item {
+                Column (
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    OutlinedTextField(
+                        value = mSelectedText,
+                        onValueChange = { mSelectedText = it }, // Auto complete options to more easily find the plant they want
+                        enabled = true,
+                        modifier = Modifier
+                            .fillMaxWidth(0.75f)
+                            .height(75.dp)
+                            //.align(Alignment.CenterHorizontally)
+                            .onGloballyPositioned { coordinates ->
+                                // This value is used to assign to
+                                // the DropDown the same width
+                                mTextFieldSize = coordinates.size.toSize()
+                            },
+                        label = {
+                            Text(
+                                text = "Plant Presets",
+                                color = MaterialTheme.colorScheme.secondary,
+                                textAlign = TextAlign.Center
+                            )
+                        },
+                        singleLine = true,
+                        shape = MaterialTheme.shapes.small,
+                        colors = TextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.background,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                            disabledContainerColor = MaterialTheme.colorScheme.background,
+                            unfocusedTextColor = Color(255, 255, 255, 255)
+                        ),
+                        trailingIcon = {
+                            Icon(
+                                icon,
+                                "Drop-Down Arrow",
+                                Modifier.clickable { mExpanded = !mExpanded }
+                            )
+                        }
+                    )
+
+                    DropdownMenu(
+                        expanded = mExpanded,
+                        onDismissRequest = { mExpanded = false },
+                        modifier = Modifier
+                            .width(with(LocalDensity.current) {
+                                mTextFieldSize.width.toDp()
+                            })
+                    ) {
+                        mPlants.forEach { label ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(text = label)
+                                },
+                                onClick = {
+                                    mSelectedText = label
+                                    mExpanded = false
+                                })
+                        }
+                    }
+                }
+
             }
         }
     }
