@@ -93,6 +93,30 @@ class CharacterLimitVisualTransformation : VisualTransformation {
     }
 }
 
+fun getMatchingPlants(query: String, plantList: List<String>): MutableList<String> {
+    val searchedPlants: MutableList<String> = mutableListOf()
+
+    plantList.forEach {
+        if (it.contains(query, true))
+            searchedPlants.add(it)
+    }
+
+    //val doesMatch = plantList.contains(query)
+
+    return searchedPlants // If not found in above loop
+}
+
+fun searchPlants(
+    text: String,
+    allPlants: List<String>
+): MutableList<String> {
+    if (text.isBlank() || text == "Plant Presets") {
+        return allPlants.toMutableList()
+    } else {
+        return getMatchingPlants(text, allPlants)
+    }
+}
+
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -126,12 +150,13 @@ fun PlantSettingsPage(
     var mExpanded by remember { mutableStateOf(false) }
 
     // List of plants for preset
-    val mPlants = listOf("Galaxy Petunia", "Plant 2", "Plant 3")
+    val mAllPlants = mutableListOf("Galaxy Petunia", "Plant 2", "Plant 3")
+    var mSearchedPlants = mAllPlants
 
     // Create a string value to store the selected city
     var mSelectedText by remember { mutableStateOf("") }
 
-    var mTextFieldSize by remember { mutableStateOf(Size.Zero)}
+    var mTextFieldSize by remember { mutableStateOf(Size.Zero) }
 
     // Up Icon when expanded and down icon when collapsed
     val icon = if (mExpanded)
@@ -514,7 +539,11 @@ fun PlantSettingsPage(
                 ) {
                     OutlinedTextField(
                         value = mSelectedText,
-                        onValueChange = { mSelectedText = it }, // Auto complete options to more easily find the plant they want
+                        onValueChange = {
+                            mSelectedText = it
+
+                            //searchPlants(mSelectedText, mAllPlants)
+                                        }, // Auto complete options to more easily find the plant they want
                         enabled = true,
                         modifier = Modifier
                             .fillMaxWidth(0.75f)
@@ -525,6 +554,18 @@ fun PlantSettingsPage(
                                 // the DropDown the same width
                                 mTextFieldSize = coordinates.size.toSize()
                             },
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                mSearchedPlants = searchPlants(mSelectedText, mAllPlants)
+
+                                mExpanded = true
+
+                                focusManager.clearFocus()
+                            }
+                        ),
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Done
+                        ),
                         label = {
                             Text(
                                 text = "Plant Presets",
@@ -557,7 +598,7 @@ fun PlantSettingsPage(
                                 mTextFieldSize.width.toDp()
                             })
                     ) {
-                        mPlants.forEach { label ->
+                        mSearchedPlants.forEach { label ->
                             DropdownMenuItem(
                                 text = {
                                     Text(text = label)
@@ -569,7 +610,6 @@ fun PlantSettingsPage(
                         }
                     }
                 }
-
             }
         }
     }
