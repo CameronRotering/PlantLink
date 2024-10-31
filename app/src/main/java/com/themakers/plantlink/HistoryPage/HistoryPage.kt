@@ -1,8 +1,6 @@
 package com.themakers.plantlink.HistoryPage
 
 import android.content.Context
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -34,14 +32,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import co.yml.charts.common.model.Point
 import co.yml.charts.ui.linechart.LineChart
-import com.themakers.plantlink.R
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
 import com.themakers.plantlink.SimpleLineChart
 import com.themakers.plantlink.data.SettingState
@@ -187,19 +183,6 @@ fun HistoryPage(
             }
         }
     ) { padding ->
-        Column (
-            verticalArrangement = Arrangement.Bottom,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.sharp_psychiatry_24),
-                contentDescription = "Big Plant",
-                tint = Color(61, 168, 44),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(450.dp)
-            )
-        }
         LazyColumn(
             contentPadding = padding,
             state = lazyListState,
