@@ -298,7 +298,7 @@ fun HistoryPage(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Average: " + "75.32%",
+                            text = "Average: " + "75.32 %",
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
@@ -338,7 +338,7 @@ fun HistoryPage(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Average: " + "99.99%",
+                            text = "Average: " + "99.99 lux",
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),

@@ -204,7 +204,7 @@ fun DeviceCard(
                             .padding(start = 5.dp)
                     )
                     Text(
-                        text = plantDevice.light.toString() + " % ",//"34.7 RH ",
+                        text = plantDevice.light.toString() + " lux ",
                         color = Color(0, 0, 0, 255),
                         textAlign = TextAlign.Right,
                         modifier = Modifier.fillMaxWidth(),
