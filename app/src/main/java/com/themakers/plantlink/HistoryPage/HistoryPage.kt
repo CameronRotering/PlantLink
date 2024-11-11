@@ -12,10 +12,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -218,7 +218,7 @@ fun HistoryPage(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Average: " + averageOfPoints(tempOverTime).toString() + "° " + if (state.isFahrenheit) "F" else "C",
+                            text = "Average Temperature: " + averageOfPoints(tempOverTime).toString() + "° " + if (state.isFahrenheit) "F" else "C",
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
@@ -258,7 +258,7 @@ fun HistoryPage(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Average: " + "34.7 RH",
+                            text = "Average Humidity: " + "34.7 RH",
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
@@ -298,7 +298,7 @@ fun HistoryPage(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Average: " + "75.32%",
+                            text = "Average Soil Moisture: " + "75.32%",
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
@@ -338,7 +338,7 @@ fun HistoryPage(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Average: " + "99.99%",
+                            text = "Average Light: " + "99.99 lux",
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
