@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.themakers.plantlink"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.themakers.plantlink"

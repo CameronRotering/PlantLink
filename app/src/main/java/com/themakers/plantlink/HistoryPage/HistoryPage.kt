@@ -218,11 +218,11 @@ fun HistoryPage(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Average: " + averageOfPoints(tempOverTime).toString() + "° " + if (state.isFahrenheit) "F" else "C",
+                            text = "Average Temperature: " + averageOfPoints(tempOverTime).toString() + "° " + if (state.isFahrenheit) "F" else "C",
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
-                            fontSize = 30.sp
+                            fontSize = 25.sp
                         )
                     }
                 }
@@ -258,11 +258,11 @@ fun HistoryPage(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Average: " + "34.7 RH",
+                            text = "Average Humidity: " + "34.7 RH",
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
-                            fontSize = 30.sp
+                            fontSize = 25.sp
                         )
                     }
                 }
@@ -302,7 +302,7 @@ fun HistoryPage(
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
-                            fontSize = 30.sp
+                            fontSize = 25.sp
                         )
                     }
                 }
@@ -342,7 +342,7 @@ fun HistoryPage(
                             color = Color(0, 0, 0, 255),
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth(),
-                            fontSize = 30.sp
+                            fontSize = 25.sp
                         )
                     }
                 }
