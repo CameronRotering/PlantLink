@@ -209,7 +209,7 @@ class AndroidBluetoothController(
                             }
 
                             UUID.fromString("dd72366c-d8a0-4c29-9943-30234819a3a2") -> { // Light
-                                i.setLight(String(buffer, 0, buffer.size).toDouble())
+                                i.setAmbientLight(String(buffer, 0, buffer.size).toLong())
                             }
                         }
                         break // Don't look through any other services if already found and changed the one
@@ -261,7 +261,7 @@ class AndroidBluetoothController(
                         }
 
                         UUID.fromString("dd72366c-d8a0-4c29-9943-30234819a3a2") -> { // Light
-                            i.setLight(String(buffer, 0, buffer.size).toDouble())
+                            i.setAmbientLight(String(buffer, 0, buffer.size).toLong())
                         }
                     }
                     break // Don't look through any other services if already found and changed the one

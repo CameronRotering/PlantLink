@@ -2,6 +2,7 @@ package com.themakers.plantlink.data
 
 import android.bluetooth.BluetoothGattService
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import java.math.BigDecimal
@@ -33,7 +34,7 @@ data class PlantDevice (
     var moisture: BigDecimal by mutableStateOf(BigDecimal(0))
         private set
 
-    var light: BigDecimal by mutableStateOf(BigDecimal(0))
+    var light: Long by mutableLongStateOf(0)
         private set
 
 
@@ -80,13 +81,7 @@ data class PlantDevice (
                 (pMoist.coerceIn(0.0, 880.0) / 880)).setScale(2, RoundingMode.HALF_EVEN)
     }
 
-    fun setLight(pLight: Double) {
-        //light = BigDecimal(pLight).setScale(2, RoundingMode.HALF_EVEN)
-
-        light = BigDecimal(100 *
-                (pLight.coerceIn(0.0, 4095.0) / 4095)).setScale(2, RoundingMode.HALF_EVEN) // With phone flashlight on max, 4095 seems to be max, peaking at 4095
-
-
-    // 666 seems to be around max amount (When tested with phone flashlight on max, it got mostly below 660 except for one being 661. When tested in direct sunlight it got up to 667)
+    fun setAmbientLight(pLight: Long) {
+        light = pLight // Lux scale: https://en.wikipedia.org/wiki/Lux
     }
 }

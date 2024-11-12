@@ -1,8 +1,8 @@
 [versions]
-androidGradlePlugin = "8.7.1"
+androidGradlePlugin = "8.7.2"
 activityCompose = "1.9.2"
 compiler = "1.5.15"
-coreKtx = "1.13.1"
+coreKtx = "1.15.0"
 junit = "1.2.1"
 junitVersion = "4.13.2"
 kotlin = "2.0.0"
