@@ -29,15 +29,18 @@ class BluetoothViewModel(
     var gatt by mutableStateOf<BluetoothGatt?>(null)
         private set
 
+    var scanning = false
 
     val state = combine(
         bluetoothController.scannedDevices,
         bluetoothController.pairedDevices,
+        bluetoothController.isScanning,
         _state
-    ) { scannedDevices, pairedDevices, state ->
+    ) { scannedDevices, pairedDevices, isScanning, state ->
         state.copy(
             scannedDevices = scannedDevices,
-            pairedDevices = pairedDevices
+            pairedDevices = pairedDevices,
+            isScanning = isScanning
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _state.value)
 

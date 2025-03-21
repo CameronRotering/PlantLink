@@ -47,7 +47,12 @@ class AndroidBluetoothController(
         bluetoothAdapter?.bluetoothLeScanner
     }
 
-    private var scanning = false
+    //private var scanning = false
+
+    private val _isScanning = MutableStateFlow(false)
+    val isScanning: StateFlow<Boolean>
+        get() = _isScanning.asStateFlow()
+
 
     private val _scannedDevices = MutableStateFlow<List<BluetoothDeviceDomain>>(emptyList())
     override val scannedDevices: StateFlow<List<BluetoothDeviceDomain>>
@@ -114,7 +119,7 @@ class AndroidBluetoothController(
 //            return
 //        }
 
-        if (scanning || bluetoothLeScanner == null) { // The BluetoothLeScanner is only available from the BluetoothAdapter if Bluetooth is currently enabled on the device. If Bluetooth is not enabled, then getBluetoothLeScanner() returns null.
+        if (_isScanning.value || bluetoothLeScanner == null) { // The BluetoothLeScanner is only available from the BluetoothAdapter if Bluetooth is currently enabled on the device. If Bluetooth is not enabled, then getBluetoothLeScanner() returns null.
             return
         }
 
@@ -126,7 +131,7 @@ class AndroidBluetoothController(
 
         updatePairedDevices()
 
-        scanning = true
+        _isScanning.value = true
 
         bluetoothLeScanner!!.startScan(leScanCallback)
 
@@ -139,12 +144,12 @@ class AndroidBluetoothController(
 //            return
 //        }
 
-        if (!scanning || bluetoothLeScanner == null) { // The BluetoothLeScanner is only available from the BluetoothAdapter if Bluetooth is currently enabled on the device. If Bluetooth is not enabled, then getBluetoothLeScanner() returns null.
+        if (!_isScanning.value || bluetoothLeScanner == null) { // The BluetoothLeScanner is only available from the BluetoothAdapter if Bluetooth is currently enabled on the device. If Bluetooth is not enabled, then getBluetoothLeScanner() returns null.
             return
         }
 
         bluetoothLeScanner!!.stopScan(leScanCallback)
-        scanning = false
+        _isScanning.value = false
     }
 
 

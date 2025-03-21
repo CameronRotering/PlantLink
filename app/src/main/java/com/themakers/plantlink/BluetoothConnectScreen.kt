@@ -3,15 +3,24 @@ package com.themakers.plantlink
 import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
@@ -22,6 +31,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,7 +43,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -154,7 +167,8 @@ fun BluetoothConnectScreen(
             )
         }
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(padding)
         ) {
 
@@ -208,11 +222,10 @@ fun BluetoothConnectScreen(
                 pairedDevices = state.pairedDevices,
                 scannedDevices = state.scannedDevices,
                 onClick = {device -> // When a bluetooth device is selected
-
-                    viewModel.stopScan() // Recommended to not be scanning while connecting    Scanning is battery intensive
-
                     if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") { // Invites possibilities of "PlantLink310" Working
                         if (device.device != viewModel.btModule) {// && device.device!!.uuids[0].uuid != viewModel.uuid) { // If connecting to different device or first device to connect to
+                            viewModel.stopScan() // Recommended to not be scanning while connecting    Scanning is battery intensive
+
                             viewModel.setGatt(
                                 context = context,
                                 device = device.device!!,
@@ -231,10 +244,59 @@ fun BluetoothConnectScreen(
                     .fillMaxWidth(),
                 lazyListState = lazyListState
             )
+
+            // Using a regular row brings in loading circle from left while
+            // lazy row brings in loading circle from top
+            // (added in specific animation details to only come in from top)
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                item {
+                    LoadingAnimation(isScanning = state.isScanning)
+                }
+
+            }
         }
     }
 }
 
+@Composable
+fun LoadingAnimation(modifier: Modifier = Modifier, isScanning: Boolean) {
+    AnimatedVisibility(
+        visible = isScanning,
+        enter = expandVertically(expandFrom = Alignment.Top),
+    ) {
+        val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
+        val rotation by infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            label = "rotation",
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 1000)
+            )
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = modifier
+                    .size(60.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    strokeWidth = 5.dp,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .rotate(rotation)
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun BluetoothDeviceList(
