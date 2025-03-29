@@ -25,12 +25,6 @@ data class PlantDevice (
     var maxMoisture: String by mutableStateOf(mMaxMoisture)
         private set
 
-    var finalTemp: BigDecimal by mutableStateOf(BigDecimal(0))
-        private set
-
-    var humidity: BigDecimal by mutableStateOf(BigDecimal(0))
-        private set
-
     var moisture: BigDecimal by mutableStateOf(BigDecimal(0))
         private set
 
@@ -48,32 +42,6 @@ data class PlantDevice (
 
     fun setMaxMoist(pMax: String) {
         maxMoisture = pMax
-    }
-
-
-    fun setTemp(pTemp: Double) {
-        //temperatureC = BigDecimal(pTemp).setScale(2, RoundingMode.HALF_EVEN)
-        //temperatureF = BigDecimal((pTemp * 1.8) + 32).setScale(2, RoundingMode.HALF_EVEN)
-
-//        if (state!!.isFahrenheit) { // When getting finalTemp, if the setting is Fahrenheit, give Fahrenheit, visa versa
-//            finalTemp = BigDecimal((pTemp * 1.8) + 32).setScale(2, RoundingMode.HALF_EVEN)
-//        } else {
-//            finalTemp = BigDecimal(pTemp).setScale(2, RoundingMode.HALF_EVEN)
-//        }
-
-        finalTemp = BigDecimal(pTemp).setScale(2, RoundingMode.HALF_EVEN)
-    }
-
-    fun getTempString(isFahrenheit: Boolean): String {
-        if (isFahrenheit) {
-            return BigDecimal((finalTemp.toDouble() * 1.8) + 32).setScale(2, RoundingMode.HALF_EVEN).toString()
-        } else {
-            return finalTemp.toString()
-        }
-    }
-
-    fun setHumid(pHumid: Double) {
-        humidity = BigDecimal(pHumid).setScale(2, RoundingMode.HALF_EVEN)
     }
 
     fun setMoist(pMoist: Double) {

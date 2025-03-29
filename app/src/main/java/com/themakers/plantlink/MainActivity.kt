@@ -47,6 +47,7 @@ import com.themakers.plantlink.SettingsPage.PlantSettingsPage
 import com.themakers.plantlink.SettingsPage.SettingsPage
 import com.themakers.plantlink.data.AndroidBluetoothController
 import com.themakers.plantlink.data.BluetoothLeService
+import com.themakers.plantlink.data.HubDevice
 import com.themakers.plantlink.data.PlantDevice
 import com.themakers.plantlink.data.SettingsDatabase
 import com.themakers.plantlink.ui.theme.PlantLInkTheme
@@ -93,8 +94,22 @@ class MainActivity : ComponentActivity() {
     var nfcText = ""
 
     val plantDeviceList = mutableListOf<PlantDevice>(
-        PlantDevice("00:00:00:00:00:00", "Galaxy Petunia", "1", "10")
+        PlantDevice("00:00:00:00:00:00", "Galaxy Petunia", "1", "10"),
+//        PlantDevice("00:00:00:00:00:01", "Galaxy Petunia", "1", "10"), // For testing
+//        PlantDevice("00:00:00:00:00:02", "Galaxy Petunia", "1", "10"),
+//        PlantDevice("00:00:00:00:00:03", "Galaxy Petunia", "1", "10"),
+//        PlantDevice("00:00:00:00:00:04", "Galaxy Petunia", "1", "10"),
+//        PlantDevice("00:00:00:00:00:05", "Galaxy Petunia", "1", "10"),
+//        PlantDevice("00:00:00:00:00:06", "Galaxy Petunia", "1", "10"),
+//        PlantDevice("00:00:00:00:00:07", "Galaxy Petunia", "1", "10"),
+//        PlantDevice("00:00:00:00:00:08", "Galaxy Petunia", "1", "10"),
+//        PlantDevice("00:00:00:00:00:09", "Galaxy Petunia", "1", "10"),
+//        PlantDevice("00:00:00:00:00:10", "Galaxy Petunia", "1", "10"),
+//        PlantDevice("00:00:00:00:00:11", "Galaxy Petunia", "1", "10"),
+//        PlantDevice("00:00:00:00:00:12", "Galaxy Petunia", "1", "10")
     )
+
+    val hubDevice = HubDevice("00:00:00:00:00:00", "Hub")
 
     private val nfcManager by lazy {
         applicationContext.getSystemService(NfcManager::class.java)
@@ -212,7 +227,7 @@ class MainActivity : ComponentActivity() {
             PlantLInkTheme {
                 val settingsState by settingsViewModel.state.collectAsState()
 
-                viewModel = BluetoothViewModel(AndroidBluetoothController(applicationContext, plantDeviceList))
+                viewModel = BluetoothViewModel(AndroidBluetoothController(applicationContext, plantDeviceList, hubDevice))
 
                 viewModel!!.setControllerViewModel(viewModel!!)
 
@@ -238,7 +253,8 @@ class MainActivity : ComponentActivity() {
                                 state = settingsState,
                                 onEvent = settingsViewModel::onEvent,
                                 clickedPlantViewModel = selectedPlantViewModel,
-                                plantDeviceList = plantDeviceList
+                                plantDeviceList = plantDeviceList,
+                                hubDevice = hubDevice
                             )
                         }
 

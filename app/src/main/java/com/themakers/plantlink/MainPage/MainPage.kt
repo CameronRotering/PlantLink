@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -29,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -39,6 +43,7 @@ import androidx.navigation.NavHostController
 import com.themakers.plantlink.PlantDataViewModel
 import com.themakers.plantlink.R
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
+import com.themakers.plantlink.data.HubDevice
 import com.themakers.plantlink.data.PlantDevice
 import com.themakers.plantlink.data.SettingEvent
 import com.themakers.plantlink.data.SettingState
@@ -55,7 +60,8 @@ fun MainPage(
     state: SettingState,
     onEvent: (SettingEvent) -> Unit,
     clickedPlantViewModel: CurrClickedPlantViewModel,
-    plantDeviceList: MutableList<PlantDevice>
+    plantDeviceList: MutableList<PlantDevice>,
+    hubDevice: HubDevice
 ) {
     val lazyGridState = rememberLazyGridState()
 
@@ -150,7 +156,7 @@ fun MainPage(
     ) { padding ->
         Column (
             verticalArrangement = Arrangement.Bottom,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) {
             Icon(
                 painter = painterResource(R.drawable.sharp_psychiatry_24),
@@ -161,27 +167,85 @@ fun MainPage(
                     .height(450.dp)
             )
         }
-        LazyVerticalGrid (
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Top,
-            horizontalArrangement = Arrangement.Start,
-            contentPadding = padding,
-            state = lazyGridState,
-            columns = GridCells.Adaptive(175.dp)
+
+        Column (
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(plantDeviceList.size) { deviceIndex ->
-                DeviceCard(
-                    modifier = Modifier
-                        .padding(deviceBoxPadding),
-                    context = context,
-                    navController = navController,
-                    plantViewModel = plantViewModel,
-                    plantDevice = plantDeviceList[deviceIndex],
-                    state = state,
-                    onEvent = onEvent,
-                    clickedPlantViewModel = clickedPlantViewModel
-                )
+            Spacer(modifier = Modifier.height(padding.calculateTopPadding()))
+
+            Column (
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    //modifier = Modifier.fillMaxWidth() // Uncomment this line and the space right below to force centering position
+                ) {
+                    //Spacer(modifier = Modifier.fillMaxWidth(0.35f))
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_device_thermostat_24),
+                        contentDescription = "Temperature",
+                        tint = Color.Black,
+                        modifier = Modifier
+                            .size(iconSize)
+                            .padding(start = 5.dp)
+                    )
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(
+                        text = hubDevice.getTempString(state.isFahrenheit) + "° " + if (state.isFahrenheit) "F " else "C ",
+                        color = Color(0, 0, 0, 255),
+                        //textAlign = TextAlign.Left,
+                        //modifier = Modifier.fillMaxWidth(),
+                        fontSize = 30.sp,
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    //modifier = Modifier.fillMaxWidth()
+                ) {
+                    //Spacer(modifier = Modifier.fillMaxWidth(0.35f))
+                    Icon(
+                        painter = painterResource(R.drawable.sharp_humidity_percentage_24),
+                        contentDescription = "Humidity",
+                        tint = Color.Black,
+                        modifier = Modifier
+                            .size(iconSize)
+                            .padding(start = 5.dp)
+                    )
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(
+                        text = hubDevice.humidity.toString() + " RH ",//"34.7 RH ",
+                        color = Color(0, 0, 0, 255),
+                        fontSize = 30.sp
+                    )
+                }
+            }
+
+            LazyVerticalGrid(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalArrangement = Arrangement.Start,
+                contentPadding = PaddingValues(bottom = padding.calculateBottomPadding()), // Only add padding to bottom to see any items that have to be scrolled to and not add padding to top
+                state = lazyGridState,
+                columns = GridCells.Adaptive(175.dp)
+            ) {
+                items(plantDeviceList.size) { deviceIndex ->
+                    DeviceCard(
+                        modifier = Modifier
+                            .padding(deviceBoxPadding),
+                        context = context,
+                        navController = navController,
+                        plantViewModel = plantViewModel,
+                        plantDevice = plantDeviceList[deviceIndex],
+                        state = state,
+                        onEvent = onEvent,
+                        clickedPlantViewModel = clickedPlantViewModel
+                    )
+                }
             }
         }
     }

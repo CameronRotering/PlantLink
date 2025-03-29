@@ -29,7 +29,8 @@ import java.util.UUID
 @SuppressLint("MissingPermission")
 class AndroidBluetoothController(
     private val context: Context,
-    private val plantDevices: MutableList<PlantDevice>
+    private val plantDevices: MutableList<PlantDevice>,
+    private var hubDevice: HubDevice
 ): BluetoothController {
     var viewModel: BluetoothViewModel? = null
 
@@ -182,6 +183,75 @@ class AndroidBluetoothController(
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 val buffer: ByteArray = value
 
+                // If hub, don't search peripherals
+                if (characteristic.service.uuid == UUID.fromString("00001800-0000-1000-8000-00805f9b34fb")) { // UUID for hub
+                    when (characteristic.uuid) {
+                        UUID.fromString("7ccecf3a-cb17-4f62-b22d-671639009fc8") -> { // Temperature
+                            hubDevice.setTemp(String(buffer, 0, buffer.size).toDouble())
+                        }
+
+                        UUID.fromString("75171ef4-4fc5-4fd4-a393-8f4cc2f9fbcd") -> { // Humidity
+                            hubDevice.setHumid(String(buffer, 0, buffer.size).toDouble())
+                        }
+                    }
+                } else {
+                    for (i in plantDevices) {
+                        if (i.device == characteristic.service) {
+                            when (characteristic.uuid) {
+                                // Settings characteristics
+
+                                UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36") -> {
+                                    i.setName(String(buffer, 0, buffer.size))
+                                }
+
+                                UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9") -> {
+                                    i.setMinMoist(String(buffer, 0, buffer.size))
+                                }
+
+                                UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1") -> {
+                                    i.setMaxMoist(String(buffer, 0, buffer.size))
+                                }
+
+                                // End of Settings
+
+                                UUID.fromString("e41a3376-0c2a-4366-bf6e-43e3b59ab962") -> { // Soil Moisture
+                                    i.setMoist(String(buffer, 0, buffer.size).toDouble())
+                                }
+
+                                UUID.fromString("dd72366c-d8a0-4c29-9943-30234819a3a2") -> { // Light
+                                    i.setAmbientLight(String(buffer, 0, buffer.size).toLong())
+                                }
+                            }
+                            break // Don't look through any other services if already found and changed the one
+                        }
+                    }
+                }
+
+                Log.w("CHARACTERISTIC READ VALUE", String(buffer, 0, buffer.size))
+            } else {
+                Log.e("CHARACTERISTIC READ ERROR", "Error reading characteristic: ${characteristic.uuid} from server ${characteristic.service.uuid}")
+            }
+        }
+
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic, //Characteristic that has been updated as a result of a remote notification event. This value cannot be null.
+            value: ByteArray // notified characteristic value This value cannot be null.
+        ) {
+            val buffer: ByteArray = value
+
+            // If hub, don't search peripherals
+            if (characteristic.service.uuid == UUID.fromString("00001800-0000-1000-8000-00805f9b34fb")) { // UUID for hub
+                when (characteristic.uuid) {
+                    UUID.fromString("7ccecf3a-cb17-4f62-b22d-671639009fc8") -> { // Temperature
+                        hubDevice.setTemp(String(buffer, 0, buffer.size).toDouble())
+                    }
+
+                    UUID.fromString("75171ef4-4fc5-4fd4-a393-8f4cc2f9fbcd") -> { // Humidity
+                        hubDevice.setHumid(String(buffer, 0, buffer.size).toDouble())
+                    }
+                }
+            } else {
                 for (i in plantDevices) {
                     if (i.device == characteristic.service) {
                         when (characteristic.uuid) {
@@ -201,14 +271,6 @@ class AndroidBluetoothController(
 
                             // End of Settings
 
-                            UUID.fromString("7ccecf3a-cb17-4f62-b22d-671639009fc8") -> {
-                                i.setTemp(String(buffer, 0, buffer.size).toDouble())
-                            }
-
-                            UUID.fromString("75171ef4-4fc5-4fd4-a393-8f4cc2f9fbcd") -> { // Humidity
-                                i.setHumid(String(buffer, 0, buffer.size).toDouble())
-                            }
-
                             UUID.fromString("e41a3376-0c2a-4366-bf6e-43e3b59ab962") -> { // Soil Moisture
                                 i.setMoist(String(buffer, 0, buffer.size).toDouble())
                             }
@@ -219,57 +281,6 @@ class AndroidBluetoothController(
                         }
                         break // Don't look through any other services if already found and changed the one
                     }
-                }
-
-                Log.w("CHARACTERISTIC READ VALUE", String(buffer, 0, buffer.size))
-            } else {
-                Log.e("CHARACTERISTIC READ ERROR", "Error reading characteristic: ${characteristic.uuid} from server ${characteristic.service.uuid}")
-            }
-        }
-
-        override fun onCharacteristicChanged(
-            gatt: BluetoothGatt,
-            characteristic: BluetoothGattCharacteristic, //Characteristic that has been updated as a result of a remote notification event. This value cannot be null.
-            value: ByteArray // notified characteristic value This value cannot be null.
-        ) {
-            val buffer: ByteArray = value
-
-            for (i in plantDevices) {
-                if (i.device == characteristic.service) {
-                    when (characteristic.uuid) {
-                        // Settings characteristics
-
-                        UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36") -> {
-                            i.setName(String(buffer, 0, buffer.size))
-                        }
-
-                        UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9") -> {
-                            i.setMinMoist(String(buffer, 0, buffer.size))
-                        }
-
-                        UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1") -> {
-                            i.setMaxMoist(String(buffer, 0, buffer.size))
-                        }
-
-                        // End of Settings
-
-                        UUID.fromString("7ccecf3a-cb17-4f62-b22d-671639009fc8") -> {
-                            i.setTemp(String(buffer, 0, buffer.size).toDouble())
-                        }
-
-                        UUID.fromString("75171ef4-4fc5-4fd4-a393-8f4cc2f9fbcd") -> { // Humidity
-                            i.setHumid(String(buffer, 0, buffer.size).toDouble())
-                        }
-
-                        UUID.fromString("e41a3376-0c2a-4366-bf6e-43e3b59ab962") -> { // Soil Moisture
-                            i.setMoist(String(buffer, 0, buffer.size).toDouble())
-                        }
-
-                        UUID.fromString("dd72366c-d8a0-4c29-9943-30234819a3a2") -> { // Light
-                            i.setAmbientLight(String(buffer, 0, buffer.size).toLong())
-                        }
-                    }
-                    break // Don't look through any other services if already found and changed the one
                 }
             }
 
@@ -282,9 +293,12 @@ class AndroidBluetoothController(
         ) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 plantDevices.clear() // Clear any old services to link to any new
+                hubDevice = HubDevice("00:00:00:00:00:00", "Hub Device", null) // Clear hub as well
 
                 gatt.services.forEach { service ->
-                    if (service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) {
+                    if (service.uuid == UUID.fromString("00001800-0000-1000-8000-00805f9b34fb")) { // Change to service for hub
+                        hubDevice = HubDevice("00:00:00:00:00:00", "Hub Device", service)
+                    } else if (service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) {
                         plantDevices.add(PlantDevice("00:00:00:00:00:00", "Set Up Plant", "1", "10", service))
                     }
                 }
@@ -295,8 +309,6 @@ class AndroidBluetoothController(
 
         // Othercallbacks like onCharacteristicRead, onCharacteristicWrite, etc.
     }
-
-
 
     override fun release() {
         context.unregisterReceiver(foundDeviceReceiver)

@@ -114,56 +114,6 @@ fun DeviceCard(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_device_thermostat_24),
-                        contentDescription = "Temperature",
-                        tint = Color.Black,
-                        modifier = Modifier
-                            .size(iconSize)
-                            .padding(start = 5.dp)
-                    )
-                    Text(
-                        text = plantDevice.getTempString(state.isFahrenheit) + "° " + if (state.isFahrenheit) "F " else "C ",
-                        color = Color(0, 0, 0, 255),
-                        textAlign = TextAlign.Right,
-                        modifier = Modifier.fillMaxWidth(),
-                        fontSize = 30.sp,
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.sharp_humidity_percentage_24),
-                        contentDescription = "Humidity",
-                        tint = Color.Black,
-                        modifier = Modifier
-                            .size(iconSize)
-                            .padding(start = 5.dp)
-                    )
-                    Text(
-                        text = plantDevice.humidity.toString() + " RH ",//"34.7 RH ",
-                        color = Color(0, 0, 0, 255),
-                        textAlign = TextAlign.Right,
-                        modifier = Modifier.fillMaxWidth(),
-                        fontSize = 30.sp
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
                 Row (
                     modifier = Modifier
                         .fillMaxWidth()
