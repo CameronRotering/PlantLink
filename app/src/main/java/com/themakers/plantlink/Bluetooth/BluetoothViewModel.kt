@@ -29,8 +29,6 @@ class BluetoothViewModel(
     var gatt by mutableStateOf<BluetoothGatt?>(null)
         private set
 
-    var scanning = false
-
     val state = combine(
         bluetoothController.scannedDevices,
         bluetoothController.pairedDevices,
@@ -65,7 +63,7 @@ class BluetoothViewModel(
     @SuppressLint("MissingPermission")
     fun setCharacteristicNotification() {
         gatt!!.services.forEach{ service ->
-            if (service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) {
+            if (service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) { // General characteristics I don't change
                 service.characteristics.forEach { characteristic ->
                     gatt!!.setCharacteristicNotification(characteristic, true)
                 }
