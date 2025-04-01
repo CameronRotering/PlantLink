@@ -33,12 +33,14 @@ class BluetoothViewModel(
         bluetoothController.scannedDevices,
         bluetoothController.pairedDevices,
         bluetoothController.isScanning,
+        bluetoothController.isConnected,
         _state
-    ) { scannedDevices, pairedDevices, isScanning, state ->
+    ) { scannedDevices, pairedDevices, isScanning, isConnected, state ->
         state.copy(
             scannedDevices = scannedDevices,
             pairedDevices = pairedDevices,
-            isScanning = isScanning
+            isScanning = isScanning,
+            isConnected = isConnected
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), _state.value)
 

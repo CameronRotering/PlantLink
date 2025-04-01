@@ -2,6 +2,7 @@ package com.themakers.plantlink
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloat
@@ -43,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -226,6 +228,8 @@ fun BluetoothConnectScreen(
                         if (device.device != viewModel.btModule) {// && device.device!!.uuids[0].uuid != viewModel.uuid) { // If connecting to different device or first device to connect to
                             viewModel.stopScan() // Recommended to not be scanning while connecting    Scanning is battery intensive
 
+                            state.isConnected = 1
+
                             viewModel.setGatt(
                                 context = context,
                                 device = device.device!!,
@@ -257,12 +261,84 @@ fun BluetoothConnectScreen(
                 }
 
             }
+
+//            LazyRow(
+//                modifier = Modifier
+//                    .fillMaxWidth(),
+//                horizontalArrangement = Arrangement.SpaceAround
+//            ) {
+//                item {
+//                    LoadingAnimation(isScanning = state.isConnected, color = Color(255, 0, 0))
+//                }
+//
+//            }
         }
+
+
+        Column(
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                item {
+                    LoadingAnimation(isConnected = state.isConnected, color = Color(255, 0, 0))
+                }
+
+            }
+
+            Text(
+                text = if (state.isConnected == 2)
+                    "Connected"
+                else if (state.isConnected == 1)
+                    "Connecting"
+                else
+                    "Not connected",
+                fontSize = 50.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+
+
+//        LazyRow(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(200.dp)
+//                .padding(top = 600.dp),
+//            horizontalArrangement = Arrangement.SpaceAround
+//        ) {
+//            item {
+//                LoadingAnimation(isScanning = connecting, color = Color(255, 0, 0))
+//            }
+//
+//        }
+    }
+
+    LaunchedEffect(state.isConnected) {
+
+        if (state.isConnected == 2) {
+            Toast.makeText(
+                context,
+                "Connected to PlantLink device.",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
+        Log.w("BT CONNECT STAT CHANGE", state.isConnected.toString())
     }
 }
 
 @Composable
-fun LoadingAnimation(modifier: Modifier = Modifier, isScanning: Boolean) {
+fun LoadingAnimation(modifier: Modifier = Modifier, isScanning: Boolean, color: Color = Color(0, 255, 0)) {
     AnimatedVisibility(
         visible = isScanning,
         enter = expandVertically(expandFrom = Alignment.Top),
@@ -291,7 +367,46 @@ fun LoadingAnimation(modifier: Modifier = Modifier, isScanning: Boolean) {
                     strokeWidth = 5.dp,
                     modifier = Modifier
                         .fillMaxSize()
-                        .rotate(rotation)
+                        .rotate(rotation),
+                    color = color
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun LoadingAnimation(modifier: Modifier = Modifier, isConnected: Int, color: Color = Color(0, 255, 0)) {
+    AnimatedVisibility(
+        visible = isConnected == 1,
+        enter = expandVertically(expandFrom = Alignment.Top),
+    ) {
+        val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
+        val rotation by infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            label = "rotation",
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 1000)
+            )
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = modifier
+                    .size(60.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    strokeWidth = 5.dp,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .rotate(rotation),
+                    color = color
                 )
             }
         }

@@ -15,7 +15,6 @@ import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.util.Log
-import android.widget.Toast
 import com.themakers.plantlink.Bluetooth.BluetoothController
 import com.themakers.plantlink.Bluetooth.BluetoothDeviceDomain
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
@@ -54,6 +53,12 @@ class AndroidBluetoothController(
     val isScanning: StateFlow<Boolean>
         get() = _isScanning.asStateFlow()
 
+    private val _isConnected = MutableStateFlow(0)
+    var isConnected: StateFlow<Int>
+        get() = _isConnected.asStateFlow()
+        set(value) {
+            _isConnected.value = value.value
+        }
 
     private val _scannedDevices = MutableStateFlow<List<BluetoothDeviceDomain>>(emptyList())
     override val scannedDevices: StateFlow<List<BluetoothDeviceDomain>>
@@ -157,19 +162,41 @@ class AndroidBluetoothController(
 
     val gattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-            when (newState) {
+            when (newState) { // Cannot use toast on either connection state due to thread not calling looper.prepare
                 BluetoothProfile.STATE_CONNECTED -> {
                     // Successfully connected to the GATT Server.
                     // You can now call gatt.discoverServices() to discover available services.
+//                    Toast.makeText(
+//                        context,
+//                        "Bluetooth connected.",
+//                        Toast.LENGTH_LONG
+//                    ).show()
+
+
+
+                    Log.w("BT CONNECT CHANGE", "Connected.")
+
+                    _isConnected.value = 2
+
                     gatt.discoverServices()
                 }
+//                BluetoothProfile.STATE_CONNECTING -> {
+//                    Log.w("BT CONNECT CHANGE", "Connecting.")
+//                    _isConnecting.value = true
+//                }
+//                BluetoothProfile.STATE_DISCONNECTING -> {
+//                    Log.w("BT CONNECT CHANGE", "Disconnecting.")
+//                }
                 BluetoothProfile.STATE_DISCONNECTED -> {
                     // Disconnected from the GATT Server.
-                    Toast.makeText(
-                        context,
-                        "Bluetooth disconnected.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Log.w("BT CONNECT CHANGE", "Disconnected.")
+                    _isConnected.value = 0
+
+//                    Toast.makeText(
+//                        context,
+//                        "Bluetooth disconnected.",
+//                        Toast.LENGTH_LONG
+//                    ).show()
                 }
             }
         }
