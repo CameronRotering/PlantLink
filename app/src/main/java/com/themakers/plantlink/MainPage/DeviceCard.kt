@@ -142,7 +142,8 @@ fun DeviceCard(
                 Row (
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(),
+                        .fillMaxHeight()
+                        .padding(bottom = 5.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(

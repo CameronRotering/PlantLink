@@ -340,7 +340,7 @@ class MainActivity : ComponentActivity() {
             "UTF-16"
         }
         val languageCodeLength: Int =
-            (payload[0] and 0b00111111).toInt()// Get language code Ex: "en
+            (payload[0] and 0b00111111).toInt()// Get language code Ex: "en"
 
         try {
             text = java.lang.String(
