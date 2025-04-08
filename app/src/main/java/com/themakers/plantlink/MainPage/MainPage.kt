@@ -154,7 +154,7 @@ fun MainPage(
         },
         contentWindowInsets = WindowInsets.safeContent // Safe content so no content is hidden under system things like camera AND is interactive
     ) { padding ->
-        Column (
+        Column(
             verticalArrangement = Arrangement.Bottom,
             modifier = Modifier.fillMaxSize(),
         ) {
@@ -168,11 +168,11 @@ fun MainPage(
             )
         }
 
-        Column (
+        Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(padding.calculateTopPadding()))
+            Spacer(modifier = Modifier.height(padding.calculateTopPadding() + 10.dp))
 
             Column (
                 modifier = Modifier

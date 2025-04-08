@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,14 +24,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Card
-import androidx.compose.material.DropdownMenu
+import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -288,10 +291,21 @@ fun PlantSettingsPage(
             }
 
             item {
-                Card (
+                Card(
                     shape = MaterialTheme.shapes.small,
-                    backgroundColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.secondary
+                    colors = CardColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.secondary,
+                        disabledContainerColor = Color.Gray,
+                        disabledContentColor = Color.Gray
+                    ),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 6.dp
+                    )
+                    //border = BorderStroke(1.dp, Color.Black)
+
+                    //backgroundColor = MaterialTheme.colorScheme.background,
+                    //contentColor = MaterialTheme.colorScheme.secondary
                 ) {
                     Column(
                         modifier = Modifier
@@ -372,8 +386,19 @@ fun PlantSettingsPage(
             item {
                 Card (
                     shape = MaterialTheme.shapes.small,
-                    backgroundColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.secondary
+                    colors = CardColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.secondary,
+                        disabledContainerColor = Color.Gray,
+                        disabledContentColor = Color.Gray
+                    ),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 6.dp
+                    )
+                    //border = BorderStroke(1.dp, Color.Black)
+
+                    //backgroundColor = MaterialTheme.colorScheme.background,
+                    //contentColor = MaterialTheme.colorScheme.secondary
                 ) {
                     Column(
                         modifier = Modifier
@@ -599,17 +624,23 @@ fun PlantSettingsPage(
                         modifier = Modifier
                             .width(with(LocalDensity.current) {
                                 mTextFieldSize.width.toDp()
-                            })
+                            }),
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        border = BorderStroke(1.dp, Color.Black)
                     ) {
                         mSearchedPlants.forEach { label ->
                             DropdownMenuItem(
                                 text = {
-                                    Text(text = label)
+                                    Text(
+                                        text = label,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
                                 },
                                 onClick = {
                                     mSelectedText = label
                                     mExpanded = false
-                                })
+                                }
+                            )
                         }
                     }
                 }
