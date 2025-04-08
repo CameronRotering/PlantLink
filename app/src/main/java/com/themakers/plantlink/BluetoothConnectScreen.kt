@@ -293,34 +293,7 @@ fun BluetoothConnectScreen(
                 }
 
             }
-
-            Text(
-                text = if (state.isConnected == 2)
-                    "Connected"
-                else if (state.isConnected == 1)
-                    "Connecting"
-                else
-                    "Not connected",
-                fontSize = 50.sp,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold
-            )
         }
-
-
-
-//        LazyRow(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(200.dp)
-//                .padding(top = 600.dp),
-//            horizontalArrangement = Arrangement.SpaceAround
-//        ) {
-//            item {
-//                LoadingAnimation(isScanning = connecting, color = Color(255, 0, 0))
-//            }
-//
-//        }
     }
 
     LaunchedEffect(state.isConnected) {
@@ -333,7 +306,7 @@ fun BluetoothConnectScreen(
             ).show()
         }
 
-        Log.w("BT CONNECT STAT CHANGE", state.isConnected.toString())
+        Log.w("BT CONNECT STATE CHANGE", state.isConnected.toString())
     }
 }
 
