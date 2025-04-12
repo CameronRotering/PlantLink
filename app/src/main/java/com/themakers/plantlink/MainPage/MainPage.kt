@@ -189,7 +189,7 @@ fun MainPage(
                         tint = Color.Black,
                         modifier = Modifier
                             .size(iconSize)
-                            .padding(start = 5.dp)
+
                     )
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
@@ -213,7 +213,6 @@ fun MainPage(
                         tint = Color.Black,
                         modifier = Modifier
                             .size(iconSize)
-                            .padding(start = 5.dp)
                     )
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
