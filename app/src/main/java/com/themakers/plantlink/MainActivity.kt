@@ -32,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -109,7 +110,7 @@ class MainActivity : ComponentActivity() {
 //        PlantDevice("00:00:00:00:00:12", "Galaxy Petunia", "1", "10")
     )
 
-    val hubDevice = HubDevice("00:00:00:00:00:00", "Hub")
+    val hubDevice = mutableStateOf(HubDevice("00:00:00:00:00:00", "Hub"))
 
     private val nfcManager by lazy {
         applicationContext.getSystemService(NfcManager::class.java)

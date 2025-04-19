@@ -15,6 +15,7 @@ import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import com.themakers.plantlink.Bluetooth.BluetoothController
 import com.themakers.plantlink.Bluetooth.BluetoothDeviceDomain
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
@@ -29,7 +30,7 @@ import java.util.UUID
 class AndroidBluetoothController(
     private val context: Context,
     private val plantDevices: MutableList<PlantDevice>,
-    private var hubDevice: HubDevice
+    private var hubDevice: MutableState<HubDevice>
 ): BluetoothController {
     var viewModel: BluetoothViewModel? = null
 
@@ -211,14 +212,14 @@ class AndroidBluetoothController(
                 val buffer: ByteArray = value
 
                 // If hub, don't search peripherals
-                if (characteristic.service.uuid == UUID.fromString("00001800-0000-1000-8000-00805f9b34fb")) { // UUID for hub
+                if (characteristic.service.uuid == UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40")) { // UUID for hub
                     when (characteristic.uuid) {
                         UUID.fromString("7ccecf3a-cb17-4f62-b22d-671639009fc8") -> { // Temperature
-                            hubDevice.setTemp(String(buffer, 0, buffer.size).toDouble())
+                            hubDevice.value.setTemp(String(buffer, 0, buffer.size).toDouble())
                         }
 
                         UUID.fromString("75171ef4-4fc5-4fd4-a393-8f4cc2f9fbcd") -> { // Humidity
-                            hubDevice.setHumid(String(buffer, 0, buffer.size).toDouble())
+                            hubDevice.value.setHumid(String(buffer, 0, buffer.size).toDouble())
                         }
                     }
                 } else {
@@ -268,14 +269,14 @@ class AndroidBluetoothController(
             val buffer: ByteArray = value
 
             // If hub, don't search peripherals
-            if (characteristic.service.uuid == UUID.fromString("00001800-0000-1000-8000-00805f9b34fb")) { // UUID for hub
+            if (characteristic.service.uuid == UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40")) { // UUID for hub
                 when (characteristic.uuid) {
                     UUID.fromString("7ccecf3a-cb17-4f62-b22d-671639009fc8") -> { // Temperature
-                        hubDevice.setTemp(String(buffer, 0, buffer.size).toDouble())
+                        hubDevice.value.setTemp(String(buffer, 0, buffer.size).toDouble())
                     }
 
                     UUID.fromString("75171ef4-4fc5-4fd4-a393-8f4cc2f9fbcd") -> { // Humidity
-                        hubDevice.setHumid(String(buffer, 0, buffer.size).toDouble())
+                        hubDevice.value.setHumid(String(buffer, 0, buffer.size).toDouble())
                     }
                 }
             } else {
@@ -320,12 +321,12 @@ class AndroidBluetoothController(
         ) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 plantDevices.clear() // Clear any old services to link to any new
-                hubDevice = HubDevice("00:00:00:00:00:00", "Hub Device", null) // Clear hub as well
+                hubDevice.value = HubDevice("00:00:00:00:00:00", "Hub Device", null) // Clear hub as well
 
                 gatt.services.forEach { service ->
-                    if (service.uuid == UUID.fromString("00001800-0000-1000-8000-00805f9b34fb")) { // Change to service for hub
-                        hubDevice = HubDevice("00:00:00:00:00:00", "Hub Device", service)
-                    } else if (service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) {
+                    if (service.uuid == UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40")) { // Change to service for hub
+                        hubDevice.value = HubDevice("00:00:00:00:00:00", "Hub Device", service)
+                    } else if (service.uuid != UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40") && service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) {
                         plantDevices.add(PlantDevice("00:00:00:00:00:00", "Set Up Plant", "1", "10", service))
                     }
                 }

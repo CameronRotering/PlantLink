@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -61,7 +62,7 @@ fun MainPage(
     onEvent: (SettingEvent) -> Unit,
     clickedPlantViewModel: CurrClickedPlantViewModel,
     plantDeviceList: MutableList<PlantDevice>,
-    hubDevice: HubDevice
+    hubDevice: MutableState<HubDevice>
 ) {
     val lazyGridState = rememberLazyGridState()
 
@@ -193,7 +194,7 @@ fun MainPage(
                     )
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
-                        text = hubDevice.getTempString(state.isFahrenheit) + "° " + if (state.isFahrenheit) "F " else "C ",
+                        text = hubDevice.value.getTempString(state.isFahrenheit) + "° " + if (state.isFahrenheit) "F " else "C ",
                         color = Color(0, 0, 0, 255),
                         //textAlign = TextAlign.Left,
                         //modifier = Modifier.fillMaxWidth(),
@@ -216,7 +217,7 @@ fun MainPage(
                     )
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
-                        text = hubDevice.humidity.toString() + " RH ",//"34.7 RH ",
+                        text = hubDevice.value.humidity.toString() + " RH ",//"34.7 RH ",
                         color = Color(0, 0, 0, 255),
                         fontSize = 30.sp
                     )
