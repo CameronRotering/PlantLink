@@ -14,7 +14,7 @@ android {
         applicationId = "com.themakers.plantlink"
         minSdk = 31
         //noinspection EditedTargetSdkVersion
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -73,7 +73,6 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 
     implementation(libs.androidx.compiler)
-    implementation(libs.androidx.material)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.ui.android)
     implementation(libs.androidx.ui.tooling.preview)
