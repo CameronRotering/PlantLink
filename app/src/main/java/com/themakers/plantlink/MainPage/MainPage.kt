@@ -55,6 +55,7 @@ var deviceBoxPadding = PaddingValues(10.dp) // Was 30 dp for non-block version
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
+    destinationName: String,
     context: Context,
     navController: NavHostController,
     plantViewModel: PlantDataViewModel,
@@ -67,6 +68,12 @@ fun MainPage(
     val lazyGridState = rememberLazyGridState()
 
     Scaffold(
+//        modifier = Modifier // Creating gradient background of whole page.
+//            .fillMaxSize()
+//            .background(
+//                brush = Brush.verticalGradient(listOf(Color(36, 164, 255), Color(148, 210, 255)))
+//            ),
+        //containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(

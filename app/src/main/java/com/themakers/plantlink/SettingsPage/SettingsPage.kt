@@ -51,6 +51,7 @@ import com.themakers.plantlink.data.SettingState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsPage(
+    destinationName: String,
     context: Context,
     navController: NavHostController,
     state: SettingState,

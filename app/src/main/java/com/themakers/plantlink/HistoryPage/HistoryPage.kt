@@ -83,6 +83,7 @@ fun averageOfPoints(points: List<Point>): Float {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryPage(
+    destinationName: String,
     context: Context,
     navController: NavHostController,
     plantViewModel: CurrClickedPlantViewModel,

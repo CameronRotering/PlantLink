@@ -127,6 +127,7 @@ fun searchPlants(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlantSettingsPage(
+    destinationName: String,
     context: Context,
     navController: NavHostController,
     plantViewModel: CurrClickedPlantViewModel,
@@ -189,7 +190,9 @@ fun PlantSettingsPage(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.navigateUp()
+                        if (navController.currentDestination!!.route == destinationName) {
+                            navController.navigateUp()
+                        }
 
                         plantViewModel.currClickedPlant = null
                     }) {

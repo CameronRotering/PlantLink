@@ -65,6 +65,7 @@ import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BluetoothConnectScreen(
+    destinationName: String,
     state: BluetoothUiState,
     onStartScan: () -> Unit,
     onStopScan: () -> Unit,
