@@ -327,7 +327,7 @@ class AndroidBluetoothController(
                     if (service.uuid == UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40")) { // Change to service for hub
                         hubDevice.value = HubDevice("00:00:00:00:00:00", "Hub Device", service)
                     } else if (service.uuid != UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40") && service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) {
-                        plantDevices.add(PlantDevice("00:00:00:00:00:00", "Set Up Plant", "1", "10", service))
+                        plantDevices.add(PlantDevice("00:00:00:00:00:00", "Plant Name", "1", "10", service))
                     }
                 }
 

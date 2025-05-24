@@ -64,23 +64,24 @@ class BluetoothViewModel(
 
     @SuppressLint("MissingPermission")
     fun setCharacteristicNotification() {
-        gatt!!.services.forEach{ service ->
-            if (service.uuid == UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40")) {
-                service.characteristics.forEach { characteristic ->
-                    gatt!!.setCharacteristicNotification(characteristic, true)
-                }
+        viewModelScope.launch {
+            gatt!!.services.forEach{ service ->
+                if (service.uuid == UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40")) {
+                    service.characteristics.forEach { characteristic ->
+                        gatt!!.setCharacteristicNotification(characteristic, true)
+                    }
 
-            } else if (service.uuid != UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40") && service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) { // General characteristics I don't change
-                service.characteristics.forEach { characteristic ->
-                    gatt!!.setCharacteristicNotification(characteristic, true)
-                }
+                } else if (service.uuid != UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40") && service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) { // General characteristics I don't change
+                    service.characteristics.forEach { characteristic ->
+                        gatt!!.setCharacteristicNotification(characteristic, true)
 
-                viewModelScope.launch {
-                    gatt!!.readCharacteristic(service.getCharacteristic(UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36")))
-                    delay(100)
-                    gatt!!.readCharacteristic(service.getCharacteristic(UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9")))
-                    delay(100)
-                    gatt!!.readCharacteristic(service.getCharacteristic(UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1")))
+                        gatt!!.readCharacteristic(service.getCharacteristic(UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36")))
+                        delay(10)
+                        gatt!!.readCharacteristic(service.getCharacteristic(UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9")))
+                        delay(10)
+                        gatt!!.readCharacteristic(service.getCharacteristic(UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1")))
+                        delay(10)
+                    }
                 }
             }
         }

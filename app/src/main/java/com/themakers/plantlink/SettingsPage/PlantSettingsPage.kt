@@ -601,7 +601,8 @@ fun PlantSettingsPage(
                             Text(
                                 text = "Plant Presets",
                                 color = MaterialTheme.colorScheme.secondary,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
+                                fontSize = 20.sp
                             )
                         },
                         singleLine = true,
