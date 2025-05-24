@@ -195,6 +195,8 @@ class MainActivity : ComponentActivity() {
 
         val plantViewModel = PlantDataViewModel()
 
+        viewModel = BluetoothViewModel(AndroidBluetoothController(applicationContext, plantDeviceList, hubDevice)) // was at around line 232
+
 
         val enableBluetoothLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -227,8 +229,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             PlantLInkTheme {
                 val settingsState by settingsViewModel.state.collectAsState()
-
-                viewModel = BluetoothViewModel(AndroidBluetoothController(applicationContext, plantDeviceList, hubDevice))
 
                 viewModel!!.setControllerViewModel(viewModel!!)
 
