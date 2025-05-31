@@ -1,6 +1,7 @@
 package com.themakers.plantlink.MainPage
 
 import android.content.Context
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,16 +14,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -40,6 +47,27 @@ import com.themakers.plantlink.data.SettingState
 val iconSize = 30.dp
 
 @Composable
+fun DrawCircleWithColor(insideColor: Color) {
+    Canvas(
+        modifier = Modifier
+            .size(20.dp)
+            .fillMaxHeight()
+            .padding(end = 5.dp)
+    ) {
+        val radius = size.minDimension / 2
+        drawCircle(
+            color = insideColor,
+            radius = radius
+        )
+        drawCircle(
+            color = Color.Black,
+            radius = radius - (2.dp.toPx() / 2), // Adjust radius for the border thickness
+            style = Stroke(width = 2.dp.toPx())
+        )
+    }
+}
+
+@Composable
 fun DeviceCard(
     modifier: Modifier = Modifier,
     context: Context,
@@ -50,6 +78,8 @@ fun DeviceCard(
     onEvent: (SettingEvent) -> Unit,
     clickedPlantViewModel: CurrClickedPlantViewModel
 ) {
+    var hidden by remember { mutableStateOf(false) }
+
     Card(
         modifier = modifier
             .clickable {
@@ -70,98 +100,107 @@ fun DeviceCard(
                     .fillMaxWidth()
             ) {
                 Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxSize(),
                 )
                 {
-                        Text(
-                            maxLines = 2,
-                            minLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            text = plantDevice.plantName,
-                            color = Color(0, 0, 0, 255),
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            textAlign = TextAlign.Center,
+                    Text(
+                        maxLines = 2,
+                        minLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        text = plantDevice.plantName,
+                        color = Color(0, 0, 0, 255),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .fillMaxHeight()
+                            .padding(start = 5.dp),
+                    )
+
+                    //if (hidden) { // Only show the icon when the device card is hidden. (Might change)
+                        DrawCircleWithColor(Color.Red)
+                    //}
+
+                    IconButton(
+                        onClick = {
+                            /* TODO: Images above name of plant, maybe just template picture as soon as possible */
+
+                            hidden = !hidden
+
+                            //clickedPlantViewModel.currClickedPlant = plantDevice
+
+                            //navController.navigate("PlantLinkSettings")
+                        },
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        Icon(
+                            imageVector = if (hidden) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
+                            contentDescription = "Plant Settings",
+                            tint = Color.Black,
                             modifier = Modifier
-                                .fillMaxWidth(0.8f)
-                                .fillMaxHeight()
-                                .padding(start = 5.dp, top = 10.dp),
-                        )
-
-                        IconButton(
-                            onClick = {
-                                /* TODO: Images above name of plant, maybe just template picture as soon as possible */
-
-                                clickedPlantViewModel.currClickedPlant = plantDevice
-
-                                navController.navigate("PlantLinkSettings")
-                            },
-                            modifier = Modifier
+                                .size(30.dp)
                                 .fillMaxSize()
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = "Plant Settings",
-                                tint = Color.Black,
-                                modifier = Modifier
-                                    .size(30.dp)
-                                    .fillMaxSize()
-                                    .padding(end = 10.dp)
-                                )
-                        }
+                                .padding(end = 10.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_water_drop_24),
-                        contentDescription = "Soil Moisture",
-                        tint = Color.Black,
+                if (!hidden) {
+                    Row(
                         modifier = Modifier
-                            .size(iconSize)
-                            .padding(start = 5.dp)
-                    )
-                    Text(
-                        text = plantDevice.moisture.toString() + " % ",//"880 ",
-                        color = Color(0, 0, 0, 255),
-                        textAlign = TextAlign.Right,
-                        modifier = Modifier.fillMaxWidth(),
-                        fontSize = 30.sp
-                    )
-                }
+                            .fillMaxWidth()
+                            .fillMaxHeight(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_water_drop_24),
+                            contentDescription = "Soil Moisture",
+                            tint = Color.Black,
+                            modifier = Modifier
+                                .size(iconSize)
+                                .padding(start = 5.dp)
+                        )
+                        Text(
+                            text = plantDevice.moisture.toString() + " % ",//"880 ",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontSize = 30.sp
+                        )
+                    }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                Row (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .padding(bottom = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_sun_24),
-                        contentDescription = "Light",
-                        tint = Color.Black,
+                    Row (
                         modifier = Modifier
-                            .size(iconSize)
-                            .padding(start = 5.dp)
-                    )
-                    Text(
-                        text = plantDevice.light.toString() + " lux ",
-                        color = Color(0, 0, 0, 255),
-                        textAlign = TextAlign.Right,
-                        modifier = Modifier.fillMaxWidth(),
-                        fontSize = 30.sp
-                    )
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(bottom = 5.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_sun_24),
+                            contentDescription = "Light",
+                            tint = Color.Black,
+                            modifier = Modifier
+                                .size(iconSize)
+                                .padding(start = 5.dp)
+                        )
+                        Text(
+                            text = plantDevice.light.toString() + " lux ",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontSize = 30.sp
+                        )
+                    }
                 }
+
             }
         }
     }
