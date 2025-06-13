@@ -115,7 +115,7 @@ fun DeviceCard(
                         fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
-                            .fillMaxWidth(0.8f)
+                            .fillMaxWidth(0.7f)
                             .fillMaxHeight()
                             .padding(start = 5.dp),
                     )
