@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "PlantLInk"
+rootProject.name = "PlantLink"
 include(":app")
  

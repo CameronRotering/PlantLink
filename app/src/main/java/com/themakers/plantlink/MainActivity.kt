@@ -51,7 +51,7 @@ import com.themakers.plantlink.data.BluetoothLeService
 import com.themakers.plantlink.data.HubDevice
 import com.themakers.plantlink.data.PlantDevice
 import com.themakers.plantlink.data.SettingsDatabase
-import com.themakers.plantlink.ui.theme.PlantLInkTheme
+import com.themakers.plantlink.ui.theme.PlantLinkTheme
 import java.io.IOException
 import java.io.UnsupportedEncodingException
 import kotlin.experimental.and
@@ -227,7 +227,7 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            PlantLInkTheme {
+            PlantLinkTheme {
                 val settingsState by settingsViewModel.state.collectAsState()
 
                 viewModel!!.setControllerViewModel(viewModel!!)
