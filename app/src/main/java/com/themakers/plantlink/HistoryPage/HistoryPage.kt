@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
@@ -103,28 +104,50 @@ fun HistoryPage(
                         text = (plantViewModel.currClickedPlant?.plantName ?: "Plant Name") + "'s History",
                         color = MaterialTheme.colorScheme.secondary,
                         textAlign = TextAlign.Center,
+                        fontSize = 25.sp,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(end = 50.dp),
+                            //.padding(end = 50.dp),
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {
+                    IconButton(
+                        onClick = {
                         navController.navigateUp()
 
                         plantViewModel.currClickedPlant = null
-                    }) {
+                    },
+                        modifier = Modifier
+                            .fillMaxHeight()
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
+                            tint = Color.Black,
                             modifier = Modifier
-                                .size(40.dp),
-                            tint = Color.Black
-
+                                .size(25.dp)
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        navController.navigate("PlantLinkSettings")
+                    },
+                        modifier = Modifier
+                            .fillMaxHeight()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = "Plant Settings",
+                            tint = Color.Black,
+                            modifier = Modifier
+                                .size(25.dp)
+                                //.padding(end = 10.dp)
                         )
                     }
                 }
             )
+
         },
         bottomBar = {
             NavigationBar(
