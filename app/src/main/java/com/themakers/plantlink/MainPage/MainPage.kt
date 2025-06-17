@@ -32,7 +32,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,6 +53,7 @@ import com.themakers.plantlink.data.HubDevice
 import com.themakers.plantlink.data.PlantDevice
 import com.themakers.plantlink.data.SettingEvent
 import com.themakers.plantlink.data.SettingState
+import kotlinx.coroutines.delay
 
 var deviceBoxPadding = PaddingValues(10.dp) // Was 30 dp for non-block version
 
@@ -66,6 +72,14 @@ fun MainPage(
     hubDevice: MutableState<HubDevice>
 ) {
     val lazyGridState = rememberLazyGridState()
+    var health by remember { mutableStateOf(0) }
+
+    LaunchedEffect(true) {
+        while (true) {
+            delay(10)
+            health = (health + 1) % 101
+        }
+    }
 
     Scaffold(
 //        modifier = Modifier // Creating gradient background of whole page.
@@ -251,6 +265,21 @@ fun MainPage(
                         state = state,
                         onEvent = onEvent,
                         clickedPlantViewModel = clickedPlantViewModel
+                    )
+                }
+
+                item {
+                    DeviceCard(
+                        modifier = Modifier
+                            .padding(deviceBoxPadding),
+                        context = context,
+                        navController = navController,
+                        plantViewModel = plantViewModel,
+                        plantDevice = plantDeviceList[0],
+                        state = state,
+                        onEvent = onEvent,
+                        clickedPlantViewModel = clickedPlantViewModel,
+                        health = health
                     )
                 }
             }

@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -87,10 +88,10 @@ fun DeviceCard(
     health: Int = 0 // 0-100 0 being bad health, 100 being best health
 ) {
     var hidden by remember { mutableStateOf(false) }
-    val healthColor = when (health) {
-        in 0..33 -> Color.Red
-        in 34..66 -> Color.Yellow
-        else -> Color.Green
+
+    val healthColorLerp: Color = when {
+        health <= 50 -> lerp(Color.Red, Color.Yellow, health / 50f)
+        else -> lerp(Color.Yellow, Color.Green, (health - 50) / 50f)
     }
 
     Card(
@@ -136,7 +137,7 @@ fun DeviceCard(
                     )
 
                     //if (hidden) { // Only show the icon when the device card is hidden. (Might change)
-                        DrawCircleWithColor(healthColor)
+                        DrawCircleWithColor(healthColorLerp)
                     //}
 
                     IconButton(
@@ -249,6 +250,22 @@ fun DeviceCardPreview() {
                     clickedPlantViewModel = null
                 )
             }
+
+            item {
+                DeviceCard(
+                    modifier = Modifier
+                        .padding(deviceBoxPadding),
+                    context = null,
+                    navController = NavHostController(LocalContext.current),
+                    plantViewModel = null,
+                    plantDevice = plantDevice,
+                    state = null,
+                    onEvent = null,
+                    clickedPlantViewModel = null,
+                    health = 25
+                )
+            }
+
             item {
                 DeviceCard(
                     modifier = Modifier
@@ -263,6 +280,22 @@ fun DeviceCardPreview() {
                     health = 50
                 )
             }
+
+            item {
+                DeviceCard(
+                    modifier = Modifier
+                        .padding(deviceBoxPadding),
+                    context = null,
+                    navController = NavHostController(LocalContext.current),
+                    plantViewModel = null,
+                    plantDevice = plantDevice,
+                    state = null,
+                    onEvent = null,
+                    clickedPlantViewModel = null,
+                    health = 75
+                )
+            }
+
             item {
                 DeviceCard(
                     modifier = Modifier
