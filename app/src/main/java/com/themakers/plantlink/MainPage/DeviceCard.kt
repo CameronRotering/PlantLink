@@ -3,6 +3,7 @@ package com.themakers.plantlink.MainPage
 import android.content.Context
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -30,10 +34,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -43,6 +49,7 @@ import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
 import com.themakers.plantlink.data.PlantDevice
 import com.themakers.plantlink.data.SettingEvent
 import com.themakers.plantlink.data.SettingState
+import com.themakers.plantlink.ui.theme.PlantLinkTheme
 
 val iconSize = 30.dp
 
@@ -70,22 +77,30 @@ fun DrawCircleWithColor(insideColor: Color) {
 @Composable
 fun DeviceCard(
     modifier: Modifier = Modifier,
-    context: Context,
+    context: Context?,
     navController: NavHostController,
-    plantViewModel: PlantDataViewModel,
+    plantViewModel: PlantDataViewModel?,
     plantDevice: PlantDevice, // Hold which plant this card pertains to
-    state: SettingState,
-    onEvent: (SettingEvent) -> Unit,
-    clickedPlantViewModel: CurrClickedPlantViewModel
+    state: SettingState?,
+    onEvent: ((SettingEvent) -> Unit)?,
+    clickedPlantViewModel: CurrClickedPlantViewModel?,
+    health: Int = 0 // 0-100 0 being bad health, 100 being best health
 ) {
     var hidden by remember { mutableStateOf(false) }
+    val healthColor = when (health) {
+        in 0..33 -> Color.Red
+        in 34..66 -> Color.Yellow
+        else -> Color.Green
+    }
 
     Card(
         modifier = modifier
             .clickable {
-                clickedPlantViewModel.currClickedPlant = plantDevice
+                if (clickedPlantViewModel != null) {
+                    clickedPlantViewModel.currClickedPlant = plantDevice
 
-                navController.navigate("HistoryPage")
+                    navController.navigate("HistoryPage")
+                }
             },
         shape = MaterialTheme.shapes.medium,
         colors = cardColors(
@@ -121,7 +136,7 @@ fun DeviceCard(
                     )
 
                     //if (hidden) { // Only show the icon when the device card is hidden. (Might change)
-                        DrawCircleWithColor(Color.Red)
+                        DrawCircleWithColor(healthColor)
                     //}
 
                     IconButton(
@@ -201,6 +216,66 @@ fun DeviceCard(
                     }
                 }
 
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DeviceCardPreview() {
+    var plantDevice = PlantDevice("00:00:00:00:00:00", "Galaxy Petunia", "1", "10")
+    val lazyGridState = rememberLazyGridState()
+
+    PlantLinkTheme {
+        LazyVerticalGrid(
+            modifier = Modifier
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalArrangement = Arrangement.Start,
+            state = lazyGridState,
+            columns = GridCells.Adaptive(175.dp)
+        ) {
+            item {
+                DeviceCard(
+                    modifier = Modifier
+                        .padding(deviceBoxPadding),
+                    context = null,
+                    navController = NavHostController(LocalContext.current),
+                    plantViewModel = null,
+                    plantDevice = plantDevice,
+                    state = null,
+                    onEvent = null,
+                    clickedPlantViewModel = null
+                )
+            }
+            item {
+                DeviceCard(
+                    modifier = Modifier
+                        .padding(deviceBoxPadding),
+                    context = null,
+                    navController = NavHostController(LocalContext.current),
+                    plantViewModel = null,
+                    plantDevice = plantDevice,
+                    state = null,
+                    onEvent = null,
+                    clickedPlantViewModel = null,
+                    health = 50
+                )
+            }
+            item {
+                DeviceCard(
+                    modifier = Modifier
+                        .padding(deviceBoxPadding),
+                    context = null,
+                    navController = NavHostController(LocalContext.current),
+                    plantViewModel = null,
+                    plantDevice = plantDevice,
+                    state = null,
+                    onEvent = null,
+                    clickedPlantViewModel = null,
+                    health = 100
+                )
             }
         }
     }
