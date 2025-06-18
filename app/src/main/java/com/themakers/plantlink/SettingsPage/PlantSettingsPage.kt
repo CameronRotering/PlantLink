@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -101,11 +102,14 @@ fun getMatchingPlants(query: String, plantList: List<String>): MutableList<Strin
     val searchedPlants: MutableList<String> = mutableListOf()
 
     plantList.forEach {
-        if (it.contains(query, true))
+        if (it.contains(query, true)) {
             searchedPlants.add(it)
+        }
     }
 
     //val doesMatch = plantList.contains(query)
+
+    Log.d("SearchPlants", "Found plants: $searchedPlants")
 
     return searchedPlants // If not found in above loop
 }
@@ -115,8 +119,10 @@ fun searchPlants(
     allPlants: List<String>
 ): MutableList<String> {
     if (text.isBlank() || text == "Plant Presets") {
+        Log.d("SearchPlants", "First return.")
         return allPlants.toMutableList()
     } else {
+        Log.d("SearchPlants", "Second return.")
         return getMatchingPlants(text, allPlants)
     }
 }
@@ -155,8 +161,8 @@ fun PlantSettingsPage(
     var mExpanded by remember { mutableStateOf(false) }
 
     // List of plants for preset
-    val mAllPlants = mutableListOf("Galaxy Petunia", "Plant 2", "Plant 3")
-    var mSearchedPlants = mAllPlants
+    val mAllPlants = listOf("Galaxy Petunia", "Plant 2", "Plant 3")
+    var mSearchedPlants by remember { mutableStateOf(mAllPlants) } // = mAllPlants
 
     // Create a string value to store the selected city
     var mSelectedText by remember { mutableStateOf("") }
@@ -289,7 +295,7 @@ fun PlantSettingsPage(
             /* TODO: To have an image set for each plant, item would go here to upload/change */
 
             item {
-                Column (
+                Column(
                     modifier = Modifier
                         .fillMaxWidth(),
                         //.padding(padding),
@@ -300,6 +306,7 @@ fun PlantSettingsPage(
                         value = mSelectedText,
                         onValueChange = {
                             mSelectedText = it
+                            //mExpanded = true // This will constantly change focus to the drop-down menu items
 
                             //searchPlants(mSelectedText, mAllPlants)
                         }, // Auto complete options to more easily find the plant they want
@@ -316,6 +323,8 @@ fun PlantSettingsPage(
                         keyboardActions = KeyboardActions(
                             onDone = {
                                 mSearchedPlants = searchPlants(mSelectedText, mAllPlants)
+
+                                Log.d("SearchPlants", "Found plants: $mSearchedPlants")
 
                                 mExpanded = true
 
@@ -396,6 +405,7 @@ fun PlantSettingsPage(
                                         mExpanded = false
                                     }
                                 )
+                                //HorizontalDivider() // Make visible space in between the drop down items
                             }
                         }
                     }
