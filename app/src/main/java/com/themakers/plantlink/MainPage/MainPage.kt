@@ -193,17 +193,17 @@ fun MainPage(
         }
 
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize(), // Would adding padding to top and bottom let me not have on start and end item?
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(padding.calculateTopPadding() + 10.dp))
 
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize(),
+                ,
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                contentPadding = padding,
+                //contentPadding = padding,
                 state = lazyListState
             ) {
                 item {
@@ -213,7 +213,9 @@ fun MainPage(
                     ) {
                         HubCard(
                             modifier = Modifier
-                                .padding(deviceBoxPadding),
+                                .padding(deviceBoxPadding)
+                                .fillMaxWidth(0.5f)
+                            ,
                             context = context,
                             navController = navController,
                             plantViewModel = plantViewModel,

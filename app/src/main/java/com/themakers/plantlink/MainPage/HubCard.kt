@@ -1,10 +1,10 @@
 package com.themakers.plantlink.MainPage
 
 import android.content.Context
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -45,7 +45,7 @@ import com.themakers.plantlink.ui.theme.PlantLinkTheme
 
 
 @Composable
-fun HubCard(
+fun HubCard( // Can add trailing and "action" (leading) icons and text to make way easier to change
     modifier: Modifier = Modifier,
     context: Context?,
     navController: NavHostController,
@@ -77,122 +77,133 @@ fun HubCard(
 //              Image would go here
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
             ) {
                 Row(
-                    verticalAlignment = Alignment.Top,
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .fillMaxSize(),
+                       // .fillMaxSize(),
                 )
                 {
-                    Text(
-                        maxLines = 2,
-                        minLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        text = hubDevice.hubName,
-                        color = Color(0, 0, 0, 255),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center,
+                    Row (
                         modifier = Modifier
-                            .fillMaxWidth(0.9f)
-                            .fillMaxHeight(0.1f)
-                            .padding(start = 5.dp),
-                    )
-
-                    IconButton(
-                        onClick = {
-                            /* TODO: Images above name of plant, maybe just template picture as soon as possible */
-
-                            hidden = !hidden
-
-                            //clickedPlantViewModel.currClickedPlant = plantDevice
-
-                            //navController.navigate("PlantLinkSettings")
-                        },
-                        modifier = Modifier
-                            //.fillMaxSize()
+                            .fillMaxWidth(0.8f)
+                            .padding(start = 50.dp)
                     ) {
-                        Icon(
-                            imageVector = if (hidden) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
-                            contentDescription = "Plant Settings",
-                            tint = Color.Black,
+                        Text(
+                            maxLines = 2,
+                            minLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            text = hubDevice.hubName,
+                            color = Color(0, 0, 0, 255),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            textAlign = TextAlign.Center,
                             modifier = Modifier
-                                .size(30.dp)
                                 .fillMaxSize()
-                                .padding(end = 10.dp)
+                                //.fillMaxWidth(0.8f)
+                                //.fillMaxHeight(0.1f)
+                                //.padding(start = 5.dp),
                         )
                     }
+
+                    Row (
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        IconButton(
+                            onClick = {
+                                /* TODO: Images above name of plant, maybe just template picture as soon as possible */
+
+                                hidden = !hidden
+
+                                //clickedPlantViewModel.currClickedPlant = plantDevice
+
+                                //navController.navigate("PlantLinkSettings")
+                            }
+                        ) {
+                            Icon(
+                                imageVector = if (hidden) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
+                                contentDescription = "Hub Settings",
+                                tint = Color.Black,
+                                modifier = Modifier
+                                    //.size(30.dp)
+                                    .fillMaxSize()
+                                    //.padding(end = 10.dp)
+                            )
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_device_thermostat_24),
-                        contentDescription = "Temperature",
-                        tint = Color.Black,
+                if (!hidden) {
+                    Row(
                         modifier = Modifier
-                            .size(iconSize)
-                            .padding(start = 5.dp)
-                    )
-                    Text(
-                        text = hubDevice.getTempString(state!!.isFahrenheit) + "° " + if (state.isFahrenheit) "F " else "C ",
-                        color = Color(0, 0, 0, 255),
-                        textAlign = TextAlign.Right,
-                        modifier = Modifier.fillMaxWidth(),
-                        fontSize = 30.sp
-                    )
-                }
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.sharp_humidity_percentage_24),
+                            contentDescription = "Humidity",
+                            tint = Color.Black,
+                            modifier = Modifier
+                                .size(iconSize)
+                                .padding(start = 5.dp)
+                        )
+                        Text(
+                            text = hubDevice.humidity.toString() + " RH ",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontSize = 30.sp
+                        )
+                    }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.sharp_humidity_percentage_24),
-                        contentDescription = "Humidity",
-                        tint = Color.Black,
+                    Row(
                         modifier = Modifier
-                            .size(iconSize)
-                            .padding(start = 5.dp)
-                    )
-                    Text(
-                        text = hubDevice.humidity.toString() + " RH ",
-                        color = Color(0, 0, 0, 255),
-                        textAlign = TextAlign.Right,
-                        modifier = Modifier.fillMaxWidth(),
-                        fontSize = 30.sp
-                    )
-                }
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_sun_24),
+                            contentDescription = "Light",
+                            tint = Color.Black,
+                            modifier = Modifier
+                                .size(iconSize)
+                                .padding(start = 5.dp)
+                        )
+                        Text(
+                            text = hubDevice.light.toString() + " lux ",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontSize = 30.sp
+                        )
+                    }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_sun_24),
-                        contentDescription = "Light",
-                        tint = Color.Black,
+                    Row(
                         modifier = Modifier
-                            .size(iconSize)
-                            .padding(start = 5.dp)
-                    )
-                    Text(
-                        text = hubDevice.light.toString() + " lux ",
-                        color = Color(0, 0, 0, 255),
-                        textAlign = TextAlign.Right,
-                        modifier = Modifier.fillMaxWidth(),
-                        fontSize = 30.sp
-                    )
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_device_thermostat_24),
+                            contentDescription = "Temperature",
+                            tint = Color.Black,
+                            modifier = Modifier
+                                .size(iconSize)
+                                .padding(start = 5.dp)
+                        )
+                        Text(
+                            text = hubDevice.getTempString(state!!.isFahrenheit) + "° " + if (state.isFahrenheit) "F " else "C ",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontSize = 30.sp
+                        )
+                    }
                 }
 
             }
