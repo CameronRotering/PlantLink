@@ -2,6 +2,7 @@ package com.themakers.plantlink.data
 
 import android.bluetooth.BluetoothGattService
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import java.math.BigDecimal
@@ -20,6 +21,9 @@ data class HubDevice (
         private set
 
     var humidity: BigDecimal by mutableStateOf(BigDecimal(0))
+        private set
+
+    var light: Long by mutableLongStateOf(0)
         private set
 
     fun setName(pName: String) {
@@ -41,5 +45,9 @@ data class HubDevice (
 
     fun setHumid(pHumid: Double) {
         humidity = BigDecimal(pHumid).setScale(2, RoundingMode.HALF_EVEN)
+    }
+
+    fun setAmbientLight(pLight: Long) {
+        light = pLight // Lux scale: https://en.wikipedia.org/wiki/Lux
     }
 }

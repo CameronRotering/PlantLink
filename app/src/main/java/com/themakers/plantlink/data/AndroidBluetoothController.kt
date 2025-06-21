@@ -221,6 +221,11 @@ class AndroidBluetoothController(
                         UUID.fromString("75171ef4-4fc5-4fd4-a393-8f4cc2f9fbcd") -> { // Humidity
                             hubDevice.value.setHumid(String(buffer, 0, buffer.size).toDouble())
                         }
+
+
+                        UUID.fromString("dd72366c-d8a0-4c29-9943-30234819a3a2") -> { // Light
+                            hubDevice.value.setAmbientLight(String(buffer, 0, buffer.size).toLong())
+                        }
                     }
                 } else {
                     for (i in plantDevices) {
@@ -244,10 +249,6 @@ class AndroidBluetoothController(
 
                                 UUID.fromString("e41a3376-0c2a-4366-bf6e-43e3b59ab962") -> { // Soil Moisture
                                     i.setMoist(String(buffer, 0, buffer.size).toDouble())
-                                }
-
-                                UUID.fromString("dd72366c-d8a0-4c29-9943-30234819a3a2") -> { // Light
-                                    i.setAmbientLight(String(buffer, 0, buffer.size).toLong())
                                 }
                             }
                             break // Don't look through any other services if already found and changed the one
@@ -278,6 +279,10 @@ class AndroidBluetoothController(
                     UUID.fromString("75171ef4-4fc5-4fd4-a393-8f4cc2f9fbcd") -> { // Humidity
                         hubDevice.value.setHumid(String(buffer, 0, buffer.size).toDouble())
                     }
+
+                    UUID.fromString("dd72366c-d8a0-4c29-9943-30234819a3a2") -> { // Light
+                        hubDevice.value.setAmbientLight(String(buffer, 0, buffer.size).toLong())
+                    }
                 }
             } else {
                 for (i in plantDevices) {
@@ -301,10 +306,6 @@ class AndroidBluetoothController(
 
                             UUID.fromString("e41a3376-0c2a-4366-bf6e-43e3b59ab962") -> { // Soil Moisture
                                 i.setMoist(String(buffer, 0, buffer.size).toDouble())
-                            }
-
-                            UUID.fromString("dd72366c-d8a0-4c29-9943-30234819a3a2") -> { // Light
-                                i.setAmbientLight(String(buffer, 0, buffer.size).toLong())
                             }
                         }
                         break // Don't look through any other services if already found and changed the one

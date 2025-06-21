@@ -13,10 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
@@ -72,6 +73,7 @@ fun MainPage(
     hubDevice: MutableState<HubDevice>
 ) {
     val lazyGridState = rememberLazyGridState()
+    val lazyListState = rememberLazyListState()
     var health by remember { mutableStateOf(0) }
 
     LaunchedEffect(true) {
@@ -196,52 +198,30 @@ fun MainPage(
         ) {
             Spacer(modifier = Modifier.height(padding.calculateTopPadding() + 10.dp))
 
-            Column (
+            LazyColumn(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                contentPadding = padding,
+                state = lazyListState
             ) {
-                Row(
-                    //modifier = Modifier.fillMaxWidth() // Uncomment this line and the space right below to force centering position
-                ) {
-                    //Spacer(modifier = Modifier.fillMaxWidth(0.35f))
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_device_thermostat_24),
-                        contentDescription = "Temperature",
-                        tint = Color.Black,
-                        modifier = Modifier
-                            .size(iconSize)
-
-                    )
-                    Spacer(modifier = Modifier.width(5.dp))
-                    Text(
-                        text = hubDevice.value.getTempString(state.isFahrenheit) + "° " + if (state.isFahrenheit) "F " else "C ",
-                        color = Color(0, 0, 0, 255),
-                        //textAlign = TextAlign.Left,
-                        //modifier = Modifier.fillMaxWidth(),
-                        fontSize = 30.sp,
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(
-                    //modifier = Modifier.fillMaxWidth()
-                ) {
-                    //Spacer(modifier = Modifier.fillMaxWidth(0.35f))
-                    Icon(
-                        painter = painterResource(R.drawable.sharp_humidity_percentage_24),
-                        contentDescription = "Humidity",
-                        tint = Color.Black,
-                        modifier = Modifier
-                            .size(iconSize)
-                    )
-                    Spacer(modifier = Modifier.width(5.dp))
-                    Text(
-                        text = hubDevice.value.humidity.toString() + " RH ",//"34.7 RH ",
-                        color = Color(0, 0, 0, 255),
-                        fontSize = 30.sp
-                    )
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        HubCard(
+                            modifier = Modifier
+                                .padding(deviceBoxPadding),
+                            context = context,
+                            navController = navController,
+                            plantViewModel = plantViewModel,
+                            hubDevice = hubDevice.value,
+                            state = state,
+                            onEvent = onEvent
+                        )
+                    }
                 }
             }
 

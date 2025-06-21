@@ -16,13 +16,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -189,34 +189,7 @@ fun DeviceCard(
                             fontSize = 30.sp
                         )
                     }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .padding(bottom = 5.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_sun_24),
-                            contentDescription = "Light",
-                            tint = Color.Black,
-                            modifier = Modifier
-                                .size(iconSize)
-                                .padding(start = 5.dp)
-                        )
-                        Text(
-                            text = plantDevice.light.toString() + " lux ",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Right,
-                            modifier = Modifier.fillMaxWidth(),
-                            fontSize = 30.sp
-                        )
-                    }
                 }
-
             }
         }
     }
