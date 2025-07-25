@@ -188,9 +188,10 @@ fun PlantSettingsPage(
                         text = "Plant Settings",
                         color = MaterialTheme.colorScheme.secondary,
                         textAlign = TextAlign.Center,
+                        fontSize = 25.sp,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(end = 50.dp),
+                            .fillMaxWidth(0.9f)
+                            //.padding(end = 50.dp),
                     )
                 },
                 navigationIcon = {

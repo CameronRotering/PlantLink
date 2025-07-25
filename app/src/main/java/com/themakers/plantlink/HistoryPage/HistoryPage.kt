@@ -125,7 +125,7 @@ fun HistoryPage(
                             contentDescription = "Back",
                             tint = Color.Black,
                             modifier = Modifier
-                                .size(25.dp)
+                                .size(40.dp)
                         )
                     }
                 },
