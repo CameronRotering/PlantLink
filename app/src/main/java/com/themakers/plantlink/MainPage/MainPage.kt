@@ -13,14 +13,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,7 +30,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,7 +42,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -73,7 +71,6 @@ fun MainPage(
     hubDevice: MutableState<HubDevice>
 ) {
     val lazyGridState = rememberLazyGridState()
-    val lazyListState = rememberLazyListState()
     var health by remember { mutableStateOf(0) }
 
     LaunchedEffect(true) {
@@ -91,7 +88,7 @@ fun MainPage(
 //            ),
         //containerColor = Color.Transparent,
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     navigationIconContentColor = MaterialTheme.colorScheme.secondary
@@ -100,10 +97,7 @@ fun MainPage(
                     Text(
                         text = "Home",
                         color = MaterialTheme.colorScheme.secondary,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(0.dp, 0.dp, 50.dp, 0.dp),
+                        fontSize = 25.sp
                     )
                 },
                 navigationIcon = {
@@ -193,20 +187,28 @@ fun MainPage(
         }
 
         Column(
-            modifier = Modifier.fillMaxSize(), // Would adding padding to top and bottom let me not have on start and end item?
+            modifier = Modifier
+                .fillMaxSize(), // Would adding padding to top and bottom let me not have on start and end item?
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(padding.calculateTopPadding() + 10.dp))
+            Spacer(modifier = Modifier.height(padding.calculateTopPadding()))
 
-            LazyColumn(
+            LazyVerticalGrid(
                 modifier = Modifier
-                ,
+                    .weight(1f)
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                //contentPadding = padding,
-                state = lazyListState
+                horizontalArrangement = Arrangement.Start,
+                contentPadding = PaddingValues(bottom = padding.calculateBottomPadding()), // Only add padding to bottom to see any items that have to be scrolled to and not add padding to top
+                state = lazyGridState,
+                columns = GridCells.Adaptive(150.dp)
             ) {
-                item {
+
+                item (
+                    span = {
+                        GridItemSpan(maxLineSpan)
+                    }
+                ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceAround
@@ -214,8 +216,7 @@ fun MainPage(
                         HubCard(
                             modifier = Modifier
                                 .padding(deviceBoxPadding)
-                                .fillMaxWidth(0.5f)
-                            ,
+                                .fillMaxWidth(0.5f),
                             context = context,
                             navController = navController,
                             plantViewModel = plantViewModel,
@@ -225,17 +226,7 @@ fun MainPage(
                         )
                     }
                 }
-            }
 
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Top,
-                horizontalArrangement = Arrangement.Start,
-                contentPadding = PaddingValues(bottom = padding.calculateBottomPadding()), // Only add padding to bottom to see any items that have to be scrolled to and not add padding to top
-                state = lazyGridState,
-                columns = GridCells.Adaptive(175.dp)
-            ) {
                 items(plantDeviceList.size) { deviceIndex ->
                     DeviceCard(
                         modifier = Modifier

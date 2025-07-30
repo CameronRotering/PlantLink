@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,7 +30,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -94,7 +94,7 @@ fun HistoryPage(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     navigationIconContentColor = MaterialTheme.colorScheme.secondary
@@ -103,11 +103,7 @@ fun HistoryPage(
                     Text(
                         text = (plantViewModel.currClickedPlant?.plantName ?: "Plant Name") + "'s History",
                         color = MaterialTheme.colorScheme.secondary,
-                        textAlign = TextAlign.Center,
-                        fontSize = 25.sp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            //.padding(end = 50.dp),
+                        fontSize = 25.sp
                     )
                 },
                 navigationIcon = {
