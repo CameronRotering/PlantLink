@@ -97,7 +97,7 @@ fun MainPage(
                     Text(
                         text = "Home",
                         color = MaterialTheme.colorScheme.secondary,
-                        fontSize = 25.sp
+                        style = MaterialTheme.typography.titleMedium
                     )
                 },
                 navigationIcon = {

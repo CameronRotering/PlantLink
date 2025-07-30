@@ -103,7 +103,7 @@ fun HistoryPage(
                     Text(
                         text = (plantViewModel.currClickedPlant?.plantName ?: "Plant Name") + "'s History",
                         color = MaterialTheme.colorScheme.secondary,
-                        fontSize = 25.sp
+                        style = MaterialTheme.typography.titleMedium
                     )
                 },
                 navigationIcon = {

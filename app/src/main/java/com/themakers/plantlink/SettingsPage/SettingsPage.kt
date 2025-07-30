@@ -71,7 +71,7 @@ fun SettingsPage(
                     Text(
                         text = "Settings",
                         color = MaterialTheme.colorScheme.secondary,
-                        fontSize = 25.sp
+                        style = MaterialTheme.typography.titleMedium
                     )
                 },
                 navigationIcon = {
