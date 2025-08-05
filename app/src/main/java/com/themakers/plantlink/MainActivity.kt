@@ -96,18 +96,18 @@ class MainActivity : ComponentActivity() {
 
     val plantDeviceList = mutableListOf<PlantDevice>(
         PlantDevice("00:00:00:00:00:00", "Galaxy Petunia", "1", "10"),
-        PlantDevice("00:00:00:00:00:01", "Galaxy Petunia", "1", "10"), // For testing
-        PlantDevice("00:00:00:00:00:02", "Galaxy Petunia", "1", "10"),
-        PlantDevice("00:00:00:00:00:03", "Galaxy Petunia", "1", "10"),
-        PlantDevice("00:00:00:00:00:04", "Galaxy Petunia", "1", "10"),
-        PlantDevice("00:00:00:00:00:05", "Galaxy Petunia", "1", "10"),
-        PlantDevice("00:00:00:00:00:06", "Galaxy Petunia", "1", "10"),
-        PlantDevice("00:00:00:00:00:07", "Galaxy Petunia", "1", "10"),
-        PlantDevice("00:00:00:00:00:08", "Galaxy Petunia", "1", "10"),
-        PlantDevice("00:00:00:00:00:09", "Galaxy Petunia", "1", "10"),
-        PlantDevice("00:00:00:00:00:10", "Galaxy Petunia", "1", "10"),
-        PlantDevice("00:00:00:00:00:11", "Galaxy Petunia", "1", "10"),
-        PlantDevice("00:00:00:00:00:12", "Galaxy Petunia", "1", "10")
+        //PlantDevice("00:00:00:00:00:01", "Galaxy Petunia", "1", "10"), // For testing
+        //PlantDevice("00:00:00:00:00:02", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:03", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:04", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:05", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:06", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:07", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:08", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:09", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:10", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:11", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:12", "Galaxy Petunia", "1", "10")
     )
 
     val hubDevice = mutableStateOf(HubDevice("00:00:00:00:00:00", "Hub"))
