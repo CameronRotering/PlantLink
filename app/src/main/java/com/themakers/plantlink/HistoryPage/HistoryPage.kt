@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import co.yml.charts.common.model.Point
 import co.yml.charts.ui.linechart.LineChart
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
@@ -86,7 +87,7 @@ fun averageOfPoints(points: List<Point>): Float {
 fun HistoryPage(
     destinationName: String,
     context: Context,
-    navController: NavHostController,
+    navController: NavHostController = rememberNavController(),
     plantViewModel: CurrClickedPlantViewModel,
     state: SettingState
 ) {

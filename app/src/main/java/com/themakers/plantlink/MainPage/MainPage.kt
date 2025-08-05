@@ -45,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.themakers.plantlink.PlantDataViewModel
 import com.themakers.plantlink.R
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
@@ -62,7 +63,7 @@ var deviceBoxPadding = PaddingValues(10.dp) // Was 30 dp for non-block version
 fun MainPage(
     destinationName: String,
     context: Context,
-    navController: NavHostController,
+    navController: NavHostController = rememberNavController(),
     plantViewModel: PlantDataViewModel,
     state: SettingState,
     onEvent: (SettingEvent) -> Unit,
@@ -218,8 +219,6 @@ fun MainPage(
                                 .padding(deviceBoxPadding)
                                 .fillMaxWidth(0.5f),
                             context = context,
-                            navController = navController,
-                            plantViewModel = plantViewModel,
                             hubDevice = hubDevice.value,
                             state = state,
                             onEvent = onEvent

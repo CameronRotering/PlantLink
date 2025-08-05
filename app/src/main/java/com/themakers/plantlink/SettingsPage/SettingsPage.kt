@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.themakers.plantlink.R
 import com.themakers.plantlink.data.SettingEvent
 import com.themakers.plantlink.data.SettingState
@@ -53,7 +54,7 @@ import com.themakers.plantlink.data.SettingState
 fun SettingsPage(
     destinationName: String,
     context: Context,
-    navController: NavHostController,
+    navController: NavHostController = rememberNavController(),
     state: SettingState,
     onEvent: (SettingEvent) -> Unit
 ) {

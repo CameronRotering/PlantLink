@@ -80,6 +80,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.R
 import kotlinx.coroutines.delay
@@ -134,7 +135,7 @@ fun searchPlants(
 fun PlantSettingsPage(
     destinationName: String,
     context: Context,
-    navController: NavHostController,
+    navController: NavHostController = rememberNavController(),
     plantViewModel: CurrClickedPlantViewModel,
     btViewModel: BluetoothViewModel
 ) {

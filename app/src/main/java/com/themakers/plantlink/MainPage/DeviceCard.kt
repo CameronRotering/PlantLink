@@ -44,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.themakers.plantlink.PlantDataViewModel
 import com.themakers.plantlink.R
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
@@ -79,7 +80,7 @@ fun DrawCircleWithColor(insideColor: Color) {
 fun DeviceCard(
     modifier: Modifier = Modifier,
     context: Context?,
-    navController: NavHostController,
+    navController: NavHostController = rememberNavController(),
     plantViewModel: PlantDataViewModel?,
     plantDevice: PlantDevice, // Hold which plant this card pertains to
     state: SettingState?,

@@ -244,9 +244,9 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController,
-                        startDestination = "Home"
+                        startDestination = Screen.Home.route
                     ) {
-                        composable("Home") {
+                        composable(Screen.Home.route) {
                             MainPage(
                                 destinationName = "Home",
                                 context = applicationContext,
@@ -260,7 +260,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable("Settings") {
+                        composable(Screen.Settings.route) {
                             SettingsPage(
                                 destinationName = "Settings",
                                 navController = navController,
@@ -270,7 +270,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable("PlantLinkSettings") {
+                        composable(Screen.PlantLinkSettings.route) {
                             PlantSettingsPage(
                                 destinationName = "PlantLinkSettings",
                                 navController = navController,
@@ -280,7 +280,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable("HistoryPage") {
+                        composable(Screen.HistoryPage.route) {
                             HistoryPage(
                                 destinationName = "HistoryPage",
                                 navController = navController,
@@ -290,7 +290,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable("BluetoothConnect") {
+                        composable(Screen.BluetoothConnect.route) {
                             BluetoothConnectScreen(
                                 destinationName = "BluetoothConnect",
                                 state = state,

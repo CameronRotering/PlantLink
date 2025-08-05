@@ -27,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -35,8 +34,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import com.themakers.plantlink.PlantDataViewModel
 import com.themakers.plantlink.R
 import com.themakers.plantlink.data.HubDevice
 import com.themakers.plantlink.data.SettingEvent
@@ -48,8 +45,6 @@ import com.themakers.plantlink.ui.theme.PlantLinkTheme
 fun HubCard( // Can add trailing and "action" (leading) icons and text to make way easier to change
     modifier: Modifier = Modifier,
     context: Context?,
-    navController: NavHostController,
-    plantViewModel: PlantDataViewModel?,
     hubDevice: HubDevice, // Hold which plant this card pertains to
     state: SettingState?,
     onEvent: ((SettingEvent) -> Unit)?
@@ -220,8 +215,6 @@ fun HubCardPreview() {
         Row() {
             HubCard(
                 context = null,
-                navController = NavHostController(LocalContext.current),
-                plantViewModel = null,
                 hubDevice = hubDevice,
                 state = null,
                 onEvent = null

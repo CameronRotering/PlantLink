@@ -56,6 +56,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.themakers.plantlink.Bluetooth.BluetoothDevice
 import com.themakers.plantlink.Bluetooth.BluetoothUiState
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
@@ -70,7 +71,7 @@ fun BluetoothConnectScreen(
     onStartScan: () -> Unit,
     onStopScan: () -> Unit,
     context: Context,
-    navController: NavHostController,
+    navController: NavHostController = rememberNavController(),
     viewModel: BluetoothViewModel,
     plantViewModel: PlantDataViewModel
 ) {
