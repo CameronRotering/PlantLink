@@ -1,3 +1,4 @@
+import org.apache.log4j.BasicConfigurator.configure
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -11,6 +12,8 @@ plugins {
 android {
     namespace = "com.themakers.plantlink"
     compileSdk = 36
+
+    configure()
 
     defaultConfig {
         applicationId = "com.themakers.plantlink"
@@ -62,6 +65,10 @@ kotlin {
 }
 
 dependencies {
+
+    implementation(libs.vico.compose)
+    implementation(libs.vico.compose.m3)
+
 
     implementation(libs.ycharts)
 

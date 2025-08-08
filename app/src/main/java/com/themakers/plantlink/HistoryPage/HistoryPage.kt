@@ -32,6 +32,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,13 +41,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import co.yml.charts.common.model.Point
-import co.yml.charts.ui.linechart.LineChart
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
-import com.themakers.plantlink.SimpleLineChart
+// import com.themakers.plantlink.SimpleLineChart // Not needed with Vico
 import com.themakers.plantlink.data.SettingState
+import co.yml.charts.common.model.Point // Keep for tempOverTime data structure, will be mapped
+import co.yml.charts.ui.linechart.LineChart
+import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
+import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
+import com.themakers.plantlink.SimpleLineChart
 
-val tempOverTime: List<Point> =
+val tempOverTime: List<Point> = // Assuming Point is {x,y}
     listOf(
         Point(0.0f, 83.45f),
         Point(1.0f, 91.78f),
@@ -69,6 +81,11 @@ val tempOverTime: List<Point> =
         Point(19.0f, 77.17f)
     )
 
+// Dummy data for other charts - replace with actual data
+val humidityOverTime: List<Point> = tempOverTime.map { Point(it.x, it.y / 2f) } // Example
+val moistureOverTime: List<Point> = tempOverTime.map { Point(it.x, it.y * 0.75f) } // Example
+val lightOverTime: List<Point> = tempOverTime.map { Point(it.x, it.y * 1.2f) } // Example
+
 fun averageOfPoints(points: List<Point>): Float {
     var sum = 0f
 
@@ -77,6 +94,22 @@ fun averageOfPoints(points: List<Point>): Float {
     }
 
     return sum / points.size
+}
+
+@Composable
+private fun JetpackComposeBasicLineChart(
+    modelProducer: CartesianChartModelProducer,
+    modifier: Modifier = Modifier,
+) {
+    CartesianChartHost(
+        chart = rememberCartesianChart(
+            rememberLineCartesianLayer(),
+            startAxis = VerticalAxis.rememberStart(),
+            bottomAxis = HorizontalAxis.rememberBottom(),
+        ),
+        modelProducer = modelProducer,
+        modifier = modifier,
+    )
 }
 
 /* TODO: Maybe have settings icon on this page to also allow you to get to that plants settings. */
@@ -91,6 +124,20 @@ fun HistoryPage(
     state: SettingState
 ) {
     val lazyListState = rememberLazyListState()
+
+    val modelProducer = remember { CartesianChartModelProducer() }
+
+    LaunchedEffect(Unit) {
+        modelProducer.runTransaction {
+            lineSeries { series(13, 8, 7, 12, 0, 1, 15, 14, 0, 11, 6, 12, 0, 11, 12, 11) }
+        }
+    }
+
+    // Create Vico models from your data
+    // It's good practice to remember these producers
+    //val tempChartEntryModelProducer = remember { ChartEntryModelProducer(tempOverTime.map { FloatEntry(it.x, it.y) }) }
+
+
 
     Scaffold(
         topBar = {
@@ -216,22 +263,15 @@ fun HistoryPage(
 
             item {
                 Card (
+                    modifier = Modifier
+                        .padding(horizontal = 5.dp, vertical = 20.dp),
                     shape = MaterialTheme.shapes.medium,
                     colors = cardColors(
                         containerColor = MaterialTheme.colorScheme.background,
                         contentColor = MaterialTheme.colorScheme.secondary
                     )
                 ) {
-                    LineChart(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp),
-                        lineChartData = SimpleLineChart(
-                            pointsData = tempOverTime,
-                            dataType = "temperature",
-                            state = state
-                        )
-                    )
+                    JetpackComposeBasicLineChart(modelProducer);
 
                     Row(
                         modifier = Modifier
