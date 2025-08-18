@@ -43,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.themakers.plantlink.PlantDataViewModel
 import com.themakers.plantlink.R
@@ -134,13 +133,13 @@ fun MainPage(
                         Text(
                             text = "Home",
                             color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 15.sp
+                            //fontSize = 15.sp
                         )
                     },
                     icon = {
                         Icon(
                             imageVector = Icons.Filled.Home,
-                            contentDescription = "Home"
+                            contentDescription = "Home",
                         )
                     }
                 )
@@ -158,7 +157,7 @@ fun MainPage(
                         Text(
                             text = "Settings",
                             color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 15.sp
+                            //fontSize = 15.sp
                         )
                     },
                     icon = {

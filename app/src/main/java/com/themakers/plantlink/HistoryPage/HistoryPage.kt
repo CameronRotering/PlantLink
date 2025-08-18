@@ -56,6 +56,7 @@ import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.themakers.plantlink.SimpleLineChart
+import com.themakers.plantlink.graphs.TemperatureChart
 
 val tempOverTime: List<Point> = // Assuming Point is {x,y}
     listOf(
@@ -271,7 +272,7 @@ fun HistoryPage(
                         contentColor = MaterialTheme.colorScheme.secondary
                     )
                 ) {
-                    JetpackComposeBasicLineChart(modelProducer);
+                    TemperatureChart()
 
                     Row(
                         modifier = Modifier
