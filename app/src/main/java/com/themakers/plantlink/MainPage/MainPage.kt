@@ -240,20 +240,23 @@ fun MainPage(
                     )
                 }
 
-                item {
-                    DeviceCard(
-                        modifier = Modifier
-                            .padding(deviceBoxPadding),
-                        context = context,
-                        navController = navController,
-                        plantViewModel = plantViewModel,
-                        plantDevice = plantDeviceList[0],
-                        state = state,
-                        onEvent = onEvent,
-                        clickedPlantViewModel = clickedPlantViewModel,
-                        health = health
-                    )
-                }
+                // TODO:  Enabling this, spams logcat. Need to check if having health change through bluetooth data will replicate this error.
+                // Also happens with loading icon, I guess it might just be animated objects
+
+//                item {
+//                    DeviceCard(
+//                        modifier = Modifier
+//                            .padding(deviceBoxPadding),
+//                        context = context,
+//                        navController = navController,
+//                        plantViewModel = plantViewModel,
+//                        plantDevice = plantDeviceList[0],
+//                        state = state,
+//                        onEvent = onEvent,
+//                        clickedPlantViewModel = clickedPlantViewModel,
+//                        health = health
+//                    )
+//                }
             }
         }
     }

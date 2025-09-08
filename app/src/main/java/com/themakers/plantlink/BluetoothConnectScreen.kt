@@ -105,9 +105,17 @@ fun BluetoothConnectScreen(
                     ),
                     selected = false,
                     onClick = {
-                        viewModel.stopScan()
+                        if (state.isConnected == 1) {
+                            Toast.makeText(
+                                context,
+                                "Wait until connected.",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        } else { // If not trying to connect
+                            viewModel.stopScan()
 
-                        navController.navigate("Home")
+                            navController.navigate("Home")
+                        }
                     },
                     label = {
                         Text(
@@ -228,11 +236,16 @@ fun BluetoothConnectScreen(
 
                             state.isConnected = 1
 
-                            viewModel.setGatt(
-                                context = context,
-                                device = device.device!!,
-                                autoConnect = false
-                            )
+
+                            // Update: Thread might be unnecessary due to fixing of the connection status and forcing user to wait for full connection
+                            // Perform Bluetooth connection in a background thread so Bluetooth still connects when switching pages
+                            //Thread {
+                                viewModel.setGatt(
+                                    context = context,
+                                    device = device.device!!,
+                                    autoConnect = false
+                                )
+                            //}.start()
                         }
                     } else {
                         Toast.makeText(
@@ -293,6 +306,8 @@ fun BluetoothConnectScreen(
             }
         }
     }
+
+    // TODO: Every time entering the page, it re checks this. If already connected and go back to this page, restates "connected to device"
 
     LaunchedEffect(state.isConnected) {
 

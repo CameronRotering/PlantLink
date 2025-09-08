@@ -173,13 +173,17 @@ class AndroidBluetoothController(
 //                        Toast.LENGTH_LONG
 //                    ).show()
 
+                    _isConnected.value = 1 // Start of connecting process
 
+                    Log.w("CONNECTIONCHANGE", "Connection state change: " + _isConnected.value.toString())
 
                     Log.w("BT CONNECT CHANGE", "Connected.")
 
-                    _isConnected.value = 2
-
                     gatt.discoverServices()
+
+                    // In gattCallbacks for services discovered, after all services are discovered, it will set
+                    // isConnected == 2
+                    //_isConnected.value = 2
                 }
 //                BluetoothProfile.STATE_CONNECTING -> {
 //                    Log.w("BT CONNECT CHANGE", "Connecting.")
@@ -333,6 +337,18 @@ class AndroidBluetoothController(
                 }
 
                 viewModel?.setCharacteristicNotification()
+            }
+
+            Log.w("CONNECTIONCHANGE", "End of connecting process: " + _isConnected.value.toString())
+
+            /*
+            Only if still connecting, set status to fully connected at end of services being discovered.
+             */
+
+            if(_isConnected.value == 1) {
+                Log.w("CONNECTIONCHANGE", "Services have been discovered. Setting connection to 'Connected'.")
+
+                _isConnected.value = 2
             }
         }
 

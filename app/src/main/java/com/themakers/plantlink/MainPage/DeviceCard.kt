@@ -155,7 +155,7 @@ fun DeviceCard(
                     ) {
                         Icon(
                             imageVector = if (hidden) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
-                            contentDescription = "Plant Settings",
+                            contentDescription = if (hidden) "Expand" else "Collapse",
                             tint = Color.Black,
                             modifier = Modifier
                                 .size(30.dp)
