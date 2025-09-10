@@ -52,7 +52,7 @@ import com.themakers.plantlink.data.SettingEvent
 import com.themakers.plantlink.data.SettingState
 import com.themakers.plantlink.ui.theme.PlantLinkTheme
 
-val iconSize = 30.dp
+val iconSize = 20.dp
 
 @Composable
 fun DrawCircleWithColor(insideColor: Color) {
@@ -60,7 +60,6 @@ fun DrawCircleWithColor(insideColor: Color) {
         modifier = Modifier
             .size(20.dp)
             .fillMaxHeight()
-            .padding(end = 5.dp)
     ) {
         val radius = size.minDimension / 2
         drawCircle(
@@ -127,7 +126,7 @@ fun DeviceCard(
                         overflow = TextOverflow.Ellipsis,
                         text = plantDevice.plantName,
                         color = Color(0, 0, 0, 255),
-                        fontSize = 20.sp,
+                        fontSize = 25.sp,
                         fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
@@ -137,7 +136,7 @@ fun DeviceCard(
                     )
 
                     //if (hidden) { // Only show the icon when the device card is hidden. (Might change)
-                        DrawCircleWithColor(healthColorLerp)
+                    DrawCircleWithColor(healthColorLerp)
                     //}
 
                     IconButton(
@@ -159,35 +158,61 @@ fun DeviceCard(
                             tint = Color.Black,
                             modifier = Modifier
                                 .size(30.dp)
-                                .fillMaxSize()
-                                .padding(end = 10.dp)
                         )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
+
+                Spacer(modifier = Modifier.height(8.dp)) // Moved to space out top info on card from sensor data. Was placed wrong before?
 
                 if (!hidden) {
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(),
+                            .fillMaxSize(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_water_drop_24),
-                            contentDescription = "Soil Moisture",
-                            tint = Color.Black,
-                            modifier = Modifier
-                                .size(iconSize)
-                                .padding(start = 5.dp)
-                        )
                         Text(
-                            text = plantDevice.moisture.toString() + " % ",//"880 ",
+                            maxLines = 2,
+                            minLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            text = "Soil Moisture",
                             color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Right,
-                            modifier = Modifier.fillMaxWidth(),
-                            fontSize = 30.sp
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth(0.55f)
+                                .fillMaxHeight()
+                                .padding(start = 5.dp),
+                            fontSize = 20.sp,
+                            //fontWeight = FontWeight.SemiBold,
                         )
+
+                        Row (
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            Text(
+                                text = plantDevice.moisture.toString() + "%",//"880 ",
+                                color = Color(0, 0, 0, 255),
+                                textAlign = TextAlign.Right,
+                                modifier = Modifier
+                                    .fillMaxWidth(0.7f)
+                                    .padding(end = 5.dp)
+                                        ,
+                                fontSize = 30.sp
+                            )
+
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_water_drop_24),
+                                contentDescription = "Soil Moisture",
+                                tint = Color.Black,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .size(iconSize)
+                                    .padding(end = 5.dp)
+                            )
+                        }
+
                     }
                 }
             }
