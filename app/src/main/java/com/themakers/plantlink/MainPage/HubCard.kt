@@ -4,10 +4,8 @@ import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -28,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -56,16 +53,7 @@ fun HubCard( // Can add trailing and "action" (leading) icons and text to make w
 ) {
     var hidden by remember { mutableStateOf(false) }
 
-
     Card(
-        //modifier = modifier
-        //    .clickable {
-        //        if (clickedPlantViewModel != null) {
-        //            clickedPlantViewModel.currClickedPlant = plantDevice
-
-        //            navController.navigate("HistoryPage")
-        //       }
-        //    },
         modifier = modifier,
         shape = MaterialTheme.shapes.medium,
         colors = cardColors(
@@ -74,138 +62,72 @@ fun HubCard( // Can add trailing and "action" (leading) icons and text to make w
         )
     ) {
         Column {
-//              Image would go here
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                       // .fillMaxSize(),
+                        .fillMaxSize(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 )
                 {
-                    Row (
+                    Text(
+                        maxLines = 2,
+                        minLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        text = hubDevice.hubName,
+                        color = Color(0, 0, 0, 255),
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center,
                         modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .padding(start = 50.dp)
+                            .fillMaxSize()
+                            .padding(start = 5.dp)
+                            .weight(1f),
+                    )
+
+
+                    IconButton(
+                        onClick = {
+                            hidden = !hidden
+                        }
                     ) {
-                        Text(
-                            maxLines = 2,
-                            minLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            text = hubDevice.hubName,
-                            color = Color(0, 0, 0, 255),
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            textAlign = TextAlign.Center,
+                        Icon(
+                            imageVector = if (hidden) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
+                            contentDescription = if (hidden) "Expand" else "Collapse",
+                            tint = Color.Black,
                             modifier = Modifier
-                                .fillMaxSize()
-                                //.fillMaxWidth(0.8f)
-                                //.fillMaxHeight(0.1f)
-                                //.padding(start = 5.dp),
+                                .size(30.dp)
                         )
                     }
-
-                    Row (
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        IconButton(
-                            onClick = {
-                                /* TODO: Images above name of plant, maybe just template picture as soon as possible */
-
-                                hidden = !hidden
-
-                                //clickedPlantViewModel.currClickedPlant = plantDevice
-
-                                //navController.navigate("PlantLinkSettings")
-                            }
-                        ) {
-                            Icon(
-                                imageVector = if (hidden) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
-                                contentDescription = "Hub Settings",
-                                tint = Color.Black,
-                                modifier = Modifier
-                                    //.size(30.dp)
-                                    .fillMaxSize()
-                                    //.padding(end = 10.dp)
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
+
+
 
                 if (!hidden) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.sharp_humidity_percentage_24),
-                            contentDescription = "Humidity",
-                            tint = Color.Black,
-                            modifier = Modifier
-                                .size(iconSize)
-                                .padding(start = 5.dp)
-                        )
-                        Text(
-                            text = hubDevice.humidity.toString() + " RH ",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Right,
-                            modifier = Modifier.fillMaxWidth(),
-                            fontSize = 30.sp
-                        )
-                    }
+                    SensorRow(
+                        "Temperature",
+                        hubDevice.getTempString(state!!.isFahrenheit),
+                        if (state.isFahrenheit) "F" else "C",
+                        R.drawable.baseline_device_thermostat_24
+                    )
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_sun_24),
-                            contentDescription = "Light",
-                            tint = Color.Black,
-                            modifier = Modifier
-                                .size(iconSize)
-                                .padding(start = 5.dp)
-                        )
-                        Text(
-                            text = hubDevice.light.toString() + " lux ",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Right,
-                            modifier = Modifier.fillMaxWidth(),
-                            fontSize = 30.sp
-                        )
-                    }
+                    SensorRow(
+                        "Humidity",
+                        hubDevice.humidity.toString(),
+                        "RH",
+                        R.drawable.sharp_humidity_percentage_24
+                    )
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_device_thermostat_24),
-                            contentDescription = "Temperature",
-                            tint = Color.Black,
-                            modifier = Modifier
-                                .size(iconSize)
-                                .padding(start = 5.dp)
-                        )
-                        Text(
-                            text = hubDevice.getTempString(state!!.isFahrenheit) + "° " + if (state.isFahrenheit) "F " else "C ",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Right,
-                            modifier = Modifier.fillMaxWidth(),
-                            fontSize = 30.sp
-                        )
-                    }
+                    SensorRow(
+                        "Light",
+                        hubDevice.light.toString(),
+                        "lux",
+                        R.drawable.baseline_sun_24
+                    )
                 }
-
             }
         }
     }
@@ -214,7 +136,7 @@ fun HubCard( // Can add trailing and "action" (leading) icons and text to make w
 @Preview(showBackground = true)
 @Composable
 fun HubCardPreview() {
-    var hubDevice = HubDevice("00:00:00:00:00:00", "Galaxy Petunia")
+    val hubDevice = HubDevice("00:00:00:00:00:00", "Galaxy Petunia")
 
     PlantLinkTheme {
         Row() {

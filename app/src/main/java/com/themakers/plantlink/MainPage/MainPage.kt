@@ -55,7 +55,6 @@ import kotlinx.coroutines.delay
 
 var deviceBoxPadding = PaddingValues(10.dp) // Was 30 dp for non-block version
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
@@ -205,7 +204,7 @@ fun MainPage(
 
                 item (
                     span = {
-                        GridItemSpan(maxLineSpan)
+                        GridItemSpan(maxLineSpan) // Will take up a whole column
                     }
                 ) {
                     Row(
@@ -215,7 +214,7 @@ fun MainPage(
                         HubCard(
                             modifier = Modifier
                                 .padding(deviceBoxPadding)
-                                .fillMaxWidth(0.5f),
+                                .fillMaxWidth(0.75f),
                             context = context,
                             navController = navController,
                             plantViewModel = plantViewModel,
