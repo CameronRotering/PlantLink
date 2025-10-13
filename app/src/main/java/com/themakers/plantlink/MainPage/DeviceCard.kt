@@ -130,39 +130,40 @@ fun DeviceCard(
                         fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
-                            .fillMaxWidth(0.7f)
-                            .fillMaxHeight()
-                            .padding(start = 5.dp),
+                            .fillMaxSize()
+                            .padding(start = 5.dp)
+                            .weight(1f),
                     )
 
-                    //if (hidden) { // Only show the icon when the device card is hidden. (Might change)
-                    DrawCircleWithColor(healthColorLerp)
-                    //}
-
-                    IconButton(
-                        onClick = {
-                            /* TODO: Images above name of plant, maybe just template picture as soon as possible */
-
-                            hidden = !hidden
-
-                            //clickedPlantViewModel.currClickedPlant = plantDevice
-
-                            //navController.navigate("PlantLinkSettings")
-                        },
-                        modifier = Modifier
-                            .fillMaxSize()
+                    Row(
+//                        modifier = Modifier
+//                            .fillMaxSize(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = if (hidden) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
-                            contentDescription = if (hidden) "Expand" else "Collapse",
-                            tint = Color.Black,
-                            modifier = Modifier
-                                .size(30.dp)
-                        )
+                        //if (hidden) { // Only show the icon when the device card is hidden. (Might change)
+                        DrawCircleWithColor(healthColorLerp)
+                        //}
+
+                        IconButton(
+                            onClick = {
+                                /* TODO: Images above name of plant, maybe just template picture as soon as possible */
+
+                                hidden = !hidden
+                            }
+                        ) {
+                            Icon(
+                                imageVector = if (hidden) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
+                                contentDescription = if (hidden) "Expand" else "Collapse",
+                                tint = Color.Black,
+                                modifier = Modifier
+                                    .size(30.dp)
+                            )
+                        }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp)) // Moved to space out top info on card from sensor data. Was placed wrong before?
+                Spacer(modifier = Modifier.height(5.dp)) // Moved to space out top info on card from sensor data. Was placed wrong before?
 
                 if (!hidden) {
                     Row(
@@ -170,49 +171,21 @@ fun DeviceCard(
                             .fillMaxSize(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            maxLines = 2,
-                            minLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            text = "Soil Moisture",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Center,
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_water_drop_24),
+                            contentDescription = "Soil Moisture",
+                            tint = Color.Black,
                             modifier = Modifier
-                                .fillMaxWidth(0.55f)
-                                .fillMaxHeight()
-                                .padding(start = 5.dp),
-                            fontSize = 20.sp,
-                            //fontWeight = FontWeight.SemiBold,
+                                .size(iconSize)
+                                .padding(start = 5.dp)
                         )
-
-                        Row (
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.End
-                        ) {
-                            Text(
-                                text = plantDevice.moisture.toString() + "%",//"880 ",
-                                color = Color(0, 0, 0, 255),
-                                textAlign = TextAlign.Right,
-                                modifier = Modifier
-                                    .fillMaxWidth(0.7f)
-                                    .padding(end = 5.dp)
-                                        ,
-                                fontSize = 30.sp
-                            )
-
-                            Icon(
-                                painter = painterResource(R.drawable.baseline_water_drop_24),
-                                contentDescription = "Soil Moisture",
-                                tint = Color.Black,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .size(iconSize)
-                                    .padding(end = 5.dp)
-                            )
-                        }
-
+                        Text(
+                            text = plantDevice.moisture.toString() + " % ",//"880 ",
+                            color = Color(0, 0, 0, 255),
+                            textAlign = TextAlign.Right,
+                            modifier = Modifier.fillMaxWidth(),
+                            fontSize = 30.sp
+                        )
                     }
                 }
             }
@@ -223,7 +196,7 @@ fun DeviceCard(
 @Preview(showBackground = true)
 @Composable
 fun DeviceCardPreview() {
-    var plantDevice = PlantDevice("00:00:00:00:00:00", "Galaxy Petunia", "1", "10")
+    val plantDevice = PlantDevice("00:00:00:00:00:00", "Galaxy Petunia", "1", "10")
     val lazyGridState = rememberLazyGridState()
 
     PlantLinkTheme {
