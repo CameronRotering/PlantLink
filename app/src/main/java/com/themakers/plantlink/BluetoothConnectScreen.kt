@@ -27,9 +27,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -37,9 +34,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -59,13 +53,13 @@ import androidx.navigation.NavHostController
 import com.themakers.plantlink.Bluetooth.BluetoothDevice
 import com.themakers.plantlink.Bluetooth.BluetoothUiState
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
+import com.themakers.plantlink.composables.BottomToolBar
 
 
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BluetoothConnectScreen(
-    destinationName: String,
     state: BluetoothUiState,
     onStartScan: () -> Unit,
     onStopScan: () -> Unit,
@@ -92,74 +86,8 @@ fun BluetoothConnectScreen(
                 }
             )
         },
-        bottomBar = {
-            NavigationBar(
-                containerColor = Color(226, 114, 91, 255),//MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.secondary
-            ) {
-                NavigationBarItem(
-                    colors = NavigationBarItemDefaults.colors(
-                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                        selectedIconColor = Color(0, 0, 0, 255),
-                        indicatorColor = MaterialTheme.colorScheme.background
-                    ),
-                    selected = false,
-                    onClick = {
-                        if (state.isConnected == 1) {
-                            Toast.makeText(
-                                context,
-                                "Wait until connected.",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        } else { // If not trying to connect
-                            viewModel.stopScan()
-
-                            navController.navigate("Home")
-                        }
-                    },
-                    label = {
-                        Text(
-                            text = "Home",
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 15.sp
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Filled.Home,
-                            contentDescription = "Home"
-                        )
-                    }
-                )
-                NavigationBarItem(
-                    colors = NavigationBarItemDefaults.colors(
-                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                        selectedIconColor = Color(0, 0, 0, 255),
-                        indicatorColor = MaterialTheme.colorScheme.background
-                    ),
-                    selected = false,
-                    onClick = {
-                        viewModel.stopScan()
-
-                        navController.navigate("Settings")
-                    },
-                    label = {
-                        Text(
-                            text = "Settings",
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 15.sp
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Outlined.Settings,
-                            contentDescription = "Settings"
-                        )
-                    }
-                )
-            }
-        },
-        contentWindowInsets = WindowInsets.safeContent
+        bottomBar = { BottomToolBar(navController = navController) },
+        contentWindowInsets = WindowInsets.safeContent // Safe content so no content is hidden under system things like camera AND is interactive
     ) { padding ->
         Column(
             verticalArrangement = Arrangement.Bottom,

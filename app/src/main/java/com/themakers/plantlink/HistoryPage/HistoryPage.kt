@@ -15,9 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -25,9 +23,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -56,6 +51,7 @@ import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.themakers.plantlink.SimpleLineChart
+import com.themakers.plantlink.composables.BottomToolBar
 import com.themakers.plantlink.graphs.TemperatureChart
 
 val tempOverTime: List<Point> = // Assuming Point is {x,y}
@@ -157,7 +153,9 @@ fun HistoryPage(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                        navController.navigateUp()
+                            if (navController.currentDestination!!.route == destinationName) {
+                                navController.navigateUp()
+                            }
 
                         plantViewModel.currClickedPlant = null
                     },
@@ -191,68 +189,9 @@ fun HistoryPage(
                     }
                 }
             )
-
         },
-        bottomBar = {
-            NavigationBar(
-                containerColor = Color(226, 114, 91, 255),//MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.secondary
-            ) {
-                NavigationBarItem(
-                    colors = NavigationBarItemDefaults.colors(
-                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                        selectedIconColor = Color(0, 0, 0, 255),
-                        indicatorColor = MaterialTheme.colorScheme.background
-                    ),
-                    selected = false,
-                    onClick = {
-                        navController.navigate("Home")
-
-                        plantViewModel.currClickedPlant = null
-                    },
-                    label = {
-                        Text(
-                            text = "Home",
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 15.sp
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Filled.Home,
-                            contentDescription = "Home"
-                        )
-                    }
-                )
-                NavigationBarItem(
-                    colors = NavigationBarItemDefaults.colors(
-                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                        selectedIconColor = Color(0, 0, 0, 255),
-                        indicatorColor = MaterialTheme.colorScheme.background
-                    ),
-                    selected = false,
-                    onClick = {
-                        navController.navigate("Settings")
-
-                        plantViewModel.currClickedPlant = null
-                    },
-                    label = {
-                        Text(
-                            text = "Settings",
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 15.sp
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Outlined.Settings,
-                            contentDescription = "Settings"
-                        )
-                    }
-                )
-            }
-        },
-        contentWindowInsets = WindowInsets.safeContent
+        bottomBar = { BottomToolBar(navController = navController) },
+        contentWindowInsets = WindowInsets.safeContent // Safe content so no content is hidden under system things like camera AND is interactive
     ) { padding ->
         LazyColumn(
             contentPadding = padding,
@@ -263,7 +202,7 @@ fun HistoryPage(
 
 
             item {
-                Card (
+                Card(
                     modifier = Modifier
                         .padding(horizontal = 5.dp, vertical = 20.dp),
                     shape = MaterialTheme.shapes.medium,

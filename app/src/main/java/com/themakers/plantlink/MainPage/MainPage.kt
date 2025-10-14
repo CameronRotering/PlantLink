@@ -17,17 +17,11 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -47,6 +41,7 @@ import androidx.navigation.NavHostController
 import com.themakers.plantlink.PlantDataViewModel
 import com.themakers.plantlink.R
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
+import com.themakers.plantlink.composables.BottomToolBar
 import com.themakers.plantlink.data.HubDevice
 import com.themakers.plantlink.data.PlantDevice
 import com.themakers.plantlink.data.SettingEvent
@@ -58,7 +53,6 @@ var deviceBoxPadding = PaddingValues(10.dp) // Was 30 dp for non-block version
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
-    destinationName: String,
     context: Context,
     navController: NavHostController,
     plantViewModel: PlantDataViewModel,
@@ -115,59 +109,7 @@ fun MainPage(
                 }
             )
         },
-        bottomBar = {
-            NavigationBar(
-                containerColor = Color(226, 114, 91, 255),
-                contentColor = MaterialTheme.colorScheme.secondary
-            ) {
-                NavigationBarItem(
-                    colors = NavigationBarItemDefaults.colors(
-                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                        selectedIconColor = Color(0, 0, 0, 255),
-                        indicatorColor = MaterialTheme.colorScheme.background
-                    ),
-                    selected = true,
-                    onClick = {},
-                    label = {
-                        Text(
-                            text = "Home",
-                            color = MaterialTheme.colorScheme.secondary,
-                            //fontSize = 15.sp
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Filled.Home,
-                            contentDescription = "Home",
-                        )
-                    }
-                )
-                NavigationBarItem(
-                    colors = NavigationBarItemDefaults.colors(
-                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                        selectedIconColor = MaterialTheme.colorScheme.secondary,
-                        indicatorColor = MaterialTheme.colorScheme.background
-                    ),
-                    selected = false,
-                    onClick = {
-                        navController.navigate("settings")
-                    },
-                    label = {
-                        Text(
-                            text = "Settings",
-                            color = MaterialTheme.colorScheme.secondary,
-                            //fontSize = 15.sp
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Outlined.Settings,
-                            contentDescription = "Settings"
-                        )
-                    }
-                )
-            }
-        },
+        bottomBar = { BottomToolBar(navController = navController) },
         contentWindowInsets = WindowInsets.safeContent // Safe content so no content is hidden under system things like camera AND is interactive
     ) { padding ->
         Column(

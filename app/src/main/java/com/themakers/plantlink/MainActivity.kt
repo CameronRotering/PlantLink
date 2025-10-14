@@ -248,7 +248,6 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable("Home") {
                             MainPage(
-                                destinationName = "Home",
                                 context = applicationContext,
                                 navController = navController,
                                 plantViewModel = plantViewModel,
@@ -262,7 +261,6 @@ class MainActivity : ComponentActivity() {
 
                         composable("Settings") {
                             SettingsPage(
-                                destinationName = "Settings",
                                 navController = navController,
                                 context = applicationContext,
                                 state = settingsState,
@@ -283,8 +281,8 @@ class MainActivity : ComponentActivity() {
                         composable("HistoryPage") {
                             HistoryPage(
                                 destinationName = "HistoryPage",
-                                navController = navController,
                                 context = applicationContext,
+                                navController = navController,
                                 plantViewModel = selectedPlantViewModel,
                                 state = settingsState
                             )
@@ -292,7 +290,6 @@ class MainActivity : ComponentActivity() {
 
                         composable("BluetoothConnect") {
                             BluetoothConnectScreen(
-                                destinationName = "BluetoothConnect",
                                 state = state,
                                 onStartScan = viewModel!!::startScan,
                                 onStopScan = viewModel!!::stopScan,
