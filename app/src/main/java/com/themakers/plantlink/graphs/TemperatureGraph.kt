@@ -1,9 +1,16 @@
 package com.themakers.plantlink.graphs
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -14,8 +21,12 @@ import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
 import com.patrykandpatrick.vico.compose.common.fill
 import com.patrykandpatrick.vico.compose.common.shader.verticalGradient
+import com.patrykandpatrick.vico.core.cartesian.AutoScrollCondition
+import com.patrykandpatrick.vico.core.cartesian.CartesianMeasuringContext
+import com.patrykandpatrick.vico.core.cartesian.axis.Axis
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
@@ -25,63 +36,107 @@ import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.core.common.shader.ShaderProvider
+import com.themakers.plantlink.data.SettingState
 import java.text.DecimalFormat
+import java.util.Calendar
+import kotlin.math.roundToInt
+import kotlin.random.Random
 
 private val secRangeProvider = CartesianLayerRangeProvider.auto()
 
-// Use, but set to max value of data rounded to nearest 10 or 5, plus 5
-private val RangeProvider = CartesianLayerRangeProvider.fixed(maxY = 100.0)
-private val YDecimalFormat = DecimalFormat("#.##'F'")
-private val StartAxisValueFormatter = CartesianValueFormatter.decimal(YDecimalFormat)
-private val MarkerValueFormatter = DefaultCartesianMarker.ValueFormatter.default(YDecimalFormat)
-
-@Composable
-private fun JetpackComposeElectricCarSales(
-    modelProducer: CartesianChartModelProducer,
-    modifier: Modifier = Modifier,
-) {
-    val lineColor = Color(0xffa485e0)
-    CartesianChartHost(
-        rememberCartesianChart(
-            rememberLineCartesianLayer(
-                lineProvider =
-                    LineCartesianLayer.LineProvider.series(
-                        LineCartesianLayer.rememberLine(
-                            fill = LineCartesianLayer.LineFill.single(fill(lineColor)),
-                            areaFill =
-                                LineCartesianLayer.AreaFill.single(
-                                    fill(
-                                        ShaderProvider.verticalGradient(
-                                            arrayOf(lineColor.copy(alpha = 0.4f), Color.Transparent)
-                                        )
-                                    )
-                                ),
-                        )
-                    ),
-                rangeProvider = secRangeProvider,
-            ),
-            startAxis = VerticalAxis.rememberStart(valueFormatter = StartAxisValueFormatter),
-            bottomAxis = HorizontalAxis.rememberBottom(),
-            marker = rememberMarker(MarkerValueFormatter),
-        ),
-        modelProducer,
-        modifier.height(220.dp),
-        rememberVicoScrollState(scrollEnabled = false),
-    )
+class BottomAxisValueFormatter(private val xLabels: List<String>) : CartesianValueFormatter {
+    override fun format(
+        context: CartesianMeasuringContext,
+        value: Double,
+        verticalAxisPosition: Axis.Position.Vertical?
+    ): CharSequence {
+        return xLabels.getOrNull(value.roundToInt()) ?: value.toString()
+    }
 }
 
-private val x = listOf("2", "3", "4", "5", "6", "7", "8/9/2025", "9", "10", "11", "12", "13", "14", "15")
-private val y = listOf<Number>(83.45, 91.78, 67.92, 105.3, 72.68, 98.03, 62.19, 89.54, 101.28, 76.35, 94.81, 69.07, 85.62, 108.95, 73.41, 90.28, 65.74, 81.99, 103.63, 77.17, 100)
+@Composable
+private fun MonthlyTemperatureChart(
+    modelProducer: CartesianChartModelProducer,
+    modifier: Modifier = Modifier,
+    xLabels: List<String>,
+    state: SettingState
+) {
+    val temperatureUnit = if (state.isFahrenheit) "F" else "C"
+    val YDecimalFormat = DecimalFormat("#.##'°$temperatureUnit'")
+    val StartAxisValueFormatter = CartesianValueFormatter.decimal(YDecimalFormat)
+    val MarkerValueFormatter = DefaultCartesianMarker.ValueFormatter.default(YDecimalFormat)
+
+    val red = Color(0xFFE57373)
+    val blue = Color(0xFF64B5F6)
+
+    //val lineColor = if()
+
+    Box(
+        contentAlignment = Alignment.BottomEnd,
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        CartesianChartHost(
+            rememberCartesianChart(
+                rememberLineCartesianLayer(
+                    lineProvider =
+                        LineCartesianLayer.LineProvider.series(
+                            LineCartesianLayer.rememberLine(
+                                fill = LineCartesianLayer.LineFill.single(fill(red)),
+                                areaFill =
+                                    LineCartesianLayer.AreaFill.single(
+                                        fill(
+                                            ShaderProvider.verticalGradient(
+                                                arrayOf(red.copy(alpha = 0.4f), blue.copy(alpha = 0.4f))
+                                            )
+                                        )
+                                    ),
+                            )
+                        ),
+                    rangeProvider = secRangeProvider,
+                ),
+                startAxis = VerticalAxis.rememberStart(
+                    valueFormatter = StartAxisValueFormatter
+                ),
+                bottomAxis = HorizontalAxis.rememberBottom(valueFormatter = BottomAxisValueFormatter(xLabels)),
+                marker = rememberMarker(MarkerValueFormatter),
+            ),
+            modelProducer,
+            modifier = Modifier
+                .height(200.dp)
+                .fillMaxWidth(1f)
+            //.width(100.dp)
+            ,
+            scrollState = rememberVicoScrollState(
+                scrollEnabled = true,
+                autoScrollCondition = AutoScrollCondition.OnModelGrowth
+            ),
+            consumeMoveEvents = true,
+            zoomState = rememberVicoZoomState(true),
+            animateIn = false
+        )
+    }
+
+}
 
 @Composable
-fun TemperatureChart(modifier: Modifier = Modifier) {
+fun TemperatureChart(
+    modifier: Modifier = Modifier,
+    state: SettingState
+) {
     val modelProducer = remember { CartesianChartModelProducer() }
+    var xLabels by remember { mutableStateOf<List<String>>(emptyList()) }
+
     LaunchedEffect(Unit) {
+        val calendar = Calendar.getInstance()
+        val month = calendar.get(Calendar.MONTH) + 1
+        val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+        xLabels = (1..daysInMonth).map { day -> "$month/$day" }
+        val y = List(daysInMonth) { Random.nextFloat() * 30 + 60 }
         modelProducer.runTransaction {
             // Learn more: https://patrykandpatrick.com/vmml6t.
             lineSeries { series(y) }
-            extras { x }
         }
     }
-    JetpackComposeElectricCarSales(modelProducer, modifier)
+    MonthlyTemperatureChart(modelProducer, modifier, xLabels, state)
 }

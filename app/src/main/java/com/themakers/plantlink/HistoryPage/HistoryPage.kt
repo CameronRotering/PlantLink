@@ -1,6 +1,7 @@
 package com.themakers.plantlink.HistoryPage
 
 import android.content.Context
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -204,29 +206,38 @@ fun HistoryPage(
             item {
                 Card(
                     modifier = Modifier
+                        .fillMaxSize()
                         .padding(horizontal = 5.dp, vertical = 20.dp),
                     shape = MaterialTheme.shapes.medium,
                     colors = cardColors(
                         containerColor = MaterialTheme.colorScheme.background,
                         contentColor = MaterialTheme.colorScheme.secondary
+                    ),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 4.dp
                     )
                 ) {
-                    TemperatureChart()
-
-                    Row(
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .fillMaxSize(0.9f)
                     ) {
-                        Text(
-                            text = "Average Temperature: " + averageOfPoints(tempOverTime).toString() + "° " + if (state.isFahrenheit) "F" else "C",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                            fontSize = 25.sp
-                        )
+                        TemperatureChart(state = state)
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Average Temperature: " + averageOfPoints(tempOverTime).toString() + "° " + if (state.isFahrenheit) "F" else "C",
+                                color = Color(0, 0, 0, 255),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth(),
+                                fontSize = 25.sp
+                            )
+                        }
                     }
                 }
             }
