@@ -114,7 +114,6 @@ private fun JetpackComposeBasicLineChart(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryPage(
-    destinationName: String,
     context: Context,
     navController: NavHostController,
     plantViewModel: CurrClickedPlantViewModel,
