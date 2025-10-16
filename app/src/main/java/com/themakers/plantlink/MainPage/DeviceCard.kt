@@ -83,10 +83,11 @@ fun DeviceCard(
     plantDevice: PlantDevice, // Hold which plant this card pertains to
     state: SettingState?,
     onEvent: ((SettingEvent) -> Unit)?,
-    clickedPlantViewModel: CurrClickedPlantViewModel?,
-    health: Int = 0 // 0-100 0 being bad health, 100 being best health
+    clickedPlantViewModel: CurrClickedPlantViewModel?
 ) {
     var hidden by remember { mutableStateOf(false) }
+
+    val health = plantDevice.moisture.toInt()
 
     val healthColorLerp: Color = when {
         health <= 50 -> lerp(Color.Red, Color.Yellow, health / 50f)
@@ -232,8 +233,7 @@ fun DeviceCardPreview() {
                     plantDevice = plantDevice,
                     state = null,
                     onEvent = null,
-                    clickedPlantViewModel = null,
-                    health = 25
+                    clickedPlantViewModel = null
                 )
             }
 
@@ -247,8 +247,7 @@ fun DeviceCardPreview() {
                     plantDevice = plantDevice,
                     state = null,
                     onEvent = null,
-                    clickedPlantViewModel = null,
-                    health = 50
+                    clickedPlantViewModel = null
                 )
             }
 
@@ -262,8 +261,7 @@ fun DeviceCardPreview() {
                     plantDevice = plantDevice,
                     state = null,
                     onEvent = null,
-                    clickedPlantViewModel = null,
-                    health = 75
+                    clickedPlantViewModel = null
                 )
             }
 
@@ -277,8 +275,7 @@ fun DeviceCardPreview() {
                     plantDevice = plantDevice,
                     state = null,
                     onEvent = null,
-                    clickedPlantViewModel = null,
-                    health = 100
+                    clickedPlantViewModel = null
                 )
             }
         }

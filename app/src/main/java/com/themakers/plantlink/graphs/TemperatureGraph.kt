@@ -4,17 +4,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
@@ -22,6 +23,7 @@ import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLa
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
+import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.fill
 import com.patrykandpatrick.vico.compose.common.shader.verticalGradient
 import com.patrykandpatrick.vico.core.cartesian.AutoScrollCondition
@@ -36,6 +38,7 @@ import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.core.common.shader.ShaderProvider
+import com.patrykandpatrick.vico.core.common.shape.Shape
 import com.themakers.plantlink.data.SettingState
 import java.text.DecimalFormat
 import java.util.Calendar
@@ -62,9 +65,9 @@ private fun MonthlyTemperatureChart(
     state: SettingState
 ) {
     val temperatureUnit = if (state.isFahrenheit) "F" else "C"
-    val YDecimalFormat = DecimalFormat("#.##'°$temperatureUnit'")
-    val StartAxisValueFormatter = CartesianValueFormatter.decimal(YDecimalFormat)
-    val MarkerValueFormatter = DefaultCartesianMarker.ValueFormatter.default(YDecimalFormat)
+    val yDecimalFormat = DecimalFormat("#.##'°$temperatureUnit'")
+    val startAxisValueFormatter = CartesianValueFormatter.decimal(yDecimalFormat)
+    val markerValueFormatter = DefaultCartesianMarker.ValueFormatter.default(yDecimalFormat)
 
     val red = Color(0xFFE57373)
     val blue = Color(0xFF64B5F6)
@@ -72,13 +75,15 @@ private fun MonthlyTemperatureChart(
     //val lineColor = if()
 
     Box(
-        contentAlignment = Alignment.BottomEnd,
+        //contentAlignment = Alignment.BottomEnd,
         modifier = modifier
             .fillMaxSize()
+            .padding(horizontal = 15.dp)
     ) {
         CartesianChartHost(
-            rememberCartesianChart(
+            chart = rememberCartesianChart(
                 rememberLineCartesianLayer(
+                    pointSpacing = 20.dp,
                     lineProvider =
                         LineCartesianLayer.LineProvider.series(
                             LineCartesianLayer.rememberLine(
@@ -96,15 +101,29 @@ private fun MonthlyTemperatureChart(
                     rangeProvider = secRangeProvider,
                 ),
                 startAxis = VerticalAxis.rememberStart(
-                    valueFormatter = StartAxisValueFormatter
+                    valueFormatter = startAxisValueFormatter,
+                    label = rememberTextComponent(
+                        color = Color.Black
+                    ),
+                    guideline = rememberAxisGuidelineComponent(
+                        shape = Shape.Rectangle
+                    )
                 ),
-                bottomAxis = HorizontalAxis.rememberBottom(valueFormatter = BottomAxisValueFormatter(xLabels)),
-                marker = rememberMarker(MarkerValueFormatter),
+                bottomAxis = HorizontalAxis.rememberBottom(
+                    valueFormatter = BottomAxisValueFormatter(xLabels),
+                    label = rememberTextComponent(
+                        color = Color.Black
+                    ),
+                    guideline = rememberAxisGuidelineComponent(
+                        shape = Shape.Rectangle
+                    )
+                ),
+                marker = rememberMarker(markerValueFormatter),
             ),
             modelProducer,
             modifier = Modifier
                 .height(200.dp)
-                .fillMaxWidth(1f)
+                .fillMaxWidth()
             //.width(100.dp)
             ,
             scrollState = rememberVicoScrollState(
