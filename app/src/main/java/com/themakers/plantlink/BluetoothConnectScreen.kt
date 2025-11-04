@@ -245,6 +245,12 @@ fun BluetoothConnectScreen(
                 "Connected to PlantLink device.",
                 Toast.LENGTH_LONG
             ).show()
+        } else if (state.isConnected == 0) {
+            Toast.makeText(
+                context,
+                "Unable to connect to PlantLink device.",
+                Toast.LENGTH_LONG
+            ).show()
         }
 
         Log.w("BT CONNECT STATE CHANGE", state.isConnected.toString())
