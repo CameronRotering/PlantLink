@@ -1,6 +1,8 @@
 package com.themakers.plantlink.SettingsPage
 
+import android.Manifest
 import android.content.Context
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -49,7 +51,9 @@ fun SettingsPage(
     context: Context,
     navController: NavHostController,
     state: SettingState,
-    onEvent: (SettingEvent) -> Unit
+    onEvent: (SettingEvent) -> Unit,
+    permissionLauncher: ActivityResultLauncher<Array<String>>,
+    hasBTPermission: Boolean
 ) {
     val lazyListState = rememberLazyListState()
     var isFahrenheit = state.isFahrenheit
@@ -71,7 +75,18 @@ fun SettingsPage(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.navigate("BluetoothConnect")
+                            if (hasBTPermission) {
+                                navController.navigate("BluetoothConnect")
+                            } else {
+                                // Will automatically follow bluetooth checks
+                                permissionLauncher.launch(
+                                    arrayOf(
+                                        Manifest.permission.BLUETOOTH_SCAN,
+                                        Manifest.permission.BLUETOOTH_CONNECT,
+                                        Manifest.permission.BLUETOOTH_ADVERTISE
+                                    )
+                                )
+                            }
                         }
                     ) {
                         Icon(

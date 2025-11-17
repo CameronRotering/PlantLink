@@ -1,6 +1,8 @@
 package com.themakers.plantlink.MainPage
 
+import android.Manifest
 import android.content.Context
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -60,7 +62,9 @@ fun MainPage(
     onEvent: (SettingEvent) -> Unit,
     clickedPlantViewModel: CurrClickedPlantViewModel,
     plantDeviceList: MutableList<PlantDevice>,
-    hubDevice: MutableState<HubDevice>
+    hubDevice: MutableState<HubDevice>,
+    permissionLauncher: ActivityResultLauncher<Array<String>>,
+    hasBTPermission: Boolean
 ) {
     val lazyGridState = rememberLazyGridState()
     var health by remember { mutableStateOf(0) }
@@ -95,7 +99,18 @@ fun MainPage(
                 navigationIcon = {
                     IconButton(
                         onClick = {
-                            navController.navigate("BluetoothConnect")
+                            if (hasBTPermission) {
+                                navController.navigate("BluetoothConnect")
+                            } else {
+                                // Will automatically follow bluetooth checks
+                                permissionLauncher.launch(
+                                    arrayOf(
+                                        Manifest.permission.BLUETOOTH_SCAN,
+                                        Manifest.permission.BLUETOOTH_CONNECT,
+                                        Manifest.permission.BLUETOOTH_ADVERTISE
+                                    )
+                                )
+                            }
                         }
                     ) {
                         Icon(

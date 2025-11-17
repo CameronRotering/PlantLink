@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.nfc.FormatException
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
@@ -33,7 +34,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
@@ -109,6 +112,9 @@ class MainActivity : ComponentActivity() {
         //PlantDevice("00:00:00:00:00:11", "Galaxy Petunia", "1", "10"),
         //PlantDevice("00:00:00:00:00:12", "Galaxy Petunia", "1", "10")
     )
+
+    var hasBtPermission by mutableStateOf(false)
+        private set
 
     val hubDevice = mutableStateOf(HubDevice("00:00:00:00:00:00", "Hub"))
 
@@ -197,7 +203,6 @@ class MainActivity : ComponentActivity() {
 
         viewModel = BluetoothViewModel(AndroidBluetoothController(applicationContext, plantDeviceList, hubDevice)) // was at around line 232
 
-
         val enableBluetoothLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { /* Not needed */}
@@ -205,26 +210,48 @@ class MainActivity : ComponentActivity() {
         val permissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { perms ->
-            val canEnableBluetooth = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                perms[Manifest.permission.BLUETOOTH_CONNECT] == true
-            } else true
+            val allPermissionsGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                perms.getOrDefault(Manifest.permission.BLUETOOTH_CONNECT, false) &&
+                perms.getOrDefault(Manifest.permission.BLUETOOTH_SCAN, false)
+            } else {
+                true
+            }
 
+            hasBtPermission = allPermissionsGranted
 
-            if (canEnableBluetooth && !isBluetoothEnabled) {
-                enableBluetoothLauncher.launch(
-                    Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                )
+            // These checks run when prompting for permissions (calling the permissionLauncher object)
+            if (allPermissionsGranted) {
+                if (!isBluetoothEnabled) {
+                    enableBluetoothLauncher.launch(
+                        Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                    )
+                }
+            } else {
+                Toast.makeText(
+                    applicationContext,
+                    "Bluetooth permissions are required. Please enable in the app settings.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
 
-        permissionLauncher.launch(
-            arrayOf(
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val permissions = arrayOf(
                 Manifest.permission.BLUETOOTH_SCAN,
-                Manifest.permission.BLUETOOTH_CONNECT,
-                Manifest.permission.NFC
-                )
-        )
+                Manifest.permission.BLUETOOTH_CONNECT
+            )
+            val allPermissionsGranted = permissions.all {
+                ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
+            }
+            if (!allPermissionsGranted) {
+                permissionLauncher.launch(permissions)
+            } else {
+                hasBtPermission = true
+            }
+        } else {
+            hasBtPermission = true
+        }
 
         setContent {
             PlantLinkTheme {
@@ -255,7 +282,9 @@ class MainActivity : ComponentActivity() {
                                 onEvent = settingsViewModel::onEvent,
                                 clickedPlantViewModel = selectedPlantViewModel,
                                 plantDeviceList = plantDeviceList,
-                                hubDevice = hubDevice
+                                hubDevice = hubDevice,
+                                permissionLauncher = permissionLauncher,
+                                hasBTPermission = hasBtPermission
                             )
                         }
 
@@ -264,7 +293,9 @@ class MainActivity : ComponentActivity() {
                                 navController = navController,
                                 context = applicationContext,
                                 state = settingsState,
-                                onEvent = settingsViewModel::onEvent
+                                onEvent = settingsViewModel::onEvent,
+                                permissionLauncher = permissionLauncher,
+                                hasBTPermission = hasBtPermission
                             )
                         }
 
