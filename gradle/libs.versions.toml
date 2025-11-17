@@ -1,5 +1,5 @@
 [versions]
-androidGradlePlugin = "8.13.0"
+androidGradlePlugin = "8.13.1"
 activityCompose = "1.11.0"
 compiler = "1.5.15"
 coreKtx = "1.17.0"
