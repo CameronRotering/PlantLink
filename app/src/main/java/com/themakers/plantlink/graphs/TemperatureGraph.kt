@@ -1,5 +1,6 @@
 package com.themakers.plantlink.graphs
 
+import android.text.SpannableStringBuilder
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,15 +38,22 @@ import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
+import com.patrykandpatrick.vico.core.cartesian.marker.LineCartesianLayerMarkerTarget
+import com.patrykandpatrick.vico.core.common.data.ExtraStore
 import com.patrykandpatrick.vico.core.common.shader.ShaderProvider
 import com.patrykandpatrick.vico.core.common.shape.Shape
 import com.themakers.plantlink.data.SettingState
 import java.text.DecimalFormat
 import java.util.Calendar
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-private val secRangeProvider = CartesianLayerRangeProvider.auto()
+private val secRangeProvider = object : CartesianLayerRangeProvider {
+    override fun getMinY(minY: Double, maxY: Double, extraStore: ExtraStore) = floor(minY - 5)
+    override fun getMaxY(minY: Double, maxY: Double, extraStore: ExtraStore) = ceil(maxY + 5)
+}
 
 class BottomAxisValueFormatter(private val xLabels: List<String>) : CartesianValueFormatter {
     override fun format(
@@ -69,7 +77,28 @@ private fun MonthlyTemperatureChart(
     val temperatureUnit = if (state.isFahrenheit) "F" else "C"
     val yDecimalFormat = DecimalFormat("#.##'°$temperatureUnit'")
     val startAxisValueFormatter = CartesianValueFormatter.decimal(yDecimalFormat)
-    val markerValueFormatter = DefaultCartesianMarker.ValueFormatter.default(yDecimalFormat)
+    val markerValueFormatter = remember(xLabels, yDecimalFormat) {
+        DefaultCartesianMarker.ValueFormatter { _, targets ->
+            val builder = SpannableStringBuilder()
+            targets.forEachIndexed { index, target ->
+                if (target is LineCartesianLayerMarkerTarget) {
+                    val point = target.points.firstOrNull()
+                    if (point != null) {
+                        val x = point.entry.x.toInt()
+                        val label = xLabels.getOrNull(x)
+                        if (label != null) {
+                            builder.append(label).append(" ")
+                        }
+                        builder.append(yDecimalFormat.format(point.entry.y))
+                    }
+                }
+                if (index != targets.lastIndex) {
+                    builder.append(", ")
+                }
+            }
+            builder
+        }
+    }
 
     Box(
         //contentAlignment = Alignment.BottomEnd,
@@ -80,7 +109,7 @@ private fun MonthlyTemperatureChart(
         CartesianChartHost(
             chart = rememberCartesianChart(
                 rememberLineCartesianLayer(
-                    pointSpacing = 20.dp,
+                    pointSpacing = 5.dp,
                     lineProvider =
                         LineCartesianLayer.LineProvider.series(
                             LineCartesianLayer.rememberLine(
@@ -119,7 +148,7 @@ private fun MonthlyTemperatureChart(
             ),
             modelProducer,
             modifier = Modifier
-                .height(200.dp)
+                .height(250.dp)
                 .fillMaxWidth()
             //.width(100.dp)
             ,
@@ -159,6 +188,6 @@ fun TemperatureChart(
         modifier,
         xLabels,
         state,
-        Color(0x7FFF6363),
-        arrayOf(Color(0x66E57373), Color(0x66FFFFFF), Color(0x6664B5F6))) // 0x66 being 0.4f alpha
+        Color(0x66F44336),
+        arrayOf(Color(0x66E57373), Color(0x66E57373), Color(0x66FFFFFF), Color(0x6664B5F6))) // 0x66 being 0.4f alpha
 }

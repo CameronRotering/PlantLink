@@ -20,7 +20,7 @@ rootProject.name = "PlantLInk"
 include(
     ":app",
     "vico",
-    "vico:compose",
+    //"vico:compose", // Removing this seems to fix project views not showing "Android"
     "vico:compose-m3",
     "vico:core",
 )

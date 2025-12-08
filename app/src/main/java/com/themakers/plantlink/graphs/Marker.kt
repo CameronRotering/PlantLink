@@ -3,6 +3,7 @@ package com.themakers.plantlink.graphs
 import android.text.Layout
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
 import com.patrykandpatrick.vico.compose.cartesian.marker.rememberDefaultCartesianMarker
@@ -35,7 +36,7 @@ internal fun rememberMarker(
         )
     val label =
         rememberTextComponent(
-            color = MaterialTheme.colorScheme.onSurface,
+            color = Color.Black,
             textAlignment = Layout.Alignment.ALIGN_CENTER,
             padding = insets(8.dp, 4.dp),
             background = labelBackground,
