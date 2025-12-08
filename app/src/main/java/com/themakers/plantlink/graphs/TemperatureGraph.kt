@@ -62,17 +62,14 @@ private fun MonthlyTemperatureChart(
     modelProducer: CartesianChartModelProducer,
     modifier: Modifier = Modifier,
     xLabels: List<String>,
-    state: SettingState
+    state: SettingState,
+    lineColor: Color,
+    gradientArray: Array<Color>
 ) {
     val temperatureUnit = if (state.isFahrenheit) "F" else "C"
     val yDecimalFormat = DecimalFormat("#.##'°$temperatureUnit'")
     val startAxisValueFormatter = CartesianValueFormatter.decimal(yDecimalFormat)
     val markerValueFormatter = DefaultCartesianMarker.ValueFormatter.default(yDecimalFormat)
-
-    val red = Color(0xFFE57373)
-    val blue = Color(0xFF64B5F6)
-
-    //val lineColor = if()
 
     Box(
         //contentAlignment = Alignment.BottomEnd,
@@ -87,12 +84,12 @@ private fun MonthlyTemperatureChart(
                     lineProvider =
                         LineCartesianLayer.LineProvider.series(
                             LineCartesianLayer.rememberLine(
-                                fill = LineCartesianLayer.LineFill.single(fill(red)),
+                                fill = LineCartesianLayer.LineFill.single(fill(lineColor)),
                                 areaFill =
                                     LineCartesianLayer.AreaFill.single(
                                         fill(
                                             ShaderProvider.verticalGradient(
-                                                arrayOf(red.copy(alpha = 0.4f), blue.copy(alpha = 0.4f))
+                                                gradientArray
                                             )
                                         )
                                     ),
@@ -157,5 +154,11 @@ fun TemperatureChart(
             lineSeries { series(y) }
         }
     }
-    MonthlyTemperatureChart(modelProducer, modifier, xLabels, state)
+    MonthlyTemperatureChart(
+        modelProducer,
+        modifier,
+        xLabels,
+        state,
+        Color(0x7FFF6363),
+        arrayOf(Color(0x66E57373), Color(0x66FFFFFF), Color(0x6664B5F6))) // 0x66 being 0.4f alpha
 }

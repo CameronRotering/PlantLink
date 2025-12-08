@@ -219,7 +219,7 @@ fun HistoryPage(
                 ) {
                     Column(
                         modifier = Modifier
-                            .fillMaxSize(0.9f)
+                            .fillMaxSize()
                     ) {
                         TemperatureChart(state = state)
 
