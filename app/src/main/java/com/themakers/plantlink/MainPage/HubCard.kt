@@ -1,6 +1,7 @@
 package com.themakers.plantlink.MainPage
 
 import android.content.Context
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -65,6 +66,9 @@ fun HubCard( // Can add trailing and "action" (leading) icons and text to make w
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable {
+                        navController.navigate("HubHistoryPage")
+                    },
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,

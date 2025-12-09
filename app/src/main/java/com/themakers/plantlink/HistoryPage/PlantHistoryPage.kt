@@ -41,9 +41,7 @@ import androidx.navigation.NavHostController
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
-// import com.themakers.plantlink.SimpleLineChart // Not needed with Vico
 import com.themakers.plantlink.data.SettingState
-import co.yml.charts.common.model.Point // Keep for tempOverTime data structure, will be mapped
 import co.yml.charts.ui.linechart.LineChart
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
@@ -56,44 +54,6 @@ import com.themakers.plantlink.SimpleLineChart
 import com.themakers.plantlink.composables.BottomToolBar
 import com.themakers.plantlink.graphs.TemperatureChart
 
-val tempOverTime: List<Point> = // Assuming Point is {x,y}
-    listOf(
-        Point(0.0f, 83.45f),
-        Point(1.0f, 91.78f),
-        Point(2.0f, 67.92f),
-        Point(3.0f, 105.31f),
-        Point(4.0f, 72.68f),
-        Point(5.0f, 98.03f),
-        Point(6.0f, 62.19f),
-        Point(7.0f, 89.54f),
-        Point(8.0f, 101.28f),
-        Point(9.0f, 76.35f),
-        Point(10.0f, 94.81f),
-        Point(11.0f, 69.07f),
-        Point(12.0f, 85.62f),
-        Point(13.0f, 108.95f),
-        Point(14.0f, 73.41f),
-        Point(15.0f, 90.28f),
-        Point(16.0f, 65.74f),
-        Point(17.0f, 81.99f),
-        Point(18.0f, 103.63f),
-        Point(19.0f, 77.17f)
-    )
-
-// Dummy data for other charts - replace with actual data
-val humidityOverTime: List<Point> = tempOverTime.map { Point(it.x, it.y / 2f) } // Example
-val moistureOverTime: List<Point> = tempOverTime.map { Point(it.x, it.y * 0.75f) } // Example
-val lightOverTime: List<Point> = tempOverTime.map { Point(it.x, it.y * 1.2f) } // Example
-
-fun averageOfPoints(points: List<Point>): Float {
-    var sum = 0f
-
-    for (point in points) {
-        sum += point.y
-    }
-
-    return sum / points.size
-}
 
 @Composable
 private fun JetpackComposeBasicLineChart(
@@ -115,7 +75,7 @@ private fun JetpackComposeBasicLineChart(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HistoryPage(
+fun PlantHistoryPage(
     destinationName: String,
     context: Context,
     navController: NavHostController,

@@ -100,7 +100,7 @@ fun DeviceCard(
                 if (clickedPlantViewModel != null) {
                     clickedPlantViewModel.currClickedPlant = plantDevice
 
-                    navController.navigate("HistoryPage")
+                    navController.navigate("PlantHistoryPage")
                 }
             },
         shape = MaterialTheme.shapes.medium,

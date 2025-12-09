@@ -41,7 +41,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
-import com.themakers.plantlink.HistoryPage.HistoryPage
+import com.themakers.plantlink.HistoryPage.HubHistoryPage
+import com.themakers.plantlink.HistoryPage.PlantHistoryPage
 import com.themakers.plantlink.MainPage.MainPage
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
 import com.themakers.plantlink.SettingsPage.PlantSettingsPage
@@ -278,13 +279,23 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable("HistoryPage") {
-                            HistoryPage(
-                                destinationName = "HistoryPage",
+                        composable("PlantHistoryPage") {
+                            PlantHistoryPage(
+                                destinationName = "PlantHistoryPage",
                                 context = applicationContext,
                                 navController = navController,
                                 plantViewModel = selectedPlantViewModel,
                                 state = settingsState
+                            )
+                        }
+
+                        composable("HubHistoryPage") {
+                            HubHistoryPage(
+                                destinationName = "HubHistoryPage",
+                                context = applicationContext,
+                                navController = navController,
+                                state = settingsState,
+                                hubDevice = hubDevice
                             )
                         }
 
