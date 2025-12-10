@@ -3,12 +3,10 @@ package com.themakers.plantlink.HistoryPage
 import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
@@ -40,12 +38,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.themakers.plantlink.data.SettingState
 import co.yml.charts.common.model.Point // Keep for tempOverTime data structure, will be mapped
-import co.yml.charts.ui.linechart.LineChart
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
-import com.themakers.plantlink.SimpleLineChart
 import com.themakers.plantlink.composables.BottomToolBar
 import com.themakers.plantlink.data.HubDevice
+import com.themakers.plantlink.graphs.HumidityChart
 import com.themakers.plantlink.graphs.LightChart
 import com.themakers.plantlink.graphs.TemperatureChart
 
@@ -218,47 +215,42 @@ fun HubHistoryPage(
             }
 
             item {
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-
-            item {
                 Card(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 5.dp, vertical = 20.dp),
                     shape = MaterialTheme.shapes.medium,
                     colors = cardColors(
                         containerColor = MaterialTheme.colorScheme.background,
                         contentColor = MaterialTheme.colorScheme.secondary
+                    ),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 4.dp
                     )
                 ) {
-                    LineChart(
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp),
-                        lineChartData = SimpleLineChart(
-                            pointsData = tempOverTime,
-                            dataType = "humidity"
-                        )
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .fillMaxSize()
                     ) {
-                        Text(
-                            text = "Average Humidity: " + "34.7 RH",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                            fontSize = 25.sp
-                        )
+                        HumidityChart()
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Average Humidity: " + averageOfPoints(tempOverTime).toString() + "% RH",
+                                color = Color(0, 0, 0, 255),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth(),
+                                fontSize = 25.sp
+                            )
+                        }
                     }
                 }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(20.dp))
             }
 
             item {

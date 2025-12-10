@@ -342,6 +342,40 @@ fun SoilMoistureChart(
 }
 
 @Composable
+fun HumidityChart(
+    modifier: Modifier = Modifier
+) {
+    val modelProducer = remember { CartesianChartModelProducer() }
+    var xLabels by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+        val calendar = Calendar.getInstance()
+        val month = calendar.get(Calendar.MONTH) + 1
+        val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+        xLabels = (1..daysInMonth).map { day -> "$month/$day" }
+        val y = List(daysInMonth) { Random.nextFloat() * 100 }
+        modelProducer.runTransaction {
+            // Learn more: https://patrykandpatrick.com/vmml6t.
+            lineSeries { series(y) }
+        }
+    }
+    MonthlyChart(
+        modelProducer,
+        modifier,
+        xLabels,
+        "#.##'% RH'",
+        Color(0x9964B5F6),
+        arrayOf(
+            Color(0x9941B2FF),
+            Color(0x9964B5F6),
+            //Color(0x4D64B5F6),
+            Color(0x66FFFFFF),
+        ), // 0x66 being 0.4f alpha
+        zeroToHundredRangeProvider
+    )
+}
+
+@Composable
 fun LightChart(
     modifier: Modifier = Modifier
 ) {
@@ -367,11 +401,15 @@ fun LightChart(
         Color(0x66FFC107),
         arrayOf(
             Color(0x99FF0000),
-            Color(0x99FFC107),
-            Color(0x66FFC107),
+            Color(0xCCFFC107),
+            Color(0x80FFC107),
             Color(0x66FFDA03),
-            Color(0x33FFDA03),
-            Color(0x99FFFFFF),
+            Color(0x66FFDA03),
+            Color(0x4DDABA01),
+            //Color(0x33FFFFFF),
+            Color(0x22FFFFFF),
+            //Color(0x33646464),
+            //Color(0x00000000),
             Color(0x99000000)
         ), // 0x66 being 0.4f alpha
         lightRangeProvider
