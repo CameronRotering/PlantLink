@@ -55,6 +55,16 @@ private val secRangeProvider = object : CartesianLayerRangeProvider {
     override fun getMaxY(minY: Double, maxY: Double, extraStore: ExtraStore) = ceil(maxY + 5)
 }
 
+private val zeroToHundredRangeProvider = object : CartesianLayerRangeProvider {
+    override fun getMinY(minY: Double, maxY: Double, extraStore: ExtraStore) = 0.0
+    override fun getMaxY(minY: Double, maxY: Double, extraStore: ExtraStore) = 100.0
+}
+
+private val lightRangeProvider = object : CartesianLayerRangeProvider {
+    override fun getMinY(minY: Double, maxY: Double, extraStore: ExtraStore) = 0.0001
+    override fun getMaxY(minY: Double, maxY: Double, extraStore: ExtraStore) = 32635.0
+}
+
 class BottomAxisValueFormatter(private val xLabels: List<String>) : CartesianValueFormatter {
     override fun format(
         context: CartesianMeasuringContext,
@@ -161,7 +171,104 @@ private fun MonthlyTemperatureChart(
             animateIn = false
         )
     }
+}
 
+@Composable
+private fun MonthlyChart(
+    modelProducer: CartesianChartModelProducer,
+    modifier: Modifier = Modifier,
+    xLabels: List<String>,
+    format: String,
+    lineColor: Color,
+    gradientArray: Array<Color>,
+    rangeProvider: CartesianLayerRangeProvider
+) {
+    val yDecimalFormat = DecimalFormat(format)
+    val startAxisValueFormatter = CartesianValueFormatter.decimal(yDecimalFormat)
+    val markerValueFormatter = remember(xLabels, yDecimalFormat) {
+        DefaultCartesianMarker.ValueFormatter { _, targets ->
+            val builder = SpannableStringBuilder()
+            targets.forEachIndexed { index, target ->
+                if (target is LineCartesianLayerMarkerTarget) {
+                    val point = target.points.firstOrNull()
+                    if (point != null) {
+                        val x = point.entry.x.toInt()
+                        val label = xLabels.getOrNull(x)
+                        if (label != null) {
+                            builder.append(label).append(" ")
+                        }
+                        builder.append(yDecimalFormat.format(point.entry.y))
+                    }
+                }
+                if (index != targets.lastIndex) {
+                    builder.append(", ")
+                }
+            }
+            builder
+        }
+    }
+
+    Box(
+        //contentAlignment = Alignment.BottomEnd,
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 15.dp)
+    ) {
+        CartesianChartHost(
+            chart = rememberCartesianChart(
+                rememberLineCartesianLayer(
+                    pointSpacing = 5.dp,
+                    lineProvider =
+                        LineCartesianLayer.LineProvider.series(
+                            LineCartesianLayer.rememberLine(
+                                fill = LineCartesianLayer.LineFill.single(fill(lineColor)),
+                                areaFill =
+                                    LineCartesianLayer.AreaFill.single(
+                                        fill(
+                                            ShaderProvider.verticalGradient(
+                                                gradientArray
+                                            )
+                                        )
+                                    ),
+                            )
+                        ),
+                    rangeProvider = rangeProvider,
+                ),
+                startAxis = VerticalAxis.rememberStart(
+                    valueFormatter = startAxisValueFormatter,
+                    label = rememberTextComponent(
+                        color = Color.Black
+                    ),
+                    guideline = rememberAxisGuidelineComponent(
+                        shape = Shape.Rectangle
+                    )
+                ),
+                bottomAxis = HorizontalAxis.rememberBottom(
+                    valueFormatter = BottomAxisValueFormatter(xLabels),
+                    label = rememberTextComponent(
+                        color = Color.Black
+                    ),
+                    guideline = rememberAxisGuidelineComponent(
+                        shape = Shape.Rectangle
+                    )
+                ),
+                marker = rememberMarker(markerValueFormatter),
+            ),
+            modelProducer,
+            modifier = Modifier
+                .height(250.dp)
+                .fillMaxWidth()
+            //.width(100.dp)
+            ,
+            scrollState = rememberVicoScrollState(
+                scrollEnabled = true,
+                autoScrollCondition = AutoScrollCondition.OnModelGrowth
+            ),
+            consumeMoveEvents = true,
+            zoomState = rememberVicoZoomState(true),
+            animateIn = false,
+        )
+    }
 }
 
 @Composable
@@ -177,7 +284,7 @@ fun TemperatureChart(
         val month = calendar.get(Calendar.MONTH) + 1
         val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
         xLabels = (1..daysInMonth).map { day -> "$month/$day" }
-        val y = List(daysInMonth) { Random.nextFloat() * 30 + 60 }
+        val y = List(daysInMonth) { Random.nextFloat() * 100 } // 30 + 60
         modelProducer.runTransaction {
             // Learn more: https://patrykandpatrick.com/vmml6t.
             lineSeries { series(y) }
@@ -189,5 +296,84 @@ fun TemperatureChart(
         xLabels,
         state,
         Color(0x66F44336),
-        arrayOf(Color(0x66E57373), Color(0x66E57373), Color(0x66FFFFFF), Color(0x6664B5F6))) // 0x66 being 0.4f alpha
+        arrayOf(
+            Color(0x99E57373),
+            Color(0x99E57373),
+            Color(0x99FFFFFF),
+            Color(0x9964B5F6)
+        )// 0x66 being 0.4f alpha
+    )
+}
+
+@Composable
+fun SoilMoistureChart(
+    modifier: Modifier = Modifier
+) {
+    val modelProducer = remember { CartesianChartModelProducer() }
+    var xLabels by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+        val calendar = Calendar.getInstance()
+        val month = calendar.get(Calendar.MONTH) + 1
+        val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+        xLabels = (1..daysInMonth).map { day -> "$month/$day" }
+        val y = List(daysInMonth) { Random.nextFloat() * 100 }
+        modelProducer.runTransaction {
+            // Learn more: https://patrykandpatrick.com/vmml6t.
+            lineSeries { series(y) }
+        }
+    }
+    MonthlyChart(
+        modelProducer,
+        modifier,
+        xLabels,
+        "#.##'%'",
+        Color(0x66248721),
+        arrayOf(
+            Color(0x9964B5F6),
+            Color(0x9964B5F6),
+            Color(0x9959E05E),
+            Color(0x9959E05E),
+            Color(0x9959E05E),
+            Color(0x99C70000)
+        ),  // 0x66 being 0.4f alpha
+        zeroToHundredRangeProvider
+    )
+}
+
+@Composable
+fun LightChart(
+    modifier: Modifier = Modifier
+) {
+    val modelProducer = remember { CartesianChartModelProducer() }
+    var xLabels by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+        val calendar = Calendar.getInstance()
+        val month = calendar.get(Calendar.MONTH) + 1
+        val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+        xLabels = (1..daysInMonth).map { day -> "$month/$day" }
+        val y = List(daysInMonth) { Random.nextDouble(0.0001, 32635.0).toFloat() }
+        modelProducer.runTransaction {
+            // Learn more: https://patrykandpatrick.com/vmml6t.
+            lineSeries { series(y) }
+        }
+    }
+    MonthlyChart(
+        modelProducer,
+        modifier,
+        xLabels,
+        "#.##' lux'",
+        Color(0x66FFC107),
+        arrayOf(
+            Color(0x99FF0000),
+            Color(0x99FFC107),
+            Color(0x66FFC107),
+            Color(0x66FFDA03),
+            Color(0x33FFDA03),
+            Color(0x99FFFFFF),
+            Color(0x99000000)
+        ), // 0x66 being 0.4f alpha
+        lightRangeProvider
+    )
 }

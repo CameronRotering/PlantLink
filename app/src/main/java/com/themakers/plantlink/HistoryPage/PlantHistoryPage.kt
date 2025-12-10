@@ -3,12 +3,10 @@ package com.themakers.plantlink.HistoryPage
 import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
@@ -38,38 +36,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
 import com.themakers.plantlink.data.SettingState
-import co.yml.charts.ui.linechart.LineChart
-import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
-import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
-import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
-import com.themakers.plantlink.SimpleLineChart
 import com.themakers.plantlink.composables.BottomToolBar
-import com.themakers.plantlink.graphs.TemperatureChart
+import com.themakers.plantlink.graphs.SoilMoistureChart
 
-
-@Composable
-private fun JetpackComposeBasicLineChart(
-    modelProducer: CartesianChartModelProducer,
-    modifier: Modifier = Modifier,
-) {
-    CartesianChartHost(
-        chart = rememberCartesianChart(
-            rememberLineCartesianLayer(),
-            startAxis = VerticalAxis.rememberStart(),
-            bottomAxis = HorizontalAxis.rememberBottom(),
-        ),
-        modelProducer = modelProducer,
-        modifier = modifier,
-    )
-}
 
 /* TODO: Maybe have settings icon on this page to also allow you to get to that plants settings. */
 
@@ -181,7 +154,7 @@ fun PlantHistoryPage(
                         modifier = Modifier
                             .fillMaxSize()
                     ) {
-                        TemperatureChart(state = state)
+                        SoilMoistureChart()
 
                         Row(
                             modifier = Modifier
@@ -191,133 +164,13 @@ fun PlantHistoryPage(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Average Temperature: " + averageOfPoints(tempOverTime).toString() + "° " + if (state.isFahrenheit) "F" else "C",
+                                text = "Average Soil Moisture: " + averageOfPoints(tempOverTime).toString() + "%",
                                 color = Color(0, 0, 0, 255),
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth(),
                                 fontSize = 25.sp
                             )
                         }
-                    }
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-
-            item {
-                Card(
-                    shape = MaterialTheme.shapes.medium,
-                    colors = cardColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        contentColor = MaterialTheme.colorScheme.secondary
-                    )
-                ) {
-                    LineChart(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp),
-                        lineChartData = SimpleLineChart(
-                            pointsData = tempOverTime,
-                            dataType = "humidity"
-                        )
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Average Humidity: " + "34.7 RH",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                            fontSize = 25.sp
-                        )
-                    }
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-
-            item {
-                Card(
-                    shape = MaterialTheme.shapes.medium,
-                    colors = cardColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        contentColor = MaterialTheme.colorScheme.secondary
-                    )
-                ) {
-                    LineChart(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp),
-                        lineChartData = SimpleLineChart(
-                            pointsData = tempOverTime,
-                            dataType = "moisture"
-                        )
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Average Soil Moisture: " + "75.32%",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                            fontSize = 25.sp
-                        )
-                    }
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-
-            item {
-                Card(
-                    shape = MaterialTheme.shapes.medium,
-                    colors = cardColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        contentColor = MaterialTheme.colorScheme.secondary
-                    )
-                ) {
-                    LineChart(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp),
-                        lineChartData = SimpleLineChart(
-                            pointsData = tempOverTime,
-                            dataType = "light"
-                        )
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Average Light: " + "99.99 lux",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                            fontSize = 25.sp
-                        )
                     }
                 }
             }

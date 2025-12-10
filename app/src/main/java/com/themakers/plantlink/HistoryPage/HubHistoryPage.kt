@@ -38,22 +38,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
-// import com.themakers.plantlink.SimpleLineChart // Not needed with Vico
 import com.themakers.plantlink.data.SettingState
 import co.yml.charts.common.model.Point // Keep for tempOverTime data structure, will be mapped
 import co.yml.charts.ui.linechart.LineChart
-import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
-import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
-import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.themakers.plantlink.SimpleLineChart
 import com.themakers.plantlink.composables.BottomToolBar
 import com.themakers.plantlink.data.HubDevice
+import com.themakers.plantlink.graphs.LightChart
 import com.themakers.plantlink.graphs.TemperatureChart
 
 val tempOverTime: List<Point> = // Assuming Point is {x,y}
@@ -93,22 +86,6 @@ fun averageOfPoints(points: List<Point>): Float {
     }
 
     return sum / points.size
-}
-
-@Composable
-private fun JetpackComposeBasicLineChart(
-    modelProducer: CartesianChartModelProducer,
-    modifier: Modifier = Modifier,
-) {
-    CartesianChartHost(
-        chart = rememberCartesianChart(
-            rememberLineCartesianLayer(),
-            startAxis = VerticalAxis.rememberStart(),
-            bottomAxis = HorizontalAxis.rememberBottom(),
-        ),
-        modelProducer = modelProducer,
-        modifier = modifier,
-    )
 }
 
 /* TODO: Maybe have settings icon on this page to also allow you to get to that plants settings. */
@@ -286,76 +263,39 @@ fun HubHistoryPage(
 
             item {
                 Card(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 5.dp, vertical = 20.dp),
                     shape = MaterialTheme.shapes.medium,
                     colors = cardColors(
                         containerColor = MaterialTheme.colorScheme.background,
                         contentColor = MaterialTheme.colorScheme.secondary
+                    ),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 4.dp
                     )
                 ) {
-                    LineChart(
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp),
-                        lineChartData = SimpleLineChart(
-                            pointsData = tempOverTime,
-                            dataType = "moisture"
-                        )
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                            .fillMaxSize()
                     ) {
-                        Text(
-                            text = "Average Soil Moisture: " + "75.32%",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                            fontSize = 25.sp
-                        )
-                    }
-                }
-            }
+                        LightChart()
 
-            item {
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-
-            item {
-                Card(
-                    shape = MaterialTheme.shapes.medium,
-                    colors = cardColors(
-                        containerColor = MaterialTheme.colorScheme.background,
-                        contentColor = MaterialTheme.colorScheme.secondary
-                    )
-                ) {
-                    LineChart(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp),
-                        lineChartData = SimpleLineChart(
-                            pointsData = tempOverTime,
-                            dataType = "light"
-                        )
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Average Light: " + "99.99 lux",
-                            color = Color(0, 0, 0, 255),
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                            fontSize = 25.sp
-                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Average Light: " + averageOfPoints(tempOverTime).toString() + " lux",
+                                color = Color(0, 0, 0, 255),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth(),
+                                fontSize = 25.sp
+                            )
+                        }
                     }
                 }
             }
