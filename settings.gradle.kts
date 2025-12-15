@@ -17,11 +17,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "PlantLInk"
-include(
-    ":app",
-    "vico",
-    "vico:compose",
-    "vico:compose-m3",
-    "vico:core",
-)
- 
+
+include(":app")

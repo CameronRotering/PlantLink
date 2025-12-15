@@ -331,13 +331,18 @@ class AndroidBluetoothController(
                 gatt.services.forEach { service ->
                     if (service.uuid == UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40")) { // Change to service for hub
                         hubDevice.value = HubDevice("00:00:00:00:00:00", "Hub Device", service)
-                    } else if (service.uuid != UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40") && service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) {
+                    } else if (service.uuid != UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40") && service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) { // If not hub UUID and not General services aka an actual peripheral device.
                         plantDevices.add(PlantDevice("00:00:00:00:00:00", "Plant Name", "1", "10", service))
                     }
                 }
 
                 viewModel?.setCharacteristicNotification()
+            } else if (status == BluetoothGatt.GATT_FAILURE) {
+                Log.e("CONNECTIONCHANGE", "Failed to discover services.")
+
+                _isConnected.value = 0 // Set to disconnected if failed to discover services
             }
+
 
             Log.w("CONNECTIONCHANGE", "End of connecting process: " + _isConnected.value.toString())
 
