@@ -27,8 +27,9 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,7 +47,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -102,58 +102,12 @@ fun BluetoothConnectScreen(
                     .height(450.dp)
             )
         }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
         ) {
-
-            LazyRow (
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                item {
-                    Button(
-                        onClick = onStartScan,
-                        modifier = Modifier
-                            .padding(15.dp),
-                        //.height(65.dp)
-                        shape = MaterialTheme.shapes.medium,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(220, 220, 220),
-                            contentColor = Color(0, 0, 0),
-                        )
-                    ) {
-                        Text(
-                            text = "Start Scan",
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-
-                item {
-                    Button(
-                        onClick = onStopScan,
-                        modifier = Modifier
-                            .padding(15.dp),
-                        shape = MaterialTheme.shapes.medium,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(220, 220, 220),
-                            contentColor = Color(0, 0, 0),
-                        )
-                    ) {
-                        Text(
-                            text = "Stop Scan",
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
-
             BluetoothDeviceList(
                 pairedDevices = state.pairedDevices,
                 scannedDevices = state.scannedDevices,
@@ -221,16 +175,12 @@ fun BluetoothConnectScreen(
                 .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            LazyRow(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
+                contentAlignment = Alignment.Center
             ) {
-                item {
-                    LoadingAnimation(isConnected = state.isConnected, color = Color(255, 0, 0))
-                }
-
+                LoadingAnimation(isConnected = state.isConnected, color = Color(255, 0, 0))
             }
         }
     }
@@ -344,50 +294,90 @@ fun BluetoothDeviceList(
     modifier: Modifier = Modifier,
     lazyListState: LazyListState
 ) {
-    LazyColumn(
+    Column(
         modifier = modifier,
-        state = lazyListState
+        //state = lazyListState
     ) {
-        item {
-            Text(
-                text = "Paired Devices",
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-                modifier = Modifier.padding(16.dp)
+        Card(
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 4.dp
+            ),
+            shape = MaterialTheme.shapes.medium,
+            colors = cardColors(
+                containerColor = Color(217, 217, 217, 255),
+                contentColor = MaterialTheme.colorScheme.secondary
             )
-        }
-
-        items(pairedDevices) { device ->
-            if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
                 Text(
-                    text = device.name,// ?:  "(No Name)",//device.address!!,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onClick(device) }
-                        .padding(16.dp)
+                    text = "Paired Devices",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
+                    //modifier = Modifier.padding(16.dp)
                 )
+            }
+
+            LazyColumn(
+                state = lazyListState
+            ) {
+                items(pairedDevices) { device ->
+                    if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
+                        Text(
+                            text = device.name,// ?:  "(No Name)",//device.address!!,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onClick(device) }
+                                .padding(16.dp)
+                        )
+                    }
+                }
             }
         }
 
 
-        item {
-            Text(
-                text = "Scanned Devices",
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-                modifier = Modifier.padding(16.dp)
+        Card(
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 4.dp
+            ),
+            shape = MaterialTheme.shapes.medium,
+            colors = cardColors(
+                containerColor = Color(217, 217, 217, 255),
+                contentColor = MaterialTheme.colorScheme.secondary
             )
-        }
-
-        items(scannedDevices) { device ->
-            if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
                 Text(
-                    text = device.name,// ?: "(No Name)",//device.address!!,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onClick(device) }
-                        .padding(16.dp)
+                    text = "Scanned Devices",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
+                    //modifier = Modifier.padding(16.dp)
                 )
+            }
+
+            LazyColumn(
+                state = lazyListState
+            ) {
+                items(scannedDevices) { device ->
+                    if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
+                        Text(
+                            text = device.name,// ?: "(No Name)",//device.address!!,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onClick(device) }
+                                .padding(16.dp)
+                        )
+                    }
+                }
             }
         }
     }
