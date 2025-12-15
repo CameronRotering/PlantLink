@@ -69,9 +69,6 @@ dependencies {
     implementation(libs.vico.compose)
     implementation(libs.vico.compose.m3)
 
-
-    implementation(libs.ycharts)
-
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     // optional - Kotlin Extensions and Coroutines support for Room

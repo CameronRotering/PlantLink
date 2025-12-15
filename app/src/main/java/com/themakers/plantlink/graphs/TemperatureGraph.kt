@@ -45,6 +45,7 @@ import com.patrykandpatrick.vico.core.common.shape.Shape
 import com.themakers.plantlink.data.SettingState
 import java.text.DecimalFormat
 import java.util.Calendar
+import kotlin.collections.emptyList
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.roundToInt
@@ -73,6 +74,23 @@ class BottomAxisValueFormatter(private val xLabels: List<String>) : CartesianVal
     ): CharSequence {
         return xLabels.getOrNull(value.roundToInt()) ?: value.toString()
     }
+}
+
+private var monthDayStringArray = mutableListOf<String>()
+
+
+fun getMonthDayString(): MutableList<String> {
+    if (monthDayStringArray.isNotEmpty()) return monthDayStringArray
+
+    var xLabels: MutableList<String>
+
+    val calendar = Calendar.getInstance()
+    val month = calendar.get(Calendar.MONTH) + 1
+    val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+    xLabels = (1..daysInMonth).map { day -> "$month/$day" } as MutableList<String>
+
+    monthDayStringArray = xLabels
+    return monthDayStringArray
 }
 
 @Composable
@@ -279,11 +297,13 @@ fun TemperatureChart(
     val modelProducer = remember { CartesianChartModelProducer() }
     var xLabels by remember { mutableStateOf<List<String>>(emptyList()) }
 
+    xLabels = getMonthDayString()
+
     LaunchedEffect(Unit) {
         val calendar = Calendar.getInstance()
         val month = calendar.get(Calendar.MONTH) + 1
-        val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        xLabels = (1..daysInMonth).map { day -> "$month/$day" }
+        val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH) // Keeping while still using random values
+        //xLabels = (1..daysInMonth).map { day -> "$month/$day" }
         val y = List(daysInMonth) { Random.nextFloat() * 100 } // 30 + 60
         modelProducer.runTransaction {
             // Learn more: https://patrykandpatrick.com/vmml6t.
@@ -297,10 +317,12 @@ fun TemperatureChart(
         state,
         Color(0x66F44336),
         arrayOf(
+            Color(0xCCFC6A6A),
             Color(0x99E57373),
             Color(0x99E57373),
-            Color(0x99FFFFFF),
-            Color(0x9964B5F6)
+            //Color(0x99FFFFFF),
+            Color(0x9964B5F6),
+            Color(0x99248FFF),
         )// 0x66 being 0.4f alpha
     )
 }
@@ -312,11 +334,13 @@ fun SoilMoistureChart(
     val modelProducer = remember { CartesianChartModelProducer() }
     var xLabels by remember { mutableStateOf<List<String>>(emptyList()) }
 
+    xLabels = getMonthDayString()
+
     LaunchedEffect(Unit) {
         val calendar = Calendar.getInstance()
         val month = calendar.get(Calendar.MONTH) + 1
         val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        xLabels = (1..daysInMonth).map { day -> "$month/$day" }
+        //xLabels = (1..daysInMonth).map { day -> "$month/$day" }
         val y = List(daysInMonth) { Random.nextFloat() * 100 }
         modelProducer.runTransaction {
             // Learn more: https://patrykandpatrick.com/vmml6t.
@@ -348,11 +372,13 @@ fun HumidityChart(
     val modelProducer = remember { CartesianChartModelProducer() }
     var xLabels by remember { mutableStateOf<List<String>>(emptyList()) }
 
+    xLabels = getMonthDayString()
+
     LaunchedEffect(Unit) {
         val calendar = Calendar.getInstance()
         val month = calendar.get(Calendar.MONTH) + 1
         val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        xLabels = (1..daysInMonth).map { day -> "$month/$day" }
+        //xLabels = (1..daysInMonth).map { day -> "$month/$day" }
         val y = List(daysInMonth) { Random.nextFloat() * 100 }
         modelProducer.runTransaction {
             // Learn more: https://patrykandpatrick.com/vmml6t.
@@ -364,12 +390,14 @@ fun HumidityChart(
         modifier,
         xLabels,
         "#.##'% RH'",
-        Color(0x9964B5F6),
+        Color(0x665A95FC),
         arrayOf(
-            Color(0x9941B2FF),
-            Color(0x9964B5F6),
+            Color(0x990700C7),
+            Color(0x990042F6),
+            Color(0x995A9BFC),
             //Color(0x4D64B5F6),
-            Color(0x66FFFFFF),
+            //Color(0x66FFFFFF),
+            Color(0x99FF7700)
         ), // 0x66 being 0.4f alpha
         zeroToHundredRangeProvider
     )
@@ -382,11 +410,13 @@ fun LightChart(
     val modelProducer = remember { CartesianChartModelProducer() }
     var xLabels by remember { mutableStateOf<List<String>>(emptyList()) }
 
+    xLabels = getMonthDayString()
+
     LaunchedEffect(Unit) {
         val calendar = Calendar.getInstance()
         val month = calendar.get(Calendar.MONTH) + 1
         val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        xLabels = (1..daysInMonth).map { day -> "$month/$day" }
+        //xLabels = (1..daysInMonth).map { day -> "$month/$day" }
         val y = List(daysInMonth) { Random.nextDouble(0.0001, 32635.0).toFloat() }
         modelProducer.runTransaction {
             // Learn more: https://patrykandpatrick.com/vmml6t.

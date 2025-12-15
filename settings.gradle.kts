@@ -17,4 +17,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "PlantLInk"
+
 include(":app")
