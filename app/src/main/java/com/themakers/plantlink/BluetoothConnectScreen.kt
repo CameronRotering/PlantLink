@@ -10,7 +10,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.themakers.plantlink.Bluetooth.BluetoothDevice
+import com.themakers.plantlink.Bluetooth.BluetoothDeviceCard
 import com.themakers.plantlink.Bluetooth.BluetoothUiState
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.composables.BottomToolBar
@@ -69,6 +69,11 @@ fun BluetoothConnectScreen(
     plantViewModel: PlantDataViewModel
 ) {
     val lazyListState = rememberLazyListState()
+
+    LaunchedEffect(Unit) {
+        Log.w("REFRESHING", "Starting scan")
+        onStartScan()
+    }
 
     Scaffold(
         topBar = {
@@ -295,7 +300,8 @@ fun BluetoothDeviceList(
     lazyListState: LazyListState
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .padding(horizontal = 16.dp),
         //state = lazyListState
     ) {
         Card(
@@ -327,12 +333,9 @@ fun BluetoothDeviceList(
             ) {
                 items(pairedDevices) { device ->
                     if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
-                        Text(
-                            text = device.name,// ?:  "(No Name)",//device.address!!,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onClick(device) }
-                                .padding(16.dp)
+                        BluetoothDeviceCard(
+                            device = device,
+                            onClick = onClick
                         )
                     }
                 }
@@ -368,13 +371,10 @@ fun BluetoothDeviceList(
                 state = lazyListState
             ) {
                 items(scannedDevices) { device ->
-                    if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
-                        Text(
-                            text = device.name,// ?: "(No Name)",//device.address!!,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onClick(device) }
-                                .padding(16.dp)
+                    if (device.name != null){// && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
+                        BluetoothDeviceCard(
+                            device = device,
+                            onClick = onClick
                         )
                     }
                 }
