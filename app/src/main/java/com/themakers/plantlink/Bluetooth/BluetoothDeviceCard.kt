@@ -1,6 +1,5 @@
 package com.themakers.plantlink.Bluetooth
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,12 +32,12 @@ fun BluetoothDeviceCard(
         ),
         shape = MaterialTheme.shapes.medium,
         colors = cardColors(
-            containerColor = Color(217, 217, 217, 255),
+            containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.secondary
         ),
         modifier = Modifier
-            .padding(vertical = 8.dp),
-        border = BorderStroke(1.dp, Color.Black)
+            .padding(4.dp),
+        //border = BorderStroke(1.dp, Color.Black)
     ) {
         Text(
             text = device.name!!,// ?:  "(No Name)",//device.address!!,
@@ -48,6 +47,16 @@ fun BluetoothDeviceCard(
                 .padding(16.dp)
         )
     }
+//    Box(
+//        contentAlignment = Alignment.Center,
+//        modifier = Modifier
+//            .fillMaxWidth(),
+//    ) {
+//        HorizontalDivider(
+//            modifier = Modifier
+//                .fillMaxWidth(0.95f)
+//        )
+//    }
 }
 
 @Preview
@@ -82,7 +91,7 @@ fun BluetoothDeviceCardPreview() {
         LazyColumn(
             state = lazyListState
         ) {
-            item {
+            items(5) {
                 BluetoothDeviceCard(
                     device = BluetoothDevice("PlantLink Device", "0", null),
                     onClick = {}

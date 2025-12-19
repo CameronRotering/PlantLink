@@ -5,15 +5,19 @@ import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,7 +27,6 @@ import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
@@ -32,18 +35,25 @@ import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -54,6 +64,9 @@ import com.themakers.plantlink.Bluetooth.BluetoothDeviceCard
 import com.themakers.plantlink.Bluetooth.BluetoothUiState
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.composables.BottomToolBar
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 
 @SuppressLint("MissingPermission")
@@ -69,10 +82,31 @@ fun BluetoothConnectScreen(
     plantViewModel: PlantDataViewModel
 ) {
     val lazyListState = rememberLazyListState()
+    val scaleAnimatable =  remember { Animatable(0.25f) }
+
+
+    LaunchedEffect(state.isScanning) {
+        if (state.isScanning) {
+            scaleAnimatable.snapTo(0.25f)
+
+            // Start the infinite loop
+            scaleAnimatable.animateTo(
+                targetValue = 1f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(2000),
+                    repeatMode = RepeatMode.Restart
+                )
+            )
+        } else {
+            // Stop/Reset the animation when not scanning
+            scaleAnimatable.snapTo(1f)
+        }
+    }
 
     LaunchedEffect(Unit) {
-        Log.w("REFRESHING", "Starting scan")
         onStartScan()
+        delay(15.seconds)
+        onStopScan()
     }
 
     Scaffold(
@@ -105,6 +139,14 @@ fun BluetoothConnectScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(450.dp)
+                    .graphicsLayer {
+                        val currentScale = scaleAnimatable.value
+
+                        scaleX = currentScale
+                        scaleY = currentScale
+                        this.alpha = alpha
+                        transformOrigin = TransformOrigin(0.5f, 1f) // Grow from bottom
+                    }
             )
         }
 
@@ -144,21 +186,24 @@ fun BluetoothConnectScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth(),
-                lazyListState = lazyListState
+                lazyListState = lazyListState,
+                onStartScan = onStartScan,
+                onStopScan = onStopScan,
+                state = state
             )
 
             // Using a regular row brings in loading circle from left while
             // lazy row brings in loading circle from top
             // (added in specific animation details to only come in from top)
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                item {
-                    LoadingAnimation(isScanning = state.isScanning)
-                }
-
-            }
+//            LazyRow(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.SpaceAround
+//            ) {
+//                item {
+//                    LoadingAnimation(isScanning = state.isScanning)
+//                }
+//
+//            }
 
 //            LazyRow(
 //                modifier = Modifier
@@ -216,7 +261,7 @@ fun BluetoothConnectScreen(
 }
 
 @Composable
-fun LoadingAnimation(modifier: Modifier = Modifier, isScanning: Boolean, color: Color = Color(0, 255, 0)) {
+fun LoadingAnimation(modifier: Modifier = Modifier, isScanning: Boolean, containerColor: Color = Color.Transparent, color: Color = Color(0, 255, 0)) {
     AnimatedVisibility(
         visible = isScanning,
         enter = expandVertically(expandFrom = Alignment.Top),
@@ -241,6 +286,17 @@ fun LoadingAnimation(modifier: Modifier = Modifier, isScanning: Boolean, color: 
                     .size(60.dp),
                 contentAlignment = Alignment.Center
             ) {
+                Canvas(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    drawCircle(
+                        color = containerColor,
+                        radius = size.minDimension / 2
+                    )
+
+
+                }
+
                 CircularProgressIndicator(
                     strokeWidth = 5.dp,
                     modifier = Modifier
@@ -296,12 +352,19 @@ fun BluetoothDeviceList(
     pairedDevices: List<BluetoothDevice>,
     scannedDevices: List<BluetoothDevice>,
     onClick: (BluetoothDevice) -> Unit,
+    onStartScan: () -> Unit,
+    onStopScan: () -> Unit,
+    state: BluetoothUiState,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState
 ) {
+    val pullToRefreshState = rememberPullToRefreshState()
+    val coroutineScope = rememberCoroutineScope()
+
+
     Column(
         modifier = modifier
-            .padding(horizontal = 16.dp),
+            .padding(10.dp),
         //state = lazyListState
     ) {
         Card(
@@ -318,64 +381,54 @@ fun BluetoothDeviceList(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp, 16.dp, 16.dp, 8.dp)
             ) {
                 Text(
-                    text = "Paired Devices",
+                    text = "Devices",
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
                     //modifier = Modifier.padding(16.dp)
                 )
             }
 
-            LazyColumn(
-                state = lazyListState
-            ) {
-                items(pairedDevices) { device ->
-                    if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
-                        BluetoothDeviceCard(
-                            device = device,
-                            onClick = onClick
-                        )
-                    }
-                }
-            }
-        }
-
-
-        Card(
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 4.dp
-            ),
-            shape = MaterialTheme.shapes.medium,
-            colors = cardColors(
-                containerColor = Color(217, 217, 217, 255),
-                contentColor = MaterialTheme.colorScheme.secondary
-            )
-        ) {
             Box(
-                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Scanned Devices",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
-                    //modifier = Modifier.padding(16.dp)
+                HorizontalDivider(
+                    modifier = Modifier
+                        .fillMaxWidth(0.95f)
                 )
             }
 
-            LazyColumn(
-                state = lazyListState
+            Spacer(modifier = Modifier.height(8.dp))
+
+
+            PullToRefreshBox(
+                isRefreshing = state.isScanning,
+                onRefresh = {
+                    coroutineScope.launch {
+                        onStartScan()
+                        delay(15.seconds)
+                        onStopScan()
+                    }
+
+                            },
+                state = pullToRefreshState,
+                //contentAlignment = Alignment.Center,
+
             ) {
-                items(scannedDevices) { device ->
-                    if (device.name != null){// && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
-                        BluetoothDeviceCard(
-                            device = device,
-                            onClick = onClick
-                        )
+                LazyColumn(
+                    state = lazyListState
+                ) {
+                    items(scannedDevices) { device ->
+                        if (device.name != null){// && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
+                            BluetoothDeviceCard(
+                                device = device,
+                                onClick = onClick
+                            )
+                        }
                     }
                 }
             }
