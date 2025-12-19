@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,13 +29,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -55,9 +51,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.themakers.plantlink.Bluetooth.BluetoothDevice
 import com.themakers.plantlink.Bluetooth.BluetoothDeviceCard
@@ -82,19 +76,22 @@ fun BluetoothConnectScreen(
     plantViewModel: PlantDataViewModel
 ) {
     val lazyListState = rememberLazyListState()
-    val scaleAnimatable =  remember { Animatable(0.25f) }
+    val scaleAnimatable =  remember { Animatable(1f) }
 
 
     LaunchedEffect(state.isScanning) {
         if (state.isScanning) {
-            scaleAnimatable.snapTo(0.25f)
+            scaleAnimatable.snapTo(1f)
 
             // Start the infinite loop
             scaleAnimatable.animateTo(
-                targetValue = 1f,
+                targetValue = 0.35f,
                 animationSpec = infiniteRepeatable(
-                    animation = tween(2000),
-                    repeatMode = RepeatMode.Restart
+                    animation = tween(
+                        2000,
+                        easing = EaseInOut
+                    ),
+                    repeatMode = RepeatMode.Reverse
                 )
             )
         } else {
@@ -153,7 +150,8 @@ fun BluetoothConnectScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(padding),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             BluetoothDeviceList(
                 pairedDevices = state.pairedDevices,
@@ -361,75 +359,33 @@ fun BluetoothDeviceList(
     val pullToRefreshState = rememberPullToRefreshState()
     val coroutineScope = rememberCoroutineScope()
 
+    PullToRefreshBox(
+        isRefreshing = state.isScanning,
+        onRefresh = {
+            coroutineScope.launch {
+                onStartScan()
+                delay(15.seconds)
+                onStopScan()
+            }
 
-    Column(
-        modifier = modifier
-            .padding(10.dp),
-        //state = lazyListState
+        },
+        modifier = Modifier
+            .fillMaxSize(),
+        state = pullToRefreshState,
+        //contentAlignment = Alignment.Center,
+
     ) {
-        Card(
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 4.dp
-            ),
-            shape = MaterialTheme.shapes.medium,
-            colors = cardColors(
-                containerColor = Color(217, 217, 217, 255),
-                contentColor = MaterialTheme.colorScheme.secondary
-            )
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize(),
+            state = lazyListState
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp, 16.dp, 16.dp, 8.dp)
-            ) {
-                Text(
-                    text = "Devices",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
-                    //modifier = Modifier.padding(16.dp)
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth(0.95f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-
-            PullToRefreshBox(
-                isRefreshing = state.isScanning,
-                onRefresh = {
-                    coroutineScope.launch {
-                        onStartScan()
-                        delay(15.seconds)
-                        onStopScan()
-                    }
-
-                            },
-                state = pullToRefreshState,
-                //contentAlignment = Alignment.Center,
-
-            ) {
-                LazyColumn(
-                    state = lazyListState
-                ) {
-                    items(scannedDevices) { device ->
-                        if (device.name != null){// && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
-                            BluetoothDeviceCard(
-                                device = device,
-                                onClick = onClick
-                            )
-                        }
-                    }
+            items(scannedDevices) { device ->
+                if (device.name != null) {// && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
+                    BluetoothDeviceCard(
+                        device = device,
+                        onClick = onClick
+                    )
                 }
             }
         }
