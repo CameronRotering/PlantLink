@@ -381,7 +381,7 @@ fun BluetoothDeviceList(
             state = lazyListState
         ) {
             items(pairedDevices) { device ->
-                if (device.name != null) {// && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
+                if (device.name != null && device.name.take(9).lowercase() == "plantlink") {
                     BluetoothDeviceCard(
                         device = device,
                         onClick = onClick,
