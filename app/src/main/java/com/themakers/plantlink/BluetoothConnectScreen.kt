@@ -48,8 +48,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -136,14 +134,14 @@ fun BluetoothConnectScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(450.dp)
-                    .graphicsLayer {
-                        val currentScale = scaleAnimatable.value
-
-                        scaleX = currentScale
-                        scaleY = currentScale
-                        this.alpha = alpha
-                        transformOrigin = TransformOrigin(0.5f, 1f) // Grow from bottom
-                    }
+//                    .graphicsLayer {
+//                        val currentScale = scaleAnimatable.value
+//
+//                        scaleX = currentScale
+//                        scaleY = currentScale
+//                        this.alpha = alpha
+//                        transformOrigin = TransformOrigin(0.5f, 1f) // Grow from bottom
+//                    }
             )
         }
 
@@ -378,6 +376,8 @@ fun BluetoothDeviceList(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
             state = lazyListState
         ) {
             items(scannedDevices) { device ->

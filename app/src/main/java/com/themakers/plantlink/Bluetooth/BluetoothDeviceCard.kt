@@ -1,7 +1,9 @@
 package com.themakers.plantlink.Bluetooth
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.themakers.plantlink.ui.theme.PlantLinkTheme
 
 @Composable
 fun BluetoothDeviceCard(
@@ -32,11 +35,12 @@ fun BluetoothDeviceCard(
         ),
         shape = MaterialTheme.shapes.medium,
         colors = cardColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.secondary
+            containerColor = Color(217, 217, 217),
+            contentColor = Color(0, 0, 0, 255)
         ),
         modifier = Modifier
-            .padding(4.dp),
+            .padding(vertical = 6.dp)
+            .fillMaxWidth(0.9f),
         //border = BorderStroke(1.dp, Color.Black)
     ) {
         Text(
@@ -44,7 +48,9 @@ fun BluetoothDeviceCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onClick(device) }
-                .padding(16.dp)
+                .padding(16.dp),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
         )
     }
 //    Box(
@@ -63,39 +69,45 @@ fun BluetoothDeviceCard(
 @Composable
 fun BluetoothDeviceCardPreview() {
     val lazyListState = rememberLazyListState()
-
-    Card(
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        ),
-        shape = MaterialTheme.shapes.medium,
-        colors = cardColors(
-            containerColor = Color(217, 217, 217, 255),
-            contentColor = MaterialTheme.colorScheme.secondary
-        )
-    ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "Scanned Devices",
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-                //modifier = Modifier.padding(16.dp)
+    PlantLinkTheme() {
+        Card(
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 4.dp
+            ),
+            shape = MaterialTheme.shapes.medium,
+            colors = cardColors(
+                containerColor = Color(255, 255, 255, 255),
+                contentColor = MaterialTheme.colorScheme.secondary
             )
-        }
-
-        LazyColumn(
-            state = lazyListState
         ) {
-            items(5) {
-                BluetoothDeviceCard(
-                    device = BluetoothDevice("PlantLink Device", "0", null),
-                    onClick = {}
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "Scanned Devices",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 24.sp,
+                    color = Color.Black
+                    //modifier = Modifier.padding(16.dp)
                 )
+            }
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                state = lazyListState
+            ) {
+                items(5) {
+                    BluetoothDeviceCard(
+                        device = BluetoothDevice("PlantLink Device", "0", null),
+                        onClick = {}
+                    )
+                }
             }
         }
     }
