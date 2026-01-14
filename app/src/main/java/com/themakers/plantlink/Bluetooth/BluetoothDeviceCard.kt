@@ -3,6 +3,7 @@ package com.themakers.plantlink.Bluetooth
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,7 +28,8 @@ import com.themakers.plantlink.ui.theme.PlantLinkTheme
 fun BluetoothDeviceCard(
     device: BluetoothDevice,
     onClick: (BluetoothDevice) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    paired: Boolean = false
 ) {
     Card(
         elevation = CardDefaults.cardElevation(
@@ -40,15 +42,29 @@ fun BluetoothDeviceCard(
         ),
         modifier = Modifier
             .padding(vertical = 6.dp)
+            .clickable { onClick(device) }
             .fillMaxWidth(0.9f),
         //border = BorderStroke(1.dp, Color.Black)
     ) {
+        if (paired) {
+            Text(
+                text = "Paired Device",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp, top = 8.dp, end = 8.dp),
+                color = Color.Blue,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        if (!paired) Spacer(modifier = Modifier.padding(top = 8.dp))
+
         Text(
             text = device.name!!,// ?:  "(No Name)",//device.address!!,
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onClick(device) }
-                .padding(16.dp),
+                .padding(start = 8.dp, bottom = 8.dp, end = 8.dp),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )

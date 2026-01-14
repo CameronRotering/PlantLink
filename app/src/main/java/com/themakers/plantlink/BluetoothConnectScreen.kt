@@ -380,6 +380,15 @@ fun BluetoothDeviceList(
             horizontalAlignment = Alignment.CenterHorizontally,
             state = lazyListState
         ) {
+            items(pairedDevices) { device ->
+                if (device.name != null) {// && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
+                    BluetoothDeviceCard(
+                        device = device,
+                        onClick = onClick,
+                        paired = true
+                    )
+                }
+            }
             items(scannedDevices) { device ->
                 if (device.name != null) {// && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
                     BluetoothDeviceCard(
