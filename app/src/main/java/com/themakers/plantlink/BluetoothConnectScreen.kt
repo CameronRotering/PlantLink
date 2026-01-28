@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,7 +50,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.themakers.plantlink.Bluetooth.BluetoothDevice
 import com.themakers.plantlink.Bluetooth.BluetoothDeviceCard
@@ -380,6 +383,19 @@ fun BluetoothDeviceList(
             horizontalAlignment = Alignment.CenterHorizontally,
             state = lazyListState
         ) {
+            if(pairedDevices.none{ device -> (device.name != null && device.name.take(9).lowercase() == "plantlink")}
+                && scannedDevices.none{ device -> (device.name != null && device.name.take(9).lowercase() == "plantlink") }) {
+                item {
+                    Spacer(modifier = Modifier.padding(top = 10.dp))
+
+                    Text(
+                        text = "No PlantLink devices found.",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
             items(pairedDevices) { device ->
                 if (device.name != null && device.name.take(9).lowercase() == "plantlink") {
                     BluetoothDeviceCard(
@@ -390,7 +406,7 @@ fun BluetoothDeviceList(
                 }
             }
             items(scannedDevices) { device ->
-                if (device.name != null) {// && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
+                if (device.name != null && device.name.take(9).lowercase() == "plantlink") {
                     BluetoothDeviceCard(
                         device = device,
                         onClick = onClick
