@@ -1,4 +1,3 @@
-import org.apache.log4j.BasicConfigurator.configure
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -6,14 +5,11 @@ plugins {
 
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.org.jetbrains.kotlin.android)
 }
 
 android {
     namespace = "com.themakers.plantlink"
     compileSdk = 36
-
-    configure()
 
     defaultConfig {
         applicationId = "com.themakers.plantlink"
@@ -47,10 +43,7 @@ android {
     buildFeatures {
         compose = true
     }
-    @Suppress("UnstableApiUsage")
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
-    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
