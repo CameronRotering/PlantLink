@@ -383,8 +383,8 @@ fun BluetoothDeviceList(
             horizontalAlignment = Alignment.CenterHorizontally,
             state = lazyListState
         ) {
-            if(pairedDevices.none{ device -> (device.name != null && device.name.take(9).lowercase() == "plantlink")}
-                && scannedDevices.none{ device -> (device.name != null && device.name.take(9).lowercase() == "plantlink") }) {
+//            if(pairedDevices.none{ device -> (device.name != null && device.name.take(9).lowercase() == "plantlink")}
+//                && scannedDevices.none{ device -> (device.name != null && device.name.take(9).lowercase() == "plantlink") }) {
                 item {
                     Spacer(modifier = Modifier.padding(top = 10.dp))
 
@@ -394,7 +394,7 @@ fun BluetoothDeviceList(
                         fontWeight = FontWeight.Bold
                     )
                 }
-            }
+//            }
 
             items(pairedDevices) { device ->
                 if (device.name != null && device.name.take(9).lowercase() == "plantlink") {
@@ -406,12 +406,12 @@ fun BluetoothDeviceList(
                 }
             }
             items(scannedDevices) { device ->
-                if (device.name != null && device.name.take(9).lowercase() == "plantlink") {
+//                if (device.name != null && device.name.take(9).lowercase() == "plantlink") {
                     BluetoothDeviceCard(
                         device = device,
                         onClick = onClick
                     )
-                }
+//                }
             }
         }
     }

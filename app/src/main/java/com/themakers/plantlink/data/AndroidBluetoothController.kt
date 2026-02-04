@@ -10,7 +10,9 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -44,9 +46,9 @@ class AndroidBluetoothController(
         bluetoothManager?.adapter
     }
 
-    private val bluetoothLeScanner: BluetoothLeScanner? by lazy {
-        bluetoothAdapter?.bluetoothLeScanner
-    }
+    // Use instead of by lazy to fetch current value instead of cached possible null value
+    private val bluetoothLeScanner: BluetoothLeScanner?
+        get() = bluetoothAdapter?.bluetoothLeScanner
 
     //private var scanning = false
 
@@ -140,7 +142,18 @@ class AndroidBluetoothController(
 
         _isScanning.value = true
 
-        bluetoothLeScanner!!.startScan(leScanCallback)
+        val filters = listOf(
+            ScanFilter.Builder()
+                .setDeviceName("PlantLink Development Device")
+                .build()
+        )
+
+        // This is more aggressive and better at picking up devices that just started broadcasting.
+        val settings = ScanSettings.Builder()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .build()
+
+        bluetoothLeScanner!!.startScan(filters, settings, leScanCallback)
 
 
         //bluetoothAdapter?.startDiscovery()
