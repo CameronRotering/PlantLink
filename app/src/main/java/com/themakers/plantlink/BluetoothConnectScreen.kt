@@ -4,60 +4,64 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Button
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.themakers.plantlink.Bluetooth.BluetoothDevice
+import com.themakers.plantlink.Bluetooth.BluetoothDeviceCard
 import com.themakers.plantlink.Bluetooth.BluetoothUiState
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
-import com.themakers.plantlink.Bluetooth.ConnectThread
-import com.themakers.plantlink.Bluetooth.ConnectedThread
-
-fun connectBluetoothDevice(context: Context, viewModel: BluetoothViewModel, plantViewModel: PlantDataViewModel, connectBluetooth: ConnectThread) {
-    if (connectBluetooth.mSocket == null) { // Not connected
-        connectBluetooth.setThread(viewModel.btModule!!, viewModel.uuid, context)
-        //connectBluetooth = ConnectThread(viewModel.btModule!!, viewModel.uuid, context)
-        connectBluetooth.run()
-    }
-
-    if (connectBluetooth.getSocket()?.isConnected == true) {
-        if (viewModel.connectedThread == null) {
-            viewModel.setThread(ConnectedThread(connectBluetooth.getSocket()!!, plantViewModel))
-        }
-    }
-}
+import com.themakers.plantlink.composables.BottomToolBar
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 
 @SuppressLint("MissingPermission")
@@ -73,13 +77,39 @@ fun BluetoothConnectScreen(
     plantViewModel: PlantDataViewModel
 ) {
     val lazyListState = rememberLazyListState()
+    val scaleAnimatable =  remember { Animatable(1f) }
 
-    val connectBluetooth = ConnectThread()
+
+    LaunchedEffect(state.isScanning) {
+        if (state.isScanning) {
+            scaleAnimatable.snapTo(1f)
+
+            // Start the infinite loop
+            scaleAnimatable.animateTo(
+                targetValue = 0.35f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(
+                        2000,
+                        easing = EaseInOut
+                    ),
+                    repeatMode = RepeatMode.Reverse
+                )
+            )
+        } else {
+            // Stop/Reset the animation when not scanning
+            scaleAnimatable.snapTo(1f)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        onStartScan()
+        delay(15.seconds)
+        onStopScan()
+    }
 
     Scaffold(
-        //backgroundColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     navigationIconContentColor = MaterialTheme.colorScheme.secondary
@@ -88,91 +118,13 @@ fun BluetoothConnectScreen(
                     Text(
                         text = "Bluetooth",
                         color = MaterialTheme.colorScheme.secondary,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(0.dp, 0.dp, 50.dp, 0.dp),
+                        style = MaterialTheme.typography.titleMedium
                     )
                 }
             )
         },
-        bottomBar = {
-            NavigationBar(
-                containerColor = Color(226, 114, 91, 255),//MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.secondary
-            ) {
-                NavigationBarItem(
-                    colors = NavigationBarItemDefaults.colors(
-                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                        selectedIconColor = Color(0, 0, 0, 255),
-                        indicatorColor = MaterialTheme.colorScheme.background
-                    ),
-                    selected = false,
-                    onClick = {
-                        navController.navigate("Home")
-                    },
-                    label = {
-                        Text(
-                            text = "Home",
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 15.sp
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Filled.Home,
-                            contentDescription = "Home"
-                        )
-                    }
-                )
-                NavigationBarItem(
-                    colors = NavigationBarItemDefaults.colors(
-                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                        selectedIconColor = Color(0, 0, 0, 255),
-                        indicatorColor = MaterialTheme.colorScheme.background
-                    ),
-                    selected = false,
-                    onClick = {
-                        navController.navigate("Settings")
-                    },
-                    label = {
-                        Text(
-                            text = "Settings",
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontSize = 15.sp
-                        )
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Outlined.Settings,
-                            contentDescription = "Settings"
-                        )
-                    }
-                )
-                //NavigationBarItem(
-                //    colors = NavigationBarItemDefaults.colors(
-                //        unselectedIconColor = MaterialTheme.colorScheme.secondary,
-                //        selectedIconColor = Color(0, 0, 0, 255),
-                //        indicatorColor = MaterialTheme.colorScheme.background
-                //    ),
-                //    selected = false,
-                //    onClick = {},
-                //    label = {
-                //        Text(
-                //            text = "History",
-                //            color = MaterialTheme.colorScheme.secondary,
-                //            fontSize = 15.sp
-                //        )
-                //    },
-                //    icon = {
-                //        Icon(
-                //            painter = painterResource(R.drawable.baseline_bar_chart_24),
-                //            contentDescription = "Bar Chart"
-                //        )
-                //    }
-                //)
-            }
-        }
+        bottomBar = { BottomToolBar(navController = navController) },
+        contentWindowInsets = WindowInsets.safeContent // Safe content so no content is hidden under system things like camera AND is interactive
     ) { padding ->
         Column(
             verticalArrangement = Arrangement.Bottom,
@@ -185,59 +137,44 @@ fun BluetoothConnectScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(450.dp)
+//                    .graphicsLayer {
+//                        val currentScale = scaleAnimatable.value
+//
+//                        scaleX = currentScale
+//                        scaleY = currentScale
+//                        this.alpha = alpha
+//                        transformOrigin = TransformOrigin(0.5f, 1f) // Grow from bottom
+//                    }
             )
         }
+
         Column(
-            modifier = Modifier.fillMaxSize()
-                .padding(padding)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                Button(onClick = onStartScan) {
-                    Text(text = "Start Scan")
-                }
-
-                Button(onClick = onStopScan) {
-                    Text(text = "Stop Scan")
-                }
-            }
-
             BluetoothDeviceList(
                 pairedDevices = state.pairedDevices,
                 scannedDevices = state.scannedDevices,
                 onClick = {device -> // When a bluetooth device is selected
-
-                    viewModel.stopScan() // Recommended to not be scanning while connecting    Scanning is battery intensive
-
-                    //if (device.device == viewModel.btModule) { // If clicking on the same device
-                        //viewModel.setCharacteristicNotification()
-                        //viewModel.getServices()
-                    //} else
                     if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") { // Invites possibilities of "PlantLink310" Working
-                        Log.e("Log", "PlantLink Clicked!")
-//                                                                          PROBLEM, no UUID
                         if (device.device != viewModel.btModule) {// && device.device!!.uuids[0].uuid != viewModel.uuid) { // If connecting to different device or first device to connect to
-                            connectBluetooth.mSocket = null
+                            viewModel.stopScan() // Recommended to not be scanning while connecting    Scanning is battery intensive
 
-                            viewModel.setGatt(
-                                context = context,
-                                device = device.device!!,
-                                autoConnect = false
-                            )
+                            state.isConnected = 1
 
 
-                            //viewModel.setCharacteristicNotification()
-
-                            //viewModel.setUUID(device.device!!.uuids[0].uuid)
-                            //viewModel.setModule(device.device)
-//
-                            //connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
-                        } else if (connectBluetooth.mSocket == null) { // If the socket is null (possibly due to error in connection) allow retry of connection
-                            //connectBluetoothDevice(context, viewModel, plantViewModel, connectBluetooth)
-                        }   // If same device and socket isn't null, do nothing
+                            // Update: Thread might be unnecessary due to fixing of the connection status and forcing user to wait for full connection
+                            // Perform Bluetooth connection in a background thread so Bluetooth still connects when switching pages
+                            //Thread {
+                                viewModel.setGatt(
+                                    context = context,
+                                    device = device.device!!,
+                                    autoConnect = false
+                                )
+                            //}.start()
+                        }
                     } else {
                         Toast.makeText(
                             context,
@@ -248,65 +185,233 @@ fun BluetoothConnectScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth(),
-                lazyListState = lazyListState
+                lazyListState = lazyListState,
+                onStartScan = onStartScan,
+                onStopScan = onStopScan,
+                state = state
             )
+
+            // Using a regular row brings in loading circle from left while
+            // lazy row brings in loading circle from top
+            // (added in specific animation details to only come in from top)
+//            LazyRow(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.SpaceAround
+//            ) {
+//                item {
+//                    LoadingAnimation(isScanning = state.isScanning)
+//                }
+//
+//            }
+
+//            LazyRow(
+//                modifier = Modifier
+//                    .fillMaxWidth(),
+//                horizontalArrangement = Arrangement.SpaceAround
+//            ) {
+//                item {
+//                    LoadingAnimation(isScanning = state.isConnected, color = Color(255, 0, 0))
+//                }
+//
+//            }
+        }
+
+
+        Column(
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                LoadingAnimation(isConnected = state.isConnected, color = Color(255, 0, 0))
+            }
+        }
+    }
+
+    // TODO: Every time entering the page, it re checks this. If already connected and go back to this page, restates "connected to device"
+
+    LaunchedEffect(state.isConnected) {
+
+        if (state.isConnected == 2) {
+            Toast.makeText(
+                context,
+                "Connected to PlantLink device.",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        // When page is opened it detects as 0 and says unable to connect
+        // and when connecting to a different device while already connected, this might say unable to connect.
+//        else if (state.isConnected == 0) {
+//            Toast.makeText(
+//                context,
+//                "Unable to connect to PlantLink device.",
+//                Toast.LENGTH_LONG
+//            ).show()
+//        }
+
+        Log.w("BT CONNECT STATE CHANGE", state.isConnected.toString())
+    }
+}
+
+@Composable
+fun LoadingAnimation(modifier: Modifier = Modifier, isScanning: Boolean, containerColor: Color = Color.Transparent, color: Color = Color(0, 255, 0)) {
+    AnimatedVisibility(
+        visible = isScanning,
+        enter = expandVertically(expandFrom = Alignment.Top),
+    ) {
+        val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
+        val rotation by infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            label = "rotation",
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 1000)
+            )
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = modifier
+                    .size(60.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Canvas(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    drawCircle(
+                        color = containerColor,
+                        radius = size.minDimension / 2
+                    )
+
+
+                }
+
+                CircularProgressIndicator(
+                    strokeWidth = 5.dp,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .rotate(rotation),
+                    color = color
+                )
+            }
         }
     }
 }
 
+@Composable
+fun LoadingAnimation(modifier: Modifier = Modifier, isConnected: Int, color: Color = Color(0, 255, 0)) {
+    AnimatedVisibility(
+        visible = isConnected == 1,
+        enter = expandVertically(expandFrom = Alignment.Top),
+    ) {
+        val infiniteTransition = rememberInfiniteTransition(label = "infinite transition")
+        val rotation by infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            label = "rotation",
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 1000)
+            )
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = modifier
+                    .size(60.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    strokeWidth = 5.dp,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .rotate(rotation),
+                    color = color
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun BluetoothDeviceList(
     pairedDevices: List<BluetoothDevice>,
     scannedDevices: List<BluetoothDevice>,
     onClick: (BluetoothDevice) -> Unit,
+    onStartScan: () -> Unit,
+    onStopScan: () -> Unit,
+    state: BluetoothUiState,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState
 ) {
-    LazyColumn(
-        modifier = modifier,
-        state = lazyListState
-    ) {
-        item {
-            Text(
-                text = "Paired Devices",
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
+    val pullToRefreshState = rememberPullToRefreshState()
+    val coroutineScope = rememberCoroutineScope()
 
-        items(pairedDevices) { device ->
-            if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
-                Text(
-                    text = device.name,// ?:  "(No Name)",//device.address!!,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onClick(device) }
-                        .padding(16.dp)
-                )
+    PullToRefreshBox(
+        isRefreshing = state.isScanning,
+        onRefresh = {
+            coroutineScope.launch {
+                onStartScan()
+                delay(15.seconds)
+                onStopScan()
             }
-        }
 
+        },
+        modifier = Modifier
+            .fillMaxSize(),
+        state = pullToRefreshState,
+        //contentAlignment = Alignment.Center,
 
-        item {
-            Text(
-                text = "Scanned Devices",
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            state = lazyListState
+        ) {
+//            if(pairedDevices.none{ device -> (device.name != null && device.name.take(9).lowercase() == "plantlink")}
+//                && scannedDevices.none{ device -> (device.name != null && device.name.take(9).lowercase() == "plantlink") }) {
+                item {
+                    Spacer(modifier = Modifier.padding(top = 10.dp))
 
-        items(scannedDevices) { device ->
-            if (device.name != null && device.name.length >= 9 && device.name.substring(0, 9).lowercase() == "plantlink") {
-                Text(
-                    text = device.name,// ?: "(No Name)",//device.address!!,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onClick(device) }
-                        .padding(16.dp)
-                )
+                    Text(
+                        text = "No PlantLink devices found.",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+//            }
+
+            items(pairedDevices) { device ->
+                if (device.name != null && device.name.take(9).lowercase() == "plantlink") {
+                    BluetoothDeviceCard(
+                        device = device,
+                        onClick = onClick,
+                        paired = true
+                    )
+                }
+            }
+            items(scannedDevices) { device ->
+//                if (device.name != null && device.name.take(9).lowercase() == "plantlink") {
+                    BluetoothDeviceCard(
+                        device = device,
+                        onClick = onClick
+                    )
+//                }
             }
         }
     }

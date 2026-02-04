@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.nfc.FormatException
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
@@ -23,6 +24,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -31,7 +33,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
@@ -39,16 +44,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
-import com.themakers.plantlink.HistoryPage.HistoryPage
+import com.themakers.plantlink.HistoryPage.HubHistoryPage
+import com.themakers.plantlink.HistoryPage.PlantHistoryPage
 import com.themakers.plantlink.MainPage.MainPage
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
 import com.themakers.plantlink.SettingsPage.PlantSettingsPage
 import com.themakers.plantlink.SettingsPage.SettingsPage
 import com.themakers.plantlink.data.AndroidBluetoothController
 import com.themakers.plantlink.data.BluetoothLeService
+import com.themakers.plantlink.data.HubDevice
 import com.themakers.plantlink.data.PlantDevice
 import com.themakers.plantlink.data.SettingsDatabase
-import com.themakers.plantlink.ui.theme.PlantLInkTheme
+import com.themakers.plantlink.ui.theme.PlantLinkTheme
 import java.io.IOException
 import java.io.UnsupportedEncodingException
 import kotlin.experimental.and
@@ -92,9 +99,25 @@ class MainActivity : ComponentActivity() {
     var nfcText = ""
 
     val plantDeviceList = mutableListOf<PlantDevice>(
-        PlantDevice("00:00:00:00:00:00", "Galaxy Petunia", "1", "10")
+        PlantDevice("00:00:00:00:00:00", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:01", "Galaxy Petunia", "1", "10"), // For testing
+        //PlantDevice("00:00:00:00:00:02", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:03", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:04", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:05", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:06", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:07", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:08", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:09", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:10", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:11", "Galaxy Petunia", "1", "10"),
+        //PlantDevice("00:00:00:00:00:12", "Galaxy Petunia", "1", "10")
     )
 
+    var hasBtPermission by mutableStateOf(false)
+        private set
+
+    val hubDevice = mutableStateOf(HubDevice("00:00:00:00:00:00", "Hub"))
 
     private val nfcManager by lazy {
         applicationContext.getSystemService(NfcManager::class.java)
@@ -102,7 +125,6 @@ class MainActivity : ComponentActivity() {
     private val nfcAdapter by lazy {
         nfcManager.defaultAdapter
     }
-
 
     private val bluetoothManager by lazy {
         applicationContext.getSystemService(BluetoothManager::class.java)
@@ -157,6 +179,7 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         val gattServiceIntent = Intent(this, BluetoothLeService::class.java)
         bindService(gattServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
@@ -168,10 +191,8 @@ class MainActivity : ComponentActivity() {
                 "This device does not support NFC.",
                 Toast.LENGTH_LONG
             ).show()
-            //finish()
         }
 
-        //readFromIntent(intent)
         pendingIntent = PendingIntent.getActivity(applicationContext, 0, Intent(applicationContext, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_IMMUTABLE) // was 0
         val tagDetected = IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED)
@@ -181,6 +202,7 @@ class MainActivity : ComponentActivity() {
 
         val plantViewModel = PlantDataViewModel()
 
+        viewModel = BluetoothViewModel(AndroidBluetoothController(applicationContext, plantDeviceList, hubDevice)) // was at around line 232
 
         val enableBluetoothLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -189,39 +211,52 @@ class MainActivity : ComponentActivity() {
         val permissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { perms ->
-            val canEnableBluetooth = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                perms[Manifest.permission.BLUETOOTH_CONNECT] == true
-            } else true
+            val allPermissionsGranted = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                perms.getOrDefault(Manifest.permission.BLUETOOTH_CONNECT, false) &&
+                perms.getOrDefault(Manifest.permission.BLUETOOTH_SCAN, false)
+            } else {
+                true
+            }
 
+            hasBtPermission = allPermissionsGranted
 
-            if (canEnableBluetooth && !isBluetoothEnabled) {
-                enableBluetoothLauncher.launch(
-                    Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-                )
+            // These checks run when prompting for permissions (calling the permissionLauncher object)
+            if (allPermissionsGranted) {
+                if (!isBluetoothEnabled) {
+                    enableBluetoothLauncher.launch(
+                        Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+                    )
+                }
+            } else {
+                Toast.makeText(
+                    applicationContext,
+                    "Bluetooth permissions are required. Please enable in the app settings.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
 
-        permissionLauncher.launch(
-            arrayOf(
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val permissions = arrayOf(
                 Manifest.permission.BLUETOOTH_SCAN,
-                Manifest.permission.BLUETOOTH_CONNECT,
-                Manifest.permission.NFC
-                )
-        )
+                Manifest.permission.BLUETOOTH_CONNECT
+            )
+            val allPermissionsGranted = permissions.all {
+                ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
+            }
+            if (!allPermissionsGranted) {
+                permissionLauncher.launch(permissions)
+            } else {
+                hasBtPermission = true
+            }
+        } else {
+            hasBtPermission = true
+        }
 
         setContent {
-
-            // Instances of BT manager and BT adapter needed to work with BT in android // Disable because when committing it said bluetoothAdapter never used and it was set above
-            //val bluetoothManager: BluetoothManager = getSystemService(BluetoothManager::class.java)
-            //var bluetoothAdapter: BluetoothAdapter = bluetoothManager.adapter
-
-
-
-            PlantLInkTheme {
+            PlantLinkTheme {
                 val settingsState by settingsViewModel.state.collectAsState()
-
-                viewModel = BluetoothViewModel(AndroidBluetoothController(applicationContext, plantDeviceList))
 
                 viewModel!!.setControllerViewModel(viewModel!!)
 
@@ -243,12 +278,14 @@ class MainActivity : ComponentActivity() {
                             MainPage(
                                 context = applicationContext,
                                 navController = navController,
-                                viewModel = viewModel!!,
                                 plantViewModel = plantViewModel,
                                 state = settingsState,
                                 onEvent = settingsViewModel::onEvent,
                                 clickedPlantViewModel = selectedPlantViewModel,
-                                plantDeviceList = plantDeviceList
+                                plantDeviceList = plantDeviceList,
+                                hubDevice = hubDevice,
+                                permissionLauncher = permissionLauncher,
+                                hasBTPermission = hasBtPermission
                             )
                         }
 
@@ -257,12 +294,15 @@ class MainActivity : ComponentActivity() {
                                 navController = navController,
                                 context = applicationContext,
                                 state = settingsState,
-                                onEvent = settingsViewModel::onEvent
+                                onEvent = settingsViewModel::onEvent,
+                                permissionLauncher = permissionLauncher,
+                                hasBTPermission = hasBtPermission
                             )
                         }
 
                         composable("PlantLinkSettings") {
                             PlantSettingsPage(
+                                destinationName = "PlantLinkSettings",
                                 navController = navController,
                                 context = applicationContext,
                                 plantViewModel = selectedPlantViewModel,
@@ -270,12 +310,23 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable("HistoryPage") {
-                            HistoryPage(
-                                navController = navController,
+                        composable("PlantHistoryPage") {
+                            PlantHistoryPage(
+                                destinationName = "PlantHistoryPage",
                                 context = applicationContext,
+                                navController = navController,
                                 plantViewModel = selectedPlantViewModel,
                                 state = settingsState
+                            )
+                        }
+
+                        composable("HubHistoryPage") {
+                            HubHistoryPage(
+                                destinationName = "HubHistoryPage",
+                                context = applicationContext,
+                                navController = navController,
+                                state = settingsState,
+                                hubDevice = hubDevice
                             )
                         }
 
@@ -298,7 +349,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onStop() { // When out of application, disconnect from bluetooth (Just in case they keep app on for a long time). Might not even be doing but be safe
         viewModel?.stopScan()
-        viewModel?.connectedThread?.cancel()
         super.onStop()
     }
 
@@ -335,7 +385,7 @@ class MainActivity : ComponentActivity() {
             "UTF-16"
         }
         val languageCodeLength: Int =
-            (payload[0] and 0b00111111).toInt()// Get language code Ex: "en
+            (payload[0] and 0b00111111).toInt()// Get language code Ex: "en"
 
         try {
             text = java.lang.String(

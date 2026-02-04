@@ -10,12 +10,14 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.util.Log
-import android.widget.Toast
+import androidx.compose.runtime.MutableState
 import com.themakers.plantlink.Bluetooth.BluetoothController
 import com.themakers.plantlink.Bluetooth.BluetoothDeviceDomain
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
@@ -29,7 +31,8 @@ import java.util.UUID
 @SuppressLint("MissingPermission")
 class AndroidBluetoothController(
     private val context: Context,
-    private val plantDevices: MutableList<PlantDevice>
+    private val plantDevices: MutableList<PlantDevice>,
+    private var hubDevice: MutableState<HubDevice>
 ): BluetoothController {
     var viewModel: BluetoothViewModel? = null
 
@@ -43,11 +46,22 @@ class AndroidBluetoothController(
         bluetoothManager?.adapter
     }
 
-    private val bluetoothLeScanner: BluetoothLeScanner? by lazy {
-        bluetoothAdapter?.bluetoothLeScanner
-    }
+    // Use instead of by lazy to fetch current value instead of cached possible null value
+    private val bluetoothLeScanner: BluetoothLeScanner?
+        get() = bluetoothAdapter?.bluetoothLeScanner
 
-    private var scanning = false
+    //private var scanning = false
+
+    private val _isScanning = MutableStateFlow(false)
+    val isScanning: StateFlow<Boolean>
+        get() = _isScanning.asStateFlow()
+
+    private val _isConnected = MutableStateFlow(0)
+    var isConnected: StateFlow<Int>
+        get() = _isConnected.asStateFlow()
+        set(value) {
+            _isConnected.value = value.value
+        }
 
     private val _scannedDevices = MutableStateFlow<List<BluetoothDeviceDomain>>(emptyList())
     override val scannedDevices: StateFlow<List<BluetoothDeviceDomain>>
@@ -114,7 +128,7 @@ class AndroidBluetoothController(
 //            return
 //        }
 
-        if (scanning || bluetoothLeScanner == null) { // The BluetoothLeScanner is only available from the BluetoothAdapter if Bluetooth is currently enabled on the device. If Bluetooth is not enabled, then getBluetoothLeScanner() returns null.
+        if (_isScanning.value || bluetoothLeScanner == null) { // The BluetoothLeScanner is only available from the BluetoothAdapter if Bluetooth is currently enabled on the device. If Bluetooth is not enabled, then getBluetoothLeScanner() returns null.
             return
         }
 
@@ -126,9 +140,20 @@ class AndroidBluetoothController(
 
         updatePairedDevices()
 
-        scanning = true
+        _isScanning.value = true
 
-        bluetoothLeScanner!!.startScan(leScanCallback)
+        val filters = listOf(
+            ScanFilter.Builder()
+                .setDeviceName("PlantLink Development Device")
+                .build()
+        )
+
+        // This is more aggressive and better at picking up devices that just started broadcasting.
+        val settings = ScanSettings.Builder()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .build()
+
+        bluetoothLeScanner!!.startScan(filters, settings, leScanCallback)
 
 
         //bluetoothAdapter?.startDiscovery()
@@ -139,31 +164,57 @@ class AndroidBluetoothController(
 //            return
 //        }
 
-        if (!scanning || bluetoothLeScanner == null) { // The BluetoothLeScanner is only available from the BluetoothAdapter if Bluetooth is currently enabled on the device. If Bluetooth is not enabled, then getBluetoothLeScanner() returns null.
+        if (!_isScanning.value || bluetoothLeScanner == null) { // The BluetoothLeScanner is only available from the BluetoothAdapter if Bluetooth is currently enabled on the device. If Bluetooth is not enabled, then getBluetoothLeScanner() returns null.
             return
         }
 
         bluetoothLeScanner!!.stopScan(leScanCallback)
-        scanning = false
+        _isScanning.value = false
     }
 
 
 
     val gattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-            when (newState) {
+            when (newState) { // Cannot use toast on either connection state due to thread not calling looper.prepare
                 BluetoothProfile.STATE_CONNECTED -> {
                     // Successfully connected to the GATT Server.
                     // You can now call gatt.discoverServices() to discover available services.
+//                    Toast.makeText(
+//                        context,
+//                        "Bluetooth connected.",
+//                        Toast.LENGTH_LONG
+//                    ).show()
+
+                    _isConnected.value = 1 // Start of connecting process
+
+                    Log.w("CONNECTIONCHANGE", "Connection state change: " + _isConnected.value.toString())
+
+                    Log.w("BT CONNECT CHANGE", "Connected.")
+
                     gatt.discoverServices()
+
+                    // In gattCallbacks for services discovered, after all services are discovered, it will set
+                    // isConnected == 2
+                    //_isConnected.value = 2
                 }
+//                BluetoothProfile.STATE_CONNECTING -> {
+//                    Log.w("BT CONNECT CHANGE", "Connecting.")
+//                    _isConnecting.value = true
+//                }
+//                BluetoothProfile.STATE_DISCONNECTING -> {
+//                    Log.w("BT CONNECT CHANGE", "Disconnecting.")
+//                }
                 BluetoothProfile.STATE_DISCONNECTED -> {
                     // Disconnected from the GATT Server.
-                    Toast.makeText(
-                        context,
-                        "Bluetooth disconnected.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Log.w("BT CONNECT CHANGE", "Disconnected.")
+                    _isConnected.value = 0
+
+//                    Toast.makeText(
+//                        context,
+//                        "Bluetooth disconnected.",
+//                        Toast.LENGTH_LONG
+//                    ).show()
                 }
             }
         }
@@ -177,6 +228,80 @@ class AndroidBluetoothController(
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 val buffer: ByteArray = value
 
+                // If hub, don't search peripherals
+                if (characteristic.service.uuid == UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40")) { // UUID for hub
+                    when (characteristic.uuid) {
+                        UUID.fromString("7ccecf3a-cb17-4f62-b22d-671639009fc8") -> { // Temperature
+                            hubDevice.value.setTemp(String(buffer, 0, buffer.size).toDouble())
+                        }
+
+                        UUID.fromString("75171ef4-4fc5-4fd4-a393-8f4cc2f9fbcd") -> { // Humidity
+                            hubDevice.value.setHumid(String(buffer, 0, buffer.size).toDouble())
+                        }
+
+
+                        UUID.fromString("dd72366c-d8a0-4c29-9943-30234819a3a2") -> { // Light
+                            hubDevice.value.setAmbientLight(String(buffer, 0, buffer.size).toLong())
+                        }
+                    }
+                } else {
+                    for (i in plantDevices) {
+                        if (i.device == characteristic.service) {
+                            when (characteristic.uuid) {
+                                // Settings characteristics
+
+                                UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36") -> {
+                                    i.setName(String(buffer, 0, buffer.size))
+                                }
+
+                                UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9") -> {
+                                    i.setMinMoist(String(buffer, 0, buffer.size))
+                                }
+
+                                UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1") -> {
+                                    i.setMaxMoist(String(buffer, 0, buffer.size))
+                                }
+
+                                // End of Settings
+
+                                UUID.fromString("e41a3376-0c2a-4366-bf6e-43e3b59ab962") -> { // Soil Moisture
+                                    i.setMoist(String(buffer, 0, buffer.size).toDouble())
+                                }
+                            }
+                            break // Don't look through any other services if already found and changed the one
+                        }
+                    }
+                }
+
+                Log.w("CHARACTERISTIC READ VALUE", String(buffer, 0, buffer.size))
+            } else {
+                Log.e("CHARACTERISTIC READ ERROR", "Error reading characteristic: ${characteristic.uuid} from server ${characteristic.service.uuid}")
+            }
+        }
+
+        override fun onCharacteristicChanged(
+            gatt: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic, //Characteristic that has been updated as a result of a remote notification event. This value cannot be null.
+            value: ByteArray // notified characteristic value This value cannot be null.
+        ) {
+            val buffer: ByteArray = value
+
+            // If hub, don't search peripherals
+            if (characteristic.service.uuid == UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40")) { // UUID for hub
+                when (characteristic.uuid) {
+                    UUID.fromString("7ccecf3a-cb17-4f62-b22d-671639009fc8") -> { // Temperature
+                        hubDevice.value.setTemp(String(buffer, 0, buffer.size).toDouble())
+                    }
+
+                    UUID.fromString("75171ef4-4fc5-4fd4-a393-8f4cc2f9fbcd") -> { // Humidity
+                        hubDevice.value.setHumid(String(buffer, 0, buffer.size).toDouble())
+                    }
+
+                    UUID.fromString("dd72366c-d8a0-4c29-9943-30234819a3a2") -> { // Light
+                        hubDevice.value.setAmbientLight(String(buffer, 0, buffer.size).toLong())
+                    }
+                }
+            } else {
                 for (i in plantDevices) {
                     if (i.device == characteristic.service) {
                         when (characteristic.uuid) {
@@ -196,75 +321,12 @@ class AndroidBluetoothController(
 
                             // End of Settings
 
-                            UUID.fromString("7ccecf3a-cb17-4f62-b22d-671639009fc8") -> {
-                                i.setTemp(String(buffer, 0, buffer.size).toDouble())
-                            }
-
-                            UUID.fromString("75171ef4-4fc5-4fd4-a393-8f4cc2f9fbcd") -> { // Humidity
-                                i.setHumid(String(buffer, 0, buffer.size).toDouble())
-                            }
-
                             UUID.fromString("e41a3376-0c2a-4366-bf6e-43e3b59ab962") -> { // Soil Moisture
                                 i.setMoist(String(buffer, 0, buffer.size).toDouble())
-                            }
-
-                            UUID.fromString("dd72366c-d8a0-4c29-9943-30234819a3a2") -> { // Light
-                                i.setLight(String(buffer, 0, buffer.size).toDouble())
                             }
                         }
                         break // Don't look through any other services if already found and changed the one
                     }
-                }
-
-                Log.w("CHARACTERISTIC READ VALUE", String(buffer, 0, buffer.size))
-            } else {
-                Log.e("CHARACTERISTIC READ ERROR", "Error reading characteristic: ${characteristic.uuid} from server ${characteristic.service.uuid}")
-            }
-        }
-
-        override fun onCharacteristicChanged(
-            gatt: BluetoothGatt,
-            characteristic: BluetoothGattCharacteristic, //Characteristic that has been updated as a result of a remote notification event. This value cannot be null.
-            value: ByteArray // notified characteristic value This value cannot be null.
-        ) {
-            val buffer: ByteArray = value
-
-            for (i in plantDevices) {
-                if (i.device == characteristic.service) {
-                    when (characteristic.uuid) {
-                        // Settings characteristics
-
-                        UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36") -> {
-                            i.setName(String(buffer, 0, buffer.size))
-                        }
-
-                        UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9") -> {
-                            i.setMinMoist(String(buffer, 0, buffer.size))
-                        }
-
-                        UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1") -> {
-                            i.setMaxMoist(String(buffer, 0, buffer.size))
-                        }
-
-                        // End of Settings
-
-                        UUID.fromString("7ccecf3a-cb17-4f62-b22d-671639009fc8") -> {
-                            i.setTemp(String(buffer, 0, buffer.size).toDouble())
-                        }
-
-                        UUID.fromString("75171ef4-4fc5-4fd4-a393-8f4cc2f9fbcd") -> { // Humidity
-                            i.setHumid(String(buffer, 0, buffer.size).toDouble())
-                        }
-
-                        UUID.fromString("e41a3376-0c2a-4366-bf6e-43e3b59ab962") -> { // Soil Moisture
-                            i.setMoist(String(buffer, 0, buffer.size).toDouble())
-                        }
-
-                        UUID.fromString("dd72366c-d8a0-4c29-9943-30234819a3a2") -> { // Light
-                            i.setLight(String(buffer, 0, buffer.size).toDouble())
-                        }
-                    }
-                    break // Don't look through any other services if already found and changed the one
                 }
             }
 
@@ -277,21 +339,39 @@ class AndroidBluetoothController(
         ) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 plantDevices.clear() // Clear any old services to link to any new
+                hubDevice.value = HubDevice("00:00:00:00:00:00", "Hub Device", null) // Clear hub as well
 
                 gatt.services.forEach { service ->
-                    if (service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) {
-                        plantDevices.add(PlantDevice("00:00:00:00:00:00", "Set Up Plant", "1", "10", service))
+                    if (service.uuid == UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40")) { // Change to service for hub
+                        hubDevice.value = HubDevice("00:00:00:00:00:00", "Hub Device", service)
+                    } else if (service.uuid != UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40") && service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) { // If not hub UUID and not General services aka an actual peripheral device.
+                        plantDevices.add(PlantDevice("00:00:00:00:00:00", "Plant Name", "1", "10", service))
                     }
                 }
 
                 viewModel?.setCharacteristicNotification()
+            } else if (status == BluetoothGatt.GATT_FAILURE) {
+                Log.e("CONNECTIONCHANGE", "Failed to discover services.")
+
+                _isConnected.value = 0 // Set to disconnected if failed to discover services
+            }
+
+
+            Log.w("CONNECTIONCHANGE", "End of connecting process: " + _isConnected.value.toString())
+
+            /*
+            Only if still connecting, set status to fully connected at end of services being discovered.
+             */
+
+            if(_isConnected.value == 1) {
+                Log.w("CONNECTIONCHANGE", "Services have been discovered. Setting connection to 'Connected'.")
+
+                _isConnected.value = 2
             }
         }
 
         // Othercallbacks like onCharacteristicRead, onCharacteristicWrite, etc.
     }
-
-
 
     override fun release() {
         context.unregisterReceiver(foundDeviceReceiver)

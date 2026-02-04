@@ -94,13 +94,16 @@ fun SimpleLineChart(
                     LineStyle(),
                     IntersectionPoint(),
                     SelectionHighlightPoint(),
-                    ShadowUnderLine(),
+                    ShadowUnderLine(), // This makes the gray underneath the line
                     SelectionHighlightPopUp()
                 )
             ),
         ),
         xAxisData = xAxisData,
         yAxisData = yAxisData,
+        paddingRight = 0.dp,
+        containerPaddingEnd = 30.dp,
+        isZoomAllowed = true,
         gridLines = null,
         backgroundColor = Color.White
     )
