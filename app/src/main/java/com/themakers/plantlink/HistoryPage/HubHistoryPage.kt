@@ -38,8 +38,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.themakers.plantlink.data.SettingState
 import co.yml.charts.common.model.Point // Keep for tempOverTime data structure, will be mapped
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
+import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
 import com.themakers.plantlink.composables.BottomToolBar
 import com.themakers.plantlink.data.HubDevice
 import com.themakers.plantlink.graphs.HumidityChart

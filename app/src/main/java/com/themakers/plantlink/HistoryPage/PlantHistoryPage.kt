@@ -36,11 +36,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
 import com.themakers.plantlink.SettingsPage.CurrClickedPlantViewModel
-import com.themakers.plantlink.data.SettingState
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.themakers.plantlink.composables.BottomToolBar
+import com.themakers.plantlink.data.SettingState
 import com.themakers.plantlink.graphs.SoilMoistureChart
 
 
