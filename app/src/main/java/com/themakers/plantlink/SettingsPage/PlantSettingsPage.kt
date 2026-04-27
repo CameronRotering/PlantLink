@@ -7,7 +7,6 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,9 +32,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -71,6 +73,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
@@ -157,8 +160,31 @@ fun PlantSettingsPage(
     var mExpanded by remember { mutableStateOf(false) }
 
     // List of plants for preset
-    val mAllPlants = listOf("Galaxy Petunia", "Plant 2", "Plant 3")
+    val mAllPlants = listOf(
+        "African Violet", "Aloe Vera", "Amaryllis", "Anthurium", "Areca Palm",
+        "Asparagus Fern", "Aster", "Azalea", "Baby's Tears", "Bamboo Palm",
+        "Basil", "Begonia", "Bird of Paradise", "Bleeding Heart", "Boston Fern",
+        "Bougainvillea", "Bromeliad", "Butterfly Bush", "Cactus", "Caladium",
+        "Calathea", "Calla Lily", "Camellia", "Cast Iron Plant", "Catnip",
+        "Chinese Evergreen", "Chinese Money Plant", "Christmas Cactus", "Chrysanthemum", "Coleus",
+        "Columbine", "Corn Plant", "Croton", "Cyclamen", "Daffodil",
+        "Dahlia", "Daisy", "Dieffenbachia", "Dragon Tree", "Dumb Cane",
+        "Elephant Ear", "English Ivy", "Eucalyptus", "Fiddle Leaf Fig", "Flamingo Flower",
+        "Gardenia", "Geranium", "Gerbera Daisy", "Gloxinia", "Golden Pothos",
+        "Hibiscus", "Hosta", "Hyacinth", "Hydrangea", "Impatiens",
+        "Jade Plant", "Jasmine", "Kalanchoe", "Lavender", "Lemon Balm",
+        "Lily of the Valley", "Lucky Bamboo", "Maidenhair Fern", "Marigold", "Money Tree",
+        "Monstera Deliciosa", "Morning Glory", "Mother in Law's Tongue", "Nerve Plant", "Orchid",
+        "Oxalis", "Painted Leaf Begonia", "Pansy", "Parlor Palm", "Peace Lily",
+        "Peony", "Peperomia", "Petunia", "Philodendron", "Pincushion Cactus",
+        "Polka Dot Plant", "Prayer Plant", "Rabbit's Foot Fern", "Rubber Plant", "Sago Palm",
+        "Schefflera", "Snake Plant", "Snapdragon", "Spider Plant", "Split Leaf Philodendron",
+        "String of Pearls", "String of Turtles", "Sunflower", "Swiss Cheese Plant", "Ti Plant",
+        "Tulip", "Umbrella Tree", "Venus Flytrap", "Yucca", "Zebra Plant"
+    )
+
     var mSearchedPlants by remember { mutableStateOf(mAllPlants) } // = mAllPlants
+    val searchedIter = mSearchedPlants.iterator()
 
     // Create a string value to store the selected city
     var mSelectedText by remember { mutableStateOf("") }
@@ -230,100 +256,98 @@ fun PlantSettingsPage(
 
             item {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                        //.padding(padding),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    //verticalArrangement = Arrangement.Center
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    OutlinedTextField(
-                        value = mSelectedText,
-                        onValueChange = {
-                            mSelectedText = it
-                            //mExpanded = true // This will constantly change focus to the drop-down menu items
+                    // Wrap both in a Box to anchor the dropdown to the text field
 
-                            //searchPlants(mSelectedText, mAllPlants)
-                        }, // Auto complete options to more easily find the plant they want
-                        enabled = true,
-                        modifier = Modifier
-                            .fillMaxWidth(0.75f)
-                            .height(75.dp)
-                            //.align(Alignment.CenterHorizontally)
-                            .onGloballyPositioned { coordinates ->
-                                // This value is used to assign to
-                                // the DropDown the same width
-                                mTextFieldSize = coordinates.size.toSize()
-                            },
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                mSearchedPlants = searchPlants(mSelectedText, mAllPlants)
-
-                                Log.d("SearchPlants", "Found plants: $mSearchedPlants")
-
-                                mExpanded = true
-
-                                focusManager.clearFocus()
-                            }
-                        ),
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Done
-                        ),
-                        label = {
-                            Text(
-                                text = "Plant Presets",
-                                color = MaterialTheme.colorScheme.secondary,
-                                textAlign = TextAlign.Center,
-                                fontSize = 20.sp
-                            )
-                        },
-                        singleLine = true,
-                        shape = MaterialTheme.shapes.small,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.background,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.primary,
-                            disabledContainerColor = MaterialTheme.colorScheme.background,
-                            unfocusedTextColor = Color(255, 255, 255, 255)
-                        ),
-                        trailingIcon = {
-                            Icon(
-                                icon,
-                                "Drop-Down Arrow",
-                                Modifier.clickable { mExpanded = !mExpanded }
-                            )
+                    ExposedDropdownMenuBox(
+                        expanded = mExpanded,
+                        onExpandedChange = {
+                            mExpanded = !mExpanded
                         }
-                    )
-
-                    Card(
-                        shape = MaterialTheme.shapes.small,
-                        colors = CardColors(
-                            containerColor = MaterialTheme.colorScheme.background,
-                            contentColor = MaterialTheme.colorScheme.secondary,
-                            disabledContainerColor = Color.Gray,
-                            disabledContentColor = Color.Gray
-                        ),
-                        elevation = CardDefaults.cardElevation(
-                            defaultElevation = 6.dp
-                        ),
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                        //border = BorderStroke(1.dp, Color.Black)
-
-                        //backgroundColor = MaterialTheme.colorScheme.background,
-                        //contentColor = MaterialTheme.colorScheme.secondary
                     ) {
-                        DropdownMenu(
+                        OutlinedTextField(
+                            value = mSelectedText,
+                            onValueChange = {
+                                mSelectedText = it
+
+                                mSearchedPlants = searchPlants(it, mAllPlants) // Moving here looks more responsive and can better (quicker) help someone find a plant name
+
+                                mExpanded = mSearchedPlants.isNotEmpty()
+                            },
+                            enabled = true,
+                            modifier = Modifier
+                                .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryEditable) // Without this, the text field consumes all
+                                .fillMaxWidth(0.75f)
+                                .height(75.dp)
+                                .focusRequester(focusRequester) // Added as suggestion from logcat
+                                .onGloballyPositioned { coordinates ->
+                                    // Capture the size of the text field
+                                    mTextFieldSize = coordinates.size.toSize()
+                                },
+                            keyboardActions = KeyboardActions(
+                                onSearch = {
+                                    mSearchedPlants = searchPlants(mSelectedText, mAllPlants)
+                                    mExpanded = true
+                                    focusManager.clearFocus()
+                                }
+                            ),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                            label = {
+                                Text(
+                                    text = "Plant Presets",
+                                    //color = MaterialTheme.colorScheme.secondary,
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 20.sp
+                                )
+                            },
+                            singleLine = true,
+                            shape = MaterialTheme.shapes.small,
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = MaterialTheme.colorScheme.background,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.primary,
+                                disabledContainerColor = MaterialTheme.colorScheme.background,
+                                unfocusedTextColor = Color(255, 255, 255),
+                                focusedTextColor = Color(0, 0, 0),
+                                unfocusedLabelColor = Color(0, 0, 0),
+                                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                                focusedTrailingIconColor = MaterialTheme.colorScheme.primary,
+                                unfocusedTrailingIconColor = Color(255, 255, 255)
+                            ),
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon( // This auto handles the logic for an arrow and uses the default arrow
+                                    expanded = mExpanded,
+                                    modifier = Modifier
+                                        .size(36.dp)
+
+                                )
+//                                Icon(
+//                                    icon,
+//                                    "Drop-Down Arrow",
+//                                    Modifier.clickable {
+//                                        // To avoid conflict if ever slow, update list first
+//                                        if (!mExpanded) { // If you search a plant (1 out of the many other options), hit search, clear the text, you will still only see the plant so re-evaluate on clicking down arrow
+//                                            mSearchedPlants = searchPlants(mSelectedText, mAllPlants)
+//                                        }
+//
+//                                        mExpanded = !mExpanded
+//                                    }
+//                                )
+                            }
+                        )
+
+
+
+                        ExposedDropdownMenu(
                             expanded = mExpanded,
                             onDismissRequest = { mExpanded = false },
-                            modifier = Modifier
-                                //.align(Alignment.CenterHorizontally)
-                                .fillMaxWidth(0.75f),
-                                //.width(with(LocalDensity.current) {
-                                //    mTextFieldSize.width.toDp()
-                                //}),
                             containerColor = MaterialTheme.colorScheme.primary,
-                            border = BorderStroke(1.dp, Color.Black)
+                            border = BorderStroke(1.dp, Color.Black),
+                            modifier = Modifier
+                                //.fillMaxHeight(0.5f)
                         ) {
-                            mSearchedPlants.forEach { label ->
+                            searchedIter.forEach { label ->
                                 DropdownMenuItem(
                                     text = {
                                         Text(
@@ -331,19 +355,38 @@ fun PlantSettingsPage(
                                             color = MaterialTheme.colorScheme.secondary,
                                             textAlign = TextAlign.Center,
                                             fontSize = 20.sp,
-                                            modifier = Modifier.fillMaxSize()
+                                            overflow = TextOverflow.Ellipsis,
+                                            maxLines = 3,
+                                            modifier = Modifier.fillMaxWidth() // Center text within the menu item
                                         )
                                     },
                                     onClick = {
                                         mSelectedText = label
                                         mExpanded = false
+                                        focusManager.clearFocus()
                                     }
                                 )
-                                //HorizontalDivider() // Make visible space in between the drop down items
+
+                                if (searchedIter.hasNext()) {
+                                    HorizontalDivider()
+                                }
                             }
                         }
+
                     }
 
+//                    Box {
+//
+//
+//                        ExposedDropdownMenu(
+//                            ,
+//                            // Set the width to match the text field exactly
+//                            modifier = Modifier.width(with(LocalDensity.current) { mTextFieldSize.width.toDp() }),
+//
+//                        ) {
+//
+//                        }
+//                    }
                 }
                 Spacer(modifier = Modifier.height(20.dp))
             }
@@ -608,101 +651,5 @@ fun PlantSettingsPage(
                 Spacer(modifier = Modifier.height(20.dp))
             }
         }
-
-        //LazyColumn(
-        //    contentPadding = padding,
-        //    state = lazyListState,
-        //    modifier = Modifier
-        //        .fillMaxWidth()
-        //        .height(200.dp),
-        //    horizontalAlignment = Alignment.CenterHorizontally,
-        //) {
-        //    item {
-        //        Column (
-        //            horizontalAlignment = Alignment.CenterHorizontally,
-        //            verticalArrangement = Arrangement.Center
-        //        ) {
-        //            OutlinedTextField(
-        //                value = mSelectedText,
-        //                onValueChange = {
-        //                    mSelectedText = it
-//
-        //                    //searchPlants(mSelectedText, mAllPlants)
-        //                                }, // Auto complete options to more easily find the plant they want
-        //                enabled = true,
-        //                modifier = Modifier
-        //                    .fillMaxWidth(0.75f)
-        //                    .height(75.dp)
-        //                    //.align(Alignment.CenterHorizontally)
-        //                    .onGloballyPositioned { coordinates ->
-        //                        // This value is used to assign to
-        //                        // the DropDown the same width
-        //                        mTextFieldSize = coordinates.size.toSize()
-        //                    },
-        //                keyboardActions = KeyboardActions(
-        //                    onDone = {
-        //                        mSearchedPlants = searchPlants(mSelectedText, mAllPlants)
-//
-        //                        mExpanded = true
-//
-        //                        focusManager.clearFocus()
-        //                    }
-        //                ),
-        //                keyboardOptions = KeyboardOptions(
-        //                    imeAction = ImeAction.Done
-        //                ),
-        //                label = {
-        //                    Text(
-        //                        text = "Plant Presets",
-        //                        color = MaterialTheme.colorScheme.secondary,
-        //                        textAlign = TextAlign.Center,
-        //                        fontSize = 20.sp
-        //                    )
-        //                },
-        //                singleLine = true,
-        //                shape = MaterialTheme.shapes.small,
-        //                colors = TextFieldDefaults.colors(
-        //                    focusedContainerColor = MaterialTheme.colorScheme.background,
-        //                    unfocusedContainerColor = MaterialTheme.colorScheme.primary,
-        //                    disabledContainerColor = MaterialTheme.colorScheme.background,
-        //                    unfocusedTextColor = Color(255, 255, 255, 255)
-        //                ),
-        //                trailingIcon = {
-        //                    Icon(
-        //                        icon,
-        //                        "Drop-Down Arrow",
-        //                        Modifier.clickable { mExpanded = !mExpanded }
-        //                    )
-        //                }
-        //            )
-//
-        //            DropdownMenu(
-        //                expanded = mExpanded,
-        //                onDismissRequest = { mExpanded = false },
-        //                modifier = Modifier
-        //                    .width(with(LocalDensity.current) {
-        //                        mTextFieldSize.width.toDp()
-        //                    }),
-        //                containerColor = MaterialTheme.colorScheme.primary,
-        //                border = BorderStroke(1.dp, Color.Black)
-        //            ) {
-        //                mSearchedPlants.forEach { label ->
-        //                    DropdownMenuItem(
-        //                        text = {
-        //                            Text(
-        //                                text = label,
-        //                                color = MaterialTheme.colorScheme.secondary
-        //                            )
-        //                        },
-        //                        onClick = {
-        //                            mSelectedText = label
-        //                            mExpanded = false
-        //                        }
-        //                    )
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
     }
 }
