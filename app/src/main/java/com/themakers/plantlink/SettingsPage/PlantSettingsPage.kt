@@ -26,8 +26,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -84,6 +82,7 @@ import com.themakers.plantlink.composables.BottomToolBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.UUID
+import kotlin.time.Duration.Companion.milliseconds
 
 class CharacterLimitVisualTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
@@ -184,18 +183,11 @@ fun PlantSettingsPage(
     )
 
     var mSearchedPlants by remember { mutableStateOf(mAllPlants) } // = mAllPlants
-    val searchedIter = mSearchedPlants.iterator()
 
     // Create a string value to store the selected city
     var mSelectedText by remember { mutableStateOf("") }
 
     var mTextFieldSize by remember { mutableStateOf(Size.Zero) }
-
-    // Up Icon when expanded and down icon when collapsed
-    val icon = if (mExpanded)
-        Icons.Filled.KeyboardArrowUp
-    else
-        Icons.Filled.KeyboardArrowDown
 
     Scaffold(
         //backgroundColor = MaterialTheme.colorScheme.background,
@@ -347,7 +339,7 @@ fun PlantSettingsPage(
                             modifier = Modifier
                                 //.fillMaxHeight(0.5f)
                         ) {
-                            searchedIter.forEach { label ->
+                            mSearchedPlants.forEachIndexed { index, label ->
                                 DropdownMenuItem(
                                     text = {
                                         Text(
@@ -367,12 +359,12 @@ fun PlantSettingsPage(
                                     }
                                 )
 
-                                if (searchedIter.hasNext()) {
+                                // Use the index to check if a divider is needed
+                                if (index < mSearchedPlants.size - 1) {
                                     HorizontalDivider()
                                 }
                             }
                         }
-
                     }
 
 //                    Box {
@@ -546,7 +538,7 @@ fun PlantSettingsPage(
 
                                             plantViewModel.currClickedPlant?.setMinMoist(minSoilMoisture.text)
 
-                                            delay(250) // Without this, it only updates one
+                                            delay(250.milliseconds) // Without this, it only updates one
 
                                             btViewModel.gatt!!.writeCharacteristic(service.getCharacteristic(
                                                 UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1")), maxSoilMoisture.text.toByteArray(), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
@@ -615,7 +607,7 @@ fun PlantSettingsPage(
 
                                             plantViewModel.currClickedPlant?.setMinMoist(minSoilMoisture.text)
 
-                                            delay(250) // Without this, it only updates one
+                                            delay(250.milliseconds) // Without this, it only updates one
 
                                             btViewModel.gatt!!.writeCharacteristic(service.getCharacteristic(
                                                 UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1")), maxSoilMoisture.text.toByteArray(), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
