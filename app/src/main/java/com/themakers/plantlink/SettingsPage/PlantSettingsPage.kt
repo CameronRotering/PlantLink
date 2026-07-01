@@ -256,7 +256,9 @@ fun PlantSettingsPage(
                     ExposedDropdownMenuBox(
                         expanded = mExpanded,
                         onExpandedChange = {
-                            mExpanded = !mExpanded
+                            if (mSearchedPlants.isNotEmpty()) {
+                                mExpanded = !mExpanded
+                            }
                         }
                     ) {
                         OutlinedTextField(

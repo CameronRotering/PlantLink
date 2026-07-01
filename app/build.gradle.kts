@@ -91,5 +91,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.navigation.compose)
 
+    implementation(libs.androidx.concurrent.futures) // Removes sync warning of "Failed to resolve: androidx.concurrent:concurrent-futures:1.0.0" (and 1.1.0 and 1.2.0)
+
     implementation(libs.material)
 }
