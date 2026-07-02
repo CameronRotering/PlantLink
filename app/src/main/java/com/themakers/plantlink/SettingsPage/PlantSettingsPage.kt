@@ -11,13 +11,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -182,7 +180,7 @@ fun PlantSettingsPage(
         "Tulip", "Umbrella Tree", "Venus Flytrap", "Yucca", "Zebra Plant"
     )
 
-    var mSearchedPlants by remember { mutableStateOf(mAllPlants) } // = mAllPlants
+    var mSearchedPlants by remember { mutableStateOf(mAllPlants.take(20)) } // = mAllPlants
 
     // Create a string value to store the selected city
     var mSelectedText by remember { mutableStateOf("") }
@@ -223,8 +221,7 @@ fun PlantSettingsPage(
                 }
             )
         },
-        bottomBar = { BottomToolBar(navController = navController) },
-        contentWindowInsets = WindowInsets.safeContent // Safe content so no content is hidden under system things like camera AND is interactive
+        bottomBar = { BottomToolBar(navController = navController) }
     ) { padding ->
         Column (
             verticalArrangement = Arrangement.Bottom,
@@ -266,7 +263,7 @@ fun PlantSettingsPage(
                             onValueChange = {
                                 mSelectedText = it
 
-                                mSearchedPlants = searchPlants(it, mAllPlants) // Moving here looks more responsive and can better (quicker) help someone find a plant name
+                                mSearchedPlants = searchPlants(it, mAllPlants).take(20) // Moving here looks more responsive and can better (quicker) help someone find a plant name
 
                                 mExpanded = mSearchedPlants.isNotEmpty()
                             },
@@ -338,8 +335,7 @@ fun PlantSettingsPage(
                             onDismissRequest = { mExpanded = false },
                             containerColor = MaterialTheme.colorScheme.primary,
                             border = BorderStroke(1.dp, Color.Black),
-                            modifier = Modifier
-                                //.fillMaxHeight(0.5f)
+                            modifier = Modifier.exposedDropdownSize()
                         ) {
                             mSearchedPlants.forEachIndexed { index, label ->
                                 DropdownMenuItem(
