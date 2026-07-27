@@ -1,6 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id("com.android.library") version "9.2.1" apply false
+    id("com.android.library") version "9.3.1" apply false
     id("com.google.devtools.ksp") version "2.3.6" apply false // Most recent version that works with this version of kotlin
 
     alias(libs.plugins.android.application) apply false
