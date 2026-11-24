@@ -77,6 +77,7 @@ import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavHostController
 import com.themakers.plantlink.Bluetooth.BluetoothViewModel
 import com.themakers.plantlink.R
+import com.themakers.plantlink.data.SettingsDropDownPlant
 import com.themakers.plantlink.composables.BottomToolBar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -95,26 +96,24 @@ class CharacterLimitVisualTransformation : VisualTransformation {
     }
 }
 
-fun getMatchingPlants(query: String, plantList: List<String>): MutableList<String> {
-    val searchedPlants: MutableList<String> = mutableListOf()
+fun getMatchingPlants(query: String, plantList: List<SettingsDropDownPlant>): MutableList<SettingsDropDownPlant> {
+    val searchedPlants: MutableList<SettingsDropDownPlant> = mutableListOf()
 
     plantList.forEach {
-        if (it.contains(query, true)) {
+        if (it.name.contains(query, true)) {
             searchedPlants.add(it)
         }
     }
 
-    //val doesMatch = plantList.contains(query)
-
     Log.d("SearchPlants", "Found plants: $searchedPlants")
 
-    return searchedPlants // If not found in above loop
+    return searchedPlants
 }
 
 fun searchPlants(
     text: String,
-    allPlants: List<String>
-): MutableList<String> {
+    allPlants: List<SettingsDropDownPlant>
+): MutableList<SettingsDropDownPlant> {
     if (text.isBlank() || text == "Plant Presets") {
         Log.d("SearchPlants", "First return.")
         return allPlants.toMutableList()
@@ -197,28 +196,7 @@ fun PlantSettingsPage(
     var mExpanded by remember { mutableStateOf(false) }
 
     // List of plants for preset
-    val mAllPlants = listOf(
-        "African Violet", "Aloe Vera", "Amaryllis", "Anthurium", "Areca Palm",
-        "Asparagus Fern", "Aster", "Azalea", "Baby's Tears", "Bamboo Palm",
-        "Basil", "Begonia", "Bird of Paradise", "Bleeding Heart", "Boston Fern",
-        "Bougainvillea", "Bromeliad", "Butterfly Bush", "Cactus", "Caladium",
-        "Calathea", "Calla Lily", "Camellia", "Cast Iron Plant", "Catnip",
-        "Chinese Evergreen", "Chinese Money Plant", "Christmas Cactus", "Chrysanthemum", "Coleus",
-        "Columbine", "Corn Plant", "Croton", "Cyclamen", "Daffodil",
-        "Dahlia", "Daisy", "Dieffenbachia", "Dragon Tree", "Dumb Cane",
-        "Elephant Ear", "English Ivy", "Eucalyptus", "Fiddle Leaf Fig", "Flamingo Flower",
-        "Gardenia", "Geranium", "Gerbera Daisy", "Gloxinia", "Golden Pothos",
-        "Hibiscus", "Hosta", "Hyacinth", "Hydrangea", "Impatiens",
-        "Jade Plant", "Jasmine", "Kalanchoe", "Lavender", "Lemon Balm",
-        "Lily of the Valley", "Lucky Bamboo", "Maidenhair Fern", "Marigold", "Money Tree",
-        "Monstera Deliciosa", "Morning Glory", "Mother in Law's Tongue", "Nerve Plant", "Orchid",
-        "Oxalis", "Painted Leaf Begonia", "Pansy", "Parlor Palm", "Peace Lily",
-        "Peony", "Peperomia", "Petunia", "Philodendron", "Pincushion Cactus",
-        "Polka Dot Plant", "Prayer Plant", "Rabbit's Foot Fern", "Rubber Plant", "Sago Palm",
-        "Schefflera", "Snake Plant", "Snapdragon", "Spider Plant", "Split Leaf Philodendron",
-        "String of Pearls", "String of Turtles", "Sunflower", "Swiss Cheese Plant", "Ti Plant",
-        "Tulip", "Umbrella Tree", "Venus Flytrap", "Yucca", "Zebra Plant"
-    )
+    val mAllPlants = providedPlants
 
     var mSearchedPlants by remember { mutableStateOf(mAllPlants.take(20)) } // = mAllPlants
 
@@ -405,11 +383,11 @@ fun PlantSettingsPage(
                             border = BorderStroke(1.dp, Color.Black),
                             modifier = Modifier.exposedDropdownSize()
                         ) {
-                            mSearchedPlants.forEachIndexed { index, label ->
+                            mSearchedPlants.forEachIndexed { index, plant ->
                                 DropdownMenuItem(
                                     text = {
                                         Text(
-                                            text = label,
+                                            text = plant.name,
                                             color = MaterialTheme.colorScheme.secondary,
                                             textAlign = TextAlign.Center,
                                             fontSize = 20.sp,
@@ -419,7 +397,10 @@ fun PlantSettingsPage(
                                         )
                                     },
                                     onClick = {
-                                        mSelectedText = label
+                                        mSelectedText = plant.name
+                                        plantName = TextFieldValue(plant.name)
+                                        minSoilMoisture = TextFieldValue(plant.minMoisture.toString())
+                                        maxSoilMoisture = TextFieldValue(plant.maxMoisture.toString())
                                         mExpanded = false
                                         focusManager.clearFocus()
                                     }
