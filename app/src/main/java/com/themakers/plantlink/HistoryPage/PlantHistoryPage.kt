@@ -125,7 +125,14 @@ fun PlantHistoryPage(
                 }
             )
         },
-        bottomBar = { BottomToolBar(navController = navController) },
+        bottomBar = {
+            BottomToolBar(
+                navController = navController,
+                {
+                    plantViewModel.currClickedPlant = null
+                }
+            )
+        },
         contentWindowInsets = WindowInsets.safeContent // Safe content so no content is hidden under system things like camera AND is interactive
     ) { padding ->
         LazyColumn(

@@ -17,7 +17,8 @@ import androidx.navigation.NavHostController
 
 @Composable
 fun BottomToolBar(
-    navController: NavHostController
+    navController: NavHostController,
+    onNavigationButtonClick: (() -> Unit)? = null
 ) {
     val currentDestination = navController.currentDestination?.route
 
@@ -34,7 +35,8 @@ fun BottomToolBar(
             ),
             selected = currentDestination == "Home",
             onClick = {
-               if (currentDestination != "Home") {
+                onNavigationButtonClick?.invoke()
+                if (currentDestination != "Home") {
                     navController.navigate("Home")
                 }
             },
@@ -61,6 +63,7 @@ fun BottomToolBar(
             ),
             selected = currentDestination == "Settings",
             onClick = {
+                onNavigationButtonClick?.invoke()
                 if (currentDestination != "Settings") {
                     navController.navigate("Settings")
                 }

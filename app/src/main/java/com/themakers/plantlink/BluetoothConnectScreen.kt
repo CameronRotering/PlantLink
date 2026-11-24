@@ -385,19 +385,24 @@ fun BluetoothDeviceList(
         ) {
 //            if(pairedDevices.none{ device -> (device.name != null && device.name.take(9).lowercase() == "plantlink")}
 //                && scannedDevices.none{ device -> (device.name != null && device.name.take(9).lowercase() == "plantlink") }) {
+            val hasPlantLink = pairedDevices.any { it.name?.startsWith("plantlink", ignoreCase = true) == true } ||
+                    scannedDevices.any { it.name?.startsWith("plantlink", ignoreCase = true) == true }
+
                 item {
                     Spacer(modifier = Modifier.padding(top = 10.dp))
 
-                    Text(
-                        text = "No PlantLink devices found.",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    if (!hasPlantLink) {
+                        Text(
+                            text = "No PlantLink devices found.",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
 //            }
 
             items(pairedDevices) { device ->
-                if (device.name != null && device.name.take(9).lowercase() == "plantlink") {
+                if (device.name != null && device.name.startsWith("plantlink", ignoreCase = true)) {
                     BluetoothDeviceCard(
                         device = device,
                         onClick = onClick,

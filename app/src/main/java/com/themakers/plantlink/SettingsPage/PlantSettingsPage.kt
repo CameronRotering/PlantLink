@@ -2,6 +2,7 @@ package com.themakers.plantlink.SettingsPage
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattService
 import android.content.Context
 import android.os.Build
 import android.util.Log
@@ -29,7 +30,6 @@ import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenu
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -126,7 +126,46 @@ fun searchPlants(
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @SuppressLint("MissingPermission")
-@OptIn(ExperimentalMaterial3Api::class)
+suspend fun updateAllPlantLinkSettings(
+    btViewModel: BluetoothViewModel,
+    service: BluetoothGattService?,
+    plantViewModel: CurrClickedPlantViewModel,
+    plantName: TextFieldValue,
+    minSoilMoisture: TextFieldValue,
+    maxSoilMoisture: TextFieldValue,
+) {
+    btViewModel.gatt?.let { gatt ->
+        service?.let { srv ->
+            gatt.writeCharacteristic(
+                srv.getCharacteristic(UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36")),
+                plantName.text.toByteArray(),
+                BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+            )
+            plantViewModel.currClickedPlant?.setName(plantName.text)
+
+            delay(250.milliseconds)
+
+            gatt.writeCharacteristic(
+                srv.getCharacteristic(UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9")),
+                minSoilMoisture.text.toByteArray(),
+                BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+            )
+            plantViewModel.currClickedPlant?.setMinMoist(minSoilMoisture.text)
+
+            delay(250.milliseconds) // Without this, it only updates one
+
+            gatt.writeCharacteristic(
+                srv.getCharacteristic(UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1")),
+                maxSoilMoisture.text.toByteArray(),
+                BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+            )
+            plantViewModel.currClickedPlant?.setMaxMoist(maxSoilMoisture.text)
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@SuppressLint("MissingPermission")
 @Composable
 fun PlantSettingsPage(
     destinationName: String,
@@ -205,11 +244,23 @@ fun PlantSettingsPage(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
+
+                        scope.launch {
+                            updateAllPlantLinkSettings(
+                                btViewModel,
+                                service,
+                                plantViewModel,
+                                plantName,
+                                minSoilMoisture,
+                                maxSoilMoisture
+                            )
+                        }
+
                         if (navController.currentDestination!!.route == destinationName) {
                             navController.navigateUp()
                         }
 
-                        plantViewModel.currClickedPlant = null
+                        //plantViewModel.currClickedPlant = null
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -222,7 +273,23 @@ fun PlantSettingsPage(
                 }
             )
         },
-        bottomBar = { BottomToolBar(navController = navController) }
+        bottomBar = {
+            BottomToolBar(
+                navController = navController,
+                {
+                    scope.launch {
+                        updateAllPlantLinkSettings(
+                            btViewModel,
+                            service,
+                            plantViewModel,
+                            plantName,
+                            minSoilMoisture,
+                            maxSoilMoisture
+                        )
+                    }
+                }
+            )
+        }
     ) { padding ->
         Column (
             verticalArrangement = Arrangement.Bottom,
@@ -440,11 +507,16 @@ fun PlantSettingsPage(
                                     .focusRequester(focusRequester),
                                 keyboardActions = KeyboardActions(
                                     onDone = {
-                                        btViewModel.gatt!!.writeCharacteristic(service!!.getCharacteristic(
-                                            UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36")), plantName.text.toByteArray(), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
-
-
-                                        plantViewModel.currClickedPlant?.setName(plantName.text)
+                                        scope.launch {
+                                            updateAllPlantLinkSettings(
+                                                btViewModel,
+                                                service,
+                                                plantViewModel,
+                                                plantName,
+                                                minSoilMoisture,
+                                                maxSoilMoisture
+                                            )
+                                        }
 
                                         focusManager.clearFocus() // Hide keyboard
                                     }
@@ -531,19 +603,14 @@ fun PlantSettingsPage(
                                 keyboardActions = KeyboardActions(
                                     onDone = {
                                         scope.launch {
-                                            btViewModel.gatt!!.writeCharacteristic(service!!.getCharacteristic(
-                                                UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9")), minSoilMoisture.text.toByteArray(), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
-
-
-                                            plantViewModel.currClickedPlant?.setMinMoist(minSoilMoisture.text)
-
-                                            delay(250.milliseconds) // Without this, it only updates one
-
-                                            btViewModel.gatt!!.writeCharacteristic(service.getCharacteristic(
-                                                UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1")), maxSoilMoisture.text.toByteArray(), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
-
-
-                                            plantViewModel.currClickedPlant?.setMaxMoist(maxSoilMoisture.text)
+                                            updateAllPlantLinkSettings(
+                                                btViewModel,
+                                                service,
+                                                plantViewModel,
+                                                plantName,
+                                                minSoilMoisture,
+                                                maxSoilMoisture
+                                            )
                                         }
 
                                         focusManager.clearFocus()
@@ -600,19 +667,14 @@ fun PlantSettingsPage(
                                 keyboardActions = KeyboardActions(
                                     onDone = {
                                         scope.launch {
-                                            btViewModel.gatt!!.writeCharacteristic(service!!.getCharacteristic(
-                                                UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9")), minSoilMoisture.text.toByteArray(), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
-
-
-                                            plantViewModel.currClickedPlant?.setMinMoist(minSoilMoisture.text)
-
-                                            delay(250.milliseconds) // Without this, it only updates one
-
-                                            btViewModel.gatt!!.writeCharacteristic(service.getCharacteristic(
-                                                UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1")), maxSoilMoisture.text.toByteArray(), BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
-
-
-                                            plantViewModel.currClickedPlant?.setMaxMoist(maxSoilMoisture.text)
+                                            updateAllPlantLinkSettings(
+                                                btViewModel,
+                                                service,
+                                                plantViewModel,
+                                                plantName,
+                                                minSoilMoisture,
+                                                maxSoilMoisture
+                                            )
                                         }
 
                                         focusManager.clearFocus()
