@@ -89,26 +89,26 @@ class BluetoothViewModel(
     fun setCharacteristicNotification() {
         viewModelScope.launch {
             gatt?.services?.forEach { service ->
-                if (service.uuid == UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40")) {
+                if (service.uuid == UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40")) { // Hubs Service UUID
                     service.characteristics.forEach { characteristic ->
                         enableNotification(characteristic)
                         delay(100.milliseconds) // Small delay between GATT operations
                     }
 
-                } else if (service.uuid != UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40") && service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) { // General characteristics I don't change
+                } else if (service.uuid != UUID.fromString("eb9782b0-44a6-4799-873d-1e7580893e40") && service.uuid != UUID.fromString("00001800-0000-1000-8000-00805f9b34fb") && service.uuid != UUID.fromString("00001801-0000-1000-8000-00805f9b34fb")) { // General characteristics I don't change, so ignore
                     service.characteristics.forEach { characteristic ->
                         enableNotification(characteristic)
                         delay(100.milliseconds)
 
-                        service.getCharacteristic(UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36"))?.let {
+                        service.getCharacteristic(UUID.fromString("b761e2e9-fac9-439c-a321-123d7f404e36"))?.let { // Name
                             gatt?.readCharacteristic(it)
                             delay(100.milliseconds)
                         }
-                        service.getCharacteristic(UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9"))?.let {
+                        service.getCharacteristic(UUID.fromString("39aec0bb-21c9-4519-8e32-e25c7523fde9"))?.let { // Min Moist
                             gatt?.readCharacteristic(it)
                             delay(100.milliseconds)
                         }
-                        service.getCharacteristic(UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1"))?.let {
+                        service.getCharacteristic(UUID.fromString("437fcdb7-74c7-4968-a669-384aa06f20c1"))?.let { // Max Moist
                             gatt?.readCharacteristic(it)
                             delay(100.milliseconds)
                         }
